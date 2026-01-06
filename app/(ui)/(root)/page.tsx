@@ -6,6 +6,8 @@ import PopularCityCards from "@/components/aqi-ui/popular-city-aqi-table";
 
 
 export default function Home() {
+  
+  
   return (
     <>
       <AQIDashboard />

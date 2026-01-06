@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
@@ -15,6 +15,9 @@ import {
 import { AQIMap } from "./aqi-map"
 import { AQIScale } from "./aqi-scale"
 import { getAQITheme } from "@/helpers/aqi-color-pallet"
+import { detectGpsLocation, detectIpLocation } from "@/store/location.actions"
+import { useLocationStore } from "@/store/location.store"
+import { Skeleton } from "../ui/skeleton"
 
 interface AQIData {
   value: number
@@ -32,9 +35,16 @@ interface AQIData {
   }
 }
 
-/* ---------------- COMPONENT ---------------- */
-
 export function AQIDashboard() {
+  const {
+    city,
+    state,
+    country,
+    loading,
+    lastUpdated,
+    error
+  } = useLocationStore();
+
   const [aqiData] = useState<AQIData>({
     value: 10,
     status: "Severe",
@@ -51,7 +61,12 @@ export function AQIDashboard() {
     },
   })
 
+  useEffect(() => {
+    detectIpLocation();
+  }, [])
+
   const theme = getAQITheme(aqiData.value)
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -70,16 +85,38 @@ export function AQIDashboard() {
             <div className="flex flex-col sm:flex-row sm:justify-between gap-4 mb-8">
               <div>
                 <h1 className="text-3xl font-bold">Real-time AQI</h1>
-                <p className={`font-semibold ${theme.text}`}>
-                  {aqiData.location}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Last Updated: {aqiData.lastUpdated}
-                </p>
+                <section className={`font-semibold ${theme.text}`}>
+                  {loading ? (
+                    <Skeleton className="h-5 w-50 rounded-2xl" />
+                  ) : error ? (
+                    <span className="text-red-500">
+                      Unable to detect location
+                    </span>
+                  ) : city || state || country ? (
+                    `${city ?? ""}${city && state ? ", " : ""}${state ?? ""}${(city || state) && country ? ", " : ""
+                    }${country ?? ""}`
+                  ) : (
+                    <span />
+                  )}
+                </section>
+
+                <section className="text-sm text-muted-foreground">
+                  {loading ? (
+                    <Skeleton className="h-5 w-90 rounded-2xl" />
+                  ) : lastUpdated ? (
+                    `Last Updated: ${lastUpdated}`
+                  ) : (
+                    <span />
+                  )}
+                </section>
               </div>
 
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="gap-2">
+                <Button
+                  variant="outline"
+                  className="gap-2"
+                  onClick={detectGpsLocation}
+                >
                   <MapPin className="h-4 w-4" /> Locate me
                 </Button>
                 <Button variant="outline" size="icon">
