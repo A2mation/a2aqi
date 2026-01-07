@@ -1,8 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import {
   MapPin,
   Heart,
@@ -10,30 +8,19 @@ import {
   Cloud,
   Droplets,
   Wind,
-  Sun,
 } from "lucide-react"
-import { AQIMap } from "./aqi-map"
-import { AQIScale } from "./aqi-scale"
-import { getAQITheme } from "@/helpers/aqi-color-pallet"
+import dynamic from "next/dynamic"
+
+import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { AQITheme, getAQITheme } from "@/helpers/aqi-color-pallet"
 import { detectGpsLocation, detectIpLocation } from "@/store/location.actions"
 import { useLocationStore } from "@/store/location.store"
-import { Skeleton } from "../ui/skeleton"
+import { Skeleton } from "@/components/ui/skeleton"
+import { AQIScale } from "./aqi-scale"
+import { cn } from "@/lib/utils"
 
-interface AQIData {
-  value: number
-  status: "Good" | "Moderate" | "Poor" | "Unhealthy" | "Severe" | "Hazardous"
-  pm10: number
-  pm25: number
-  location: string
-  lastUpdated: string
-  weather: {
-    temp: number
-    condition: string
-    humidity: number
-    windSpeed: number
-    uvIndex: number
-  }
-}
+const AQIMap = dynamic(() => import("./aqi-map"), { ssr: false })
 
 export function AQIDashboard() {
   const {
@@ -42,31 +29,62 @@ export function AQIDashboard() {
     country,
     loading,
     lastUpdated,
-    error
-  } = useLocationStore();
+    temp,
+    humidity,
+    wind,
+    pm10,
+    pm25,
+    aqi,
+    error,
+  } = useLocationStore()
 
-  const [aqiData] = useState<AQIData>({
-    value: 10,
-    status: "Severe",
-    pm10: 181,
-    pm25: 134,
-    location: "Kolkata, West Bengal, India",
-    lastUpdated: "2026-01-05 12:30",
-    weather: {
-      temp: 16,
-      condition: "Mist",
-      humidity: 72,
-      windSpeed: 17,
-      uvIndex: 5,
-    },
+  const [theme, setTheme] = useState<AQITheme>({
+    label: "Unknown",
+    color: "#9CA3AF", 
+    borderClass: "border-gray-200 dark:border-gray-800",
+    bg: "from-white via-gray-50 to-gray-100 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900",
+    text: "text-gray-700 dark:text-gray-300",
+    card: "bg-white/80 dark:bg-neutral-900/60 backdrop-blur-md",
+
   })
 
+  /* -----------------------------------
+     Detect IP location on mount
+  ----------------------------------- */
   useEffect(() => {
-    detectIpLocation();
+    detectIpLocation()
   }, [])
 
-  const theme = getAQITheme(aqiData.value)
+  /* -----------------------------------
+     Update AQI theme
+  ----------------------------------- */
+  useEffect(() => {
+    if (typeof aqi === "number") {
+      setTheme(getAQITheme(aqi))
+    }
+  }, [aqi])
 
+  /* -----------------------------------
+     Global loading state
+  ----------------------------------- */
+  if (loading && !lastUpdated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Skeleton className="h-10 w-80 rounded-2xl" />
+      </div>
+    )
+  }
+
+  /* -----------------------------------
+     Global error state
+  ----------------------------------- */
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-500">
+        Failed to load air quality data.
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -77,48 +95,32 @@ export function AQIDashboard() {
 
       {/* Dashboard */}
       <div className="max-w-7xl mx-auto px-4 -mt-32 relative z-10 pb-12">
-        <Card
-          className={`overflow-hidden shadow-2xl bg-gradient-to-br ${theme.bg} `}
-        >
+        <Card className={`overflow-hidden shadow-2xl bg-gradient-to-br ${theme.bg}`}>
           <div className="p-6 sm:p-8 lg:p-10 backdrop-blur-sm">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:justify-between gap-4 mb-8">
               <div>
                 <h1 className="text-3xl font-bold">Real-time AQI</h1>
-                <section className={`font-semibold ${theme.text}`}>
-                  {loading ? (
-                    <Skeleton className="h-5 w-50 rounded-2xl" />
-                  ) : error ? (
-                    <span className="text-red-500">
-                      Unable to detect location
-                    </span>
-                  ) : city || state || country ? (
-                    `${city ?? ""}${city && state ? ", " : ""}${state ?? ""}${(city || state) && country ? ", " : ""
-                    }${country ?? ""}`
-                  ) : (
-                    <span />
-                  )}
-                </section>
 
-                <section className="text-sm text-muted-foreground">
-                  {loading ? (
-                    <Skeleton className="h-5 w-90 rounded-2xl" />
-                  ) : lastUpdated ? (
-                    `Last Updated: ${lastUpdated}`
+                <div className={`font-semibold ${theme.text}`}>
+                  {city || state || country ? (
+                    `${city ?? ""}${city && state ? ", " : ""}${state ?? ""}${(city || state) && country ? ", " : ""}${country ?? ""}`
                   ) : (
-                    <span />
+                    <span className="text-muted-foreground">
+                      Location unavailable
+                    </span>
                   )}
-                </section>
+                </div>
+
+                <div className="text-sm text-muted-foreground">
+                  {lastUpdated ? `Last updated: ${lastUpdated}` : ""}
+                </div>
               </div>
 
               <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  className="gap-2"
-                  onClick={detectGpsLocation}
-                >
+                {/* <Button variant="outline" className="gap-2" onClick={detectGpsLocation}>
                   <MapPin className="h-4 w-4" /> Locate me
-                </Button>
+                </Button> */}
                 <Button variant="outline" size="icon">
                   <Heart className="h-4 w-4" />
                 </Button>
@@ -130,36 +132,37 @@ export function AQIDashboard() {
 
             {/* Main Grid */}
             <div className="grid lg:grid-cols-3 gap-8">
-              {/* AQI */}
+              {/* AQI Section */}
               <div className="lg:col-span-2 space-y-6">
                 <div className="flex items-start gap-8">
                   <div>
-                    <div className={`flex items-center gap-2 ${aqiData.value > 200 ? " ring-red-500 animate-pulse" : ""
-                      }`}>
+                    <div className={cn(
+                      `flex items-center gap-2 `,
+                      aqi && (aqi > 200 ? " ring-red-500 animate-pulse" : "")
+                    )}>
                       <span className="relative flex size-3">
                         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
                         <span className="relative inline-flex size-3 rounded-full bg-red-600"></span>
                       </span>
-                      <span className="text-sm text-red-600">
-                        Live AQI
-                      </span>
+                      <span className="text-sm">Live AQI</span>
                     </div>
+
                     <p
                       style={{ color: theme.color }}
-                      className={`text-8xl font-bold bg-clip-text text-transparent]`}
+                      className="text-6xl md:text-8xl font-bold"
                     >
-                      {aqiData.value}
+                      {typeof aqi === "number" ? aqi : "--"}
                     </p>
                   </div>
 
-                  <div
-                    className={`px-8 py-3  rounded-2xl flex flex-col items-center justify-center text-white `}
-                  >
-                    <p className=" text-black opacity-80 mb-2">Air Quality</p>
+                  <div className="px-8 py-3 rounded-2xl flex flex-col items-center">
+                    <p className="text-sm opacity-70">Air Quality</p>
                     <p
                       style={{ color: theme.color }}
-                      className={`text-3xl px-4 py-2 rounded font-bold `}
-                    >{aqiData.status}</p>
+                      className="text-lg md:text-3xl font-bold"
+                    >
+                      {theme.label}
+                    </p>
                   </div>
                 </div>
 
@@ -167,27 +170,31 @@ export function AQIDashboard() {
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className={`${theme.card} rounded-xl p-5`}>
                     <p className="text-sm">PM10</p>
-                    <p className="text-2xl font-bold">{aqiData.pm10} µg/m³</p>
+                    <p className="text-2xl font-bold">
+                      {typeof pm10 === "number" ? `${pm10} µg/m³` : "--"}
+                    </p>
                   </div>
 
                   <div className={`${theme.card} rounded-xl p-5`}>
                     <p className="text-sm">PM2.5</p>
-                    <p className="text-2xl font-bold">{aqiData.pm25} µg/m³</p>
+                    <p className="text-2xl font-bold">
+                      {typeof pm25 === "number" ? `${pm25} µg/m³` : "--"}
+                    </p>
                   </div>
                 </div>
 
-                <AQIScale currentValue={aqiData.value} />
+                {typeof aqi === "number" && <AQIScale currentValue={aqi} />}
               </div>
 
               {/* Weather */}
-              <div className={`${theme.card} rounded-2xl p-6 space-y-6 w-75 md:w-full`}>
+              <div className={`${theme.card} rounded-2xl p-6 space-y-6`}>
                 <div className="flex items-center gap-4">
                   <Cloud className="h-10 w-10" />
                   <div>
                     <p className="text-4xl font-bold">
-                      {aqiData.weather.temp}°C
+                      {typeof temp === "number" ? `${temp}°C` : "--"}
                     </p>
-                    <p>{aqiData.weather.condition}</p>
+                    <p className="text-sm opacity-70">Weather</p>
                   </div>
                 </div>
 
@@ -196,21 +203,18 @@ export function AQIDashboard() {
                     <span className="flex gap-2">
                       <Droplets className="h-4 w-4" /> Humidity
                     </span>
-                    <span>{aqiData.weather.humidity}%</span>
+                    <span>
+                      {typeof humidity === "number" ? `${Math.round(humidity)}%` : "--"}
+                    </span>
                   </div>
 
                   <div className="flex justify-between">
                     <span className="flex gap-2">
                       <Wind className="h-4 w-4" /> Wind
                     </span>
-                    <span>{aqiData.weather.windSpeed} km/h</span>
-                  </div>
-
-                  <div className="flex justify-between">
-                    <span className="flex gap-2">
-                      <Sun className="h-4 w-4" /> UV Index
+                    <span>
+                      {typeof wind === "number" ? `${wind} km/h` : "--"}
                     </span>
-                    <span>{aqiData.weather.uvIndex}</span>
                   </div>
                 </div>
               </div>

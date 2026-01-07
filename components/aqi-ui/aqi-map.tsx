@@ -1,91 +1,165 @@
-"use client"
+"use client";
 
-import { Maximize2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
-const markers = [
-  { id: 1, lat: 22.5726, lng: 88.3639, value: 211, x: "45%", y: "42%" },
-  { id: 2, lat: 22.6, lng: 88.4, value: 199, x: "52%", y: "48%" },
-  { id: 3, lat: 22.55, lng: 88.42, value: 205, x: "48%", y: "32%" },
-  { id: 4, lat: 22.62, lng: 88.38, value: 198, x: "58%", y: "35%" },
-  { id: 5, lat: 22.58, lng: 88.36, value: 203, x: "42%", y: "52%" },
-  { id: 6, lat: 22.54, lng: 88.45, value: 202, x: "65%", y: "28%" },
-  { id: 7, lat: 22.59, lng: 88.41, value: 203, x: "72%", y: "18%" },
-]
+import { http } from "@/lib/http";
+import { useLocationStore } from "@/store/location.store";
+import { getAQIBgColor } from "@/helpers/aqi-color-pallet";
+import dynamic from "next/dynamic";
 
-export function AQIMap() {
+const MapContainer = dynamic(
+  () => import("react-leaflet").then((m) => m.MapContainer),
+  { ssr: false }
+)
+
+const TileLayer = dynamic(
+  () => import("react-leaflet").then((m) => m.TileLayer),
+  { ssr: false }
+)
+
+const Marker = dynamic(
+  () => import("react-leaflet").then((m) => m.Marker),
+  { ssr: false }
+)
+
+const Tooltip = dynamic(
+  () => import("react-leaflet").then((m) => m.Tooltip),
+  { ssr: false }
+)
+
+type AQIMarker = {
+  id: string;
+  name: string;
+  lat: number;
+  lng: number;
+  aqi: number;
+};
+
+delete (L.Icon.Default.prototype as any)._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  iconUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  shadowUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+})
+
+const aqiIcon = (value: number) =>
+  L.divIcon({
+    className: "bg-transparent",
+    html: `
+      <div class="relative flex items-center justify-center">
+        <span class="absolute inline-flex h-10 w-10 rounded-full ${getAQIBgColor(
+      value
+    )} opacity-60 animate-ping"></span>
+        <span class="relative inline-flex items-center justify-center px-2 py-2 rounded-full ${getAQIBgColor(
+      value
+    )} text-white text-sm font-bold shadow-md">
+          ${value}
+        </span>
+      </div>
+    `,
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
+  });
+
+export default function AQIMap() {
+  const [markers, setMarkers] = useState<AQIMarker[]>([]);
+  const [loading, setLoading] = useState(true);
+  const {
+    lat,
+    lng,
+  } = useLocationStore();
+  const [mounted, setMounted] = useState(false)
 
 
-  const getMarkerColor = (value: number) => {
-    if (value <= 50) return "bg-green-500"
-    if (value <= 100) return "bg-yellow-500"
-    if (value <= 150) return "bg-orange-500"
-    if (value <= 200) return "bg-red-500"
-    if (value <= 300) return "bg-purple-500"
-    return "bg-purple-800"
+
+
+  useEffect(() => {
+    async function fetchAQIData() {
+      if (lat == null || lng == null) return;
+      try {
+        const res = await http.get(
+          `/api/location/nearby-cities?lat=${lat}&lon=${lng}`
+        );
+        const data = res.data;
+
+        const normalized: AQIMarker[] = data.map((city: any) => ({
+          id: city.name,
+          name: city.name,
+          lat: city.lat,
+          lng: city.lon,
+          aqi: city.aqi?.data.aqi ?? 0,
+        }));
+
+        setMarkers(normalized);
+      } catch (err) {
+        console.error("Failed to load AQI data", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchAQIData();
+  }, [lat, lng]);
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        Loading AQI map...
+      </div>
+    );
   }
 
+  if (!mounted) return null
 
 
   return (
-    <div className="relative w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900">
-      {/* Mock Map Background */}
-      <div
-        className="absolute inset-0 opacity-30"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%239C92AC' fillOpacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-        }}
-      />
+    <div className="relative w-full h-full rounded-2xl overflow-hidden bg-white shadow">
+      {
+        lat != null && lng != null && (
+          <MapContainer
+            center={[lat, lng]}
+            zoom={13}
+            scrollWheelZoom={false}
+            className="h-full w-full z-0"
+          >
+            <TileLayer
+              attribution="&copy; OpenStreetMap contributors"
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
 
-      {/* Map Interface Elements */}
-      <div className="absolute top-4 left-4 flex gap-2 z-10">
-        <Button variant="secondary" size="sm" className="bg-white shadow-lg">
-          🗺️ AQI Map
-        </Button>
-        <Button variant="ghost" size="sm" className="bg-white/80 shadow">
-          ☀️ Weather
-        </Button>
-      </div>
+            {markers.map((station) => (
+              <Marker
+                key={station.id}
+                position={[station.lat, station.lng]}
+                icon={aqiIcon(station.aqi)}
+              >
+                <Tooltip
+                  direction="top"
+                  offset={[0, -10]}
+                  opacity={1}
+                  sticky
+                >
+                  <div className="text-sm">
+                    <strong>{station.name}</strong>
+                    <br />
+                    AQI: <b>{station.aqi}</b>
+                  </div>
+                </Tooltip>
+              </Marker>
+            ))}
+          </MapContainer>
 
-      <div className="absolute top-4 right-4 z-10">
-        <Button variant="secondary" size="sm" className="bg-white shadow-lg gap-2">
-          AQI Map
-          <Maximize2 className="h-3 w-3" />
-        </Button>
-      </div>
-
-      {/* AQI Markers */}
-      {markers.map((marker) => (
-        <div
-          key={marker.id}
-          className="absolute transform -translate-x-1/2 -translate-y-1/2 animate-in fade-in zoom-in duration-500"
-          style={{ left: marker.x, top: marker.y }}
-        >
-          <div className="relative group cursor-pointer">
-            <div
-              className={`${getMarkerColor(marker.value)} rounded-full px-4 py-2 shadow-lg font-bold text-white text-sm hover:scale-110 transition-transform`}
-            >
-              {marker.value}
-            </div>
-            <div className="absolute inset-0 rounded-full bg-current opacity-30 animate-ping" />
-          </div>
-        </div>
-      ))}
-
-      {/* Map Attribution */}
-      <div className="absolute bottom-2 right-2 text-xs text-muted-foreground bg-white/80 px-2 py-1 rounded">
-        Map Data © OpenStreetMap
-      </div>
+        )
+      }
     </div>
-  )
-}
-
-
-const MapLoading = () => {
-  return <div
-    className="absolute inset-0 opacity-30"
-    style={{
-      backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%239C92AC' fillOpacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-    }}
-  />
+  );
 }

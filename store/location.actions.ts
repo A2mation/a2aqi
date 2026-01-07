@@ -21,6 +21,8 @@ export const detectIpLocation = async () => {
             const lat = data.lat || data.latitude
             const lng = data.lng || data.longitude
 
+            const {} = await http.get(url)
+
             if (lat && lng) {
                 setState({
                     lat,
@@ -28,7 +30,15 @@ export const detectIpLocation = async () => {
                     city: data.city,
                     state: data.state,
                     country: data.country,
-                    source: "ip",
+                    pm10: data.pm10,
+                    pm25: data.pm25,
+                    aqi: data.aqi,
+                    no2: data.no2,
+                    o3: data.o3,
+                    temp: data.temp,
+                    humidity: data.humidity,
+                    wind: data.wind,
+                    source: data.source || "ip",
                     loading: false,
                     lastUpdated: new Date(),
                 })
