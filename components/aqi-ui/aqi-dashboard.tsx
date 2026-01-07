@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import {
-  MapPin,
   Heart,
   Share2,
   Cloud,
@@ -14,7 +13,7 @@ import dynamic from "next/dynamic"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { AQITheme, getAQITheme } from "@/helpers/aqi-color-pallet"
-import { detectGpsLocation, detectIpLocation } from "@/store/location.actions"
+import { detectIpLocation } from "@/store/location.actions"
 import { useLocationStore } from "@/store/location.store"
 import { Skeleton } from "@/components/ui/skeleton"
 import { AQIScale } from "./aqi-scale"
@@ -48,25 +47,18 @@ export function AQIDashboard() {
 
   })
 
-  /* -----------------------------------
-     Detect IP location on mount
-  ----------------------------------- */
+
   useEffect(() => {
     detectIpLocation()
   }, [])
 
-  /* -----------------------------------
-     Update AQI theme
-  ----------------------------------- */
+
   useEffect(() => {
     if (typeof aqi === "number") {
       setTheme(getAQITheme(aqi))
     }
   }, [aqi])
 
-  /* -----------------------------------
-     Global loading state
-  ----------------------------------- */
   if (loading && !lastUpdated) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -75,9 +67,6 @@ export function AQIDashboard() {
     )
   }
 
-  /* -----------------------------------
-     Global error state
-  ----------------------------------- */
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center text-red-500">

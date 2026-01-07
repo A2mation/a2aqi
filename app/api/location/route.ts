@@ -1,6 +1,9 @@
 import axios from "axios"
-import { redis } from "@/lib/redis"
 import { NextRequest, NextResponse } from "next/server"
+
+import { redis } from "@/lib/redis"
+import { rateLimit } from "@/helpers/rateLimiter"
+import { getLocationCacheKey } from "@/helpers/cashKeys"
 import { fetchAqiByCoordinates } from "@/services/air-quality/fetchAqiByCoordinates"
 
 let geoip: any = null
@@ -24,18 +27,6 @@ const http = axios.create({
 
 const CACHE_TTL = 60 * 60 // 1 hour
 
-/* -----------------------------------
-   Simple rate limiter (per IP)
------------------------------------ */
-const rateMap = new Map<string, number>()
-
-function rateLimit(ip: string): boolean {
-    const count = rateMap.get(ip) ?? 0
-    if (count > 30) return false // 30 req/min
-    rateMap.set(ip, count + 1)
-    setTimeout(() => rateMap.delete(ip), 60_000)
-    return true
-}
 
 /* -----------------------------------
    IP helpers
@@ -69,12 +60,7 @@ function getClientIp(req: NextRequest): string {
     return ip
 }
 
-/* -----------------------------------
-   Redis key helper (lat/lng based)
------------------------------------ */
-function getLocationCacheKey(lat: number, lng: number) {
-    return `location:${lat.toFixed(4)},${lng.toFixed(4)}`
-}
+
 
 /* -----------------------------------
    IP location providers

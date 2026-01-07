@@ -86,6 +86,7 @@ export default function AQIMap() {
           `/api/location/nearby-cities?lat=${lat}&lon=${lng}`
         );
         const data = res.data;
+        console.log("Nearby cities AQI data:", res);
 
         const normalized: AQIMarker[] = data.map((city: any) => ({
           id: city.name,
