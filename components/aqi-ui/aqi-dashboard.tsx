@@ -206,7 +206,7 @@ export function AQIDashboard() {
                       <Wind className="h-4 w-4" /> Wind
                     </span>
                     <span>
-                      {typeof wind === "number" ? `${wind} km/h` : "--"}
+                      {typeof wind === "number" ? `${parseFloat(wind.toString()).toFixed(2)} km/h` : "--"}
                     </span>
                   </div>
                 </div>

@@ -104,8 +104,8 @@ export async function GET(req: NextRequest) {
 
     /* Rate limit */
     if (!rateLimit(ip)) {
-        return NextResponse.json(
-            { error: "Too many requests" },
+        return new NextResponse(
+            "Too many requests",
             { status: 429 }
         )
     }

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/resizable-navbar";
 import { useState } from "react";
 import { navItems } from "./navItems";
+import Link from "next/link";
 
 export function NavbarMain() {
 
@@ -45,14 +46,14 @@ export function NavbarMain() {
             onClose={() => setIsMobileMenuOpen(false)}
           >
             {navItems.map((item, idx) => (
-              <a
+              <Link
                 key={`mobile-link-${idx}`}
                 href={item.link}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="relative text-neutral-600 dark:text-neutral-300"
               >
                 <span className="block">{item.name}</span>
-              </a>
+              </Link>
             ))}
             <div className="flex w-full flex-col gap-4">
               <NavbarButton

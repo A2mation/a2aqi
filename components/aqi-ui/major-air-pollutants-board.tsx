@@ -1,40 +1,70 @@
+'use client'
+
 import type React from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ChevronRight, CloudFog, Droplets, Wind, Zap } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { getAQIBorderClass } from "@/helpers/aqi-color-pallet"
+import { useLocationStore } from "@/store/location.store"
+import { Skeleton } from "../ui/skeleton"
+import { useEffect, useMemo } from "react"
+import { detectIpLocation } from "@/store/location.actions"
 
 interface Pollutant {
   name: string
   formula: string
-  value: number
+  value: number | null
   unit: string
   icon: React.ReactNode
   hasAlert?: boolean
 }
 
 export default function AirQualityDashboard() {
-  const pollutants: Pollutant[] = [
+  const {
+    pm10,
+    pm25,
+    so2,
+    o3,
+    co,
+    no2,
+    loading,
+    error
+  } = useLocationStore()
+
+  // useEffect(() => {
+  //   if (
+  //     (!pm10 ||
+  //     !pm25 ||
+  //     !so2 ||
+  //     !o3 ||
+  //     !co ||
+  //     !no2) && !loading
+  //   ) {
+  //     detectIpLocation();
+  //   }
+  // }, [])
+
+  const pollutants: Pollutant[] = useMemo(() => [
     {
       name: "Particulate Matter",
       formula: "(PM2.5)",
-      value: 134,
+      value: pm25 ?? null,
       unit: "µg/m³",
       icon: <CloudFog className="w-10 h-10 text-muted-foreground" />,
     },
     {
       name: "Particulate Matter",
       formula: "(PM10)",
-      value: 181,
+      value: pm10 ?? null,
       unit: "µg/m³",
       icon: <CloudFog className="w-10 h-10 text-muted-foreground" />,
-      hasAlert: true,
+      hasAlert: typeof pm10 === "number" && pm10 > 150,
     },
     {
       name: "Carbon Monoxide",
       formula: "(CO)",
-      value: 316,
+      value: co ?? null,
       unit: "ppb",
       icon: (
         <svg
@@ -52,33 +82,45 @@ export default function AirQualityDashboard() {
     {
       name: "Sulfur Dioxide",
       formula: "(SO2)",
-      value: 2,
+      value: so2 ?? null,
       unit: "ppb",
       icon: <Droplets className="w-10 h-10 text-muted-foreground" />,
     },
     {
       name: "Nitrogen Dioxide",
       formula: "(NO2)",
-      value: 8,
+      value: no2 ?? null,
       unit: "ppb",
       icon: <Wind className="w-10 h-10 text-muted-foreground" />,
     },
     {
       name: "Ozone",
       formula: "(O3)",
-      value: 7,
+      value: o3 ?? null,
       unit: "ppb",
       icon: <Zap className="w-10 h-10 text-muted-foreground" />,
     },
-  ]
+  ], [pm10, pm25, so2, o3, co, no2])
+
+
+  if (error) {
+    return (
+      <div className="min-h-full bg-background p-6 flex items-center justify-center">
+        <p className="text-red-500 text-lg font-medium">
+          Failed to load air quality data. Please try again.
+        </p>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-full bg-background p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="flex items-start justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-semibold text-foreground mb-1">Major Air Pollutants</h1>
+            <h1 className="text-3xl font-semibold text-foreground mb-1">
+              Major Air Pollutants
+            </h1>
             <p className="text-lg text-blue-600 font-medium">Kolkata</p>
           </div>
           <Button variant="outline" className="border-blue-500 text-blue-600 bg-transparent">
@@ -90,13 +132,13 @@ export default function AirQualityDashboard() {
           </Button>
         </div>
 
-        {/* Pollutant Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {pollutants.map((pollutant, index) => (
             <Card
               key={index}
-              className={cn("relative border-l-4 bg-card hover:shadow-md transition-shadow cursor-pointer",
-                getAQIBorderClass(pollutant.value)
+              className={cn(
+                "relative border-l-4 bg-card hover:shadow-md transition-shadow cursor-pointer",
+                pollutant.value !== null ? getAQIBorderClass(pollutant.value) : "border-gray-300"
               )}
             >
               {pollutant.hasAlert && (
@@ -108,14 +150,22 @@ export default function AirQualityDashboard() {
                 <div className="flex items-center gap-4">
                   <div className="flex-shrink-0">{pollutant.icon}</div>
                   <div>
-                    <div className="text-sm font-medium text-foreground mb-1">{pollutant.name}</div>
-                    <div className="text-sm text-muted-foreground">{pollutant.formula}</div>
+                    <div className="text-sm font-medium text-foreground mb-1">
+                      {pollutant.name}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {pollutant.formula}
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <div className="text-2xl font-bold text-foreground">{pollutant.value}</div>
-                    <div className="text-xs text-muted-foreground">{pollutant.unit}</div>
+                    <div className="text-2xl font-bold text-foreground">
+                      {pollutant.value ?? "--"}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {pollutant.unit}
+                    </div>
                   </div>
                   <ChevronRight className="w-5 h-5 text-muted-foreground flex-shrink-0" />
                 </div>
