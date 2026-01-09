@@ -6,9 +6,14 @@ import { fetchAqiByCoordinates } from "@/services/air-quality/fetchAqiByCoordina
 
 export async function GET(req: Request) {
     try {
-        const auth = req.headers.get("authorization");
+        const isVercelCron = req.headers.get("x-vercel-cron");
+        const { searchParams } = new URL(req.url);
 
-        if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
+        if (!isVercelCron) {
+            return new Response("Forbidden", { status: 403 });
+        }
+
+        if (searchParams.get("token") !== process.env.CRON_SECRET) {
             return new Response("Unauthorized", { status: 401 });
         }
 
