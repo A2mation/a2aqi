@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Popup, useMapEvents } from "react-leaflet";
@@ -64,25 +64,44 @@ export default function Map({
   setMarkers: React.Dispatch<React.SetStateAction<AQIMarker[]>>;
 }) {
   const [mounted, setMounted] = useState(false);
-  const [selectedStation, setSelectedStation] =
-    useState<AQIMarker | null>(null);
+  const [selectedStation, setSelectedStation] = useState<AQIMarker | null>(null);
+  const requestRef = useRef<AbortController | null>(null);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
 
-  const handleBoundsChange = async (bounds: {
+  const handleBoundsChange = (bounds: {
     north: number;
     south: number;
     east: number;
     west: number;
   }) => {
-    try {
-      const res = await http.get("/api/maps/aqi", {
-        params: bounds,
-      });
-
-      setMarkers(res.data);
-    } catch (err) {
-      console.error("Failed to fetch map AQI data", err);
+    
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
     }
+
+    debounceRef.current = setTimeout(async () => {
+      
+      if (requestRef.current) {
+        requestRef.current.abort();
+      }
+
+      const controller = new AbortController();
+      requestRef.current = controller;
+
+      try {
+        const res = await http.get("/api/maps/aqi", {
+          params: bounds,
+          signal: controller.signal,
+        });
+
+        setMarkers(res.data);
+      } catch (err: any) {
+        if (err.name !== "CanceledError") {
+          console.error("Failed to fetch map AQI data", err);
+        }
+      }
+    }, 300); 
   };
 
 
@@ -97,7 +116,7 @@ export default function Map({
       <MapContainer
         center={[lat, lng]}
         zoom={13}
-        scrollWheelZoom={false}
+        scrollWheelZoom={true}
         className="h-full w-full z-0"
       >
         <MapEvents onBoundsChange={handleBoundsChange} />
