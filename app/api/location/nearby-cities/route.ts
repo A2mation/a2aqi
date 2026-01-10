@@ -125,12 +125,12 @@ export async function GET(req: NextRequest) {
             score: cityScore(city),
         }))
 
-        const rankedCities = cities
-            .sort((a, b) => b.score - a.score || a.distanceKm - b.distanceKm)
-            .slice(0, 6)
+        // const rankedCities = cities
+        //     .sort((a, b) => b.score - a.score || a.distanceKm - b.distanceKm)
+        //     .slice(0, 6)
 
         const citiesWithAqi = await Promise.all(
-            rankedCities.map(async (city) => {
+            cities.map(async (city) => {
                 const aqi = await fetchAqiByCoordinates(city.lat, city.lon)
                 return {
                     ...city,

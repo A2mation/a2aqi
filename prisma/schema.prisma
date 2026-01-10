@@ -48,6 +48,7 @@ model AQIReading {
   @@index([lat, lng])
   @@index([measuredAt])
   @@index([source])
+  @@index([location, measuredAt])
   @@unique([lat, lng, source, measuredAt], name: "lat_lng_source_measuredAt")
 }
 

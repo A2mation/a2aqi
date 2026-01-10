@@ -12,7 +12,7 @@ export default function Home() {
     <>
       <AQIDashboard />
       <AirQualityDashboard />
-      <AQIGraph />
+      {/* <AQIGraph /> */}
       <AirPollutionTable/>
       <PopularCityCards />
     </>

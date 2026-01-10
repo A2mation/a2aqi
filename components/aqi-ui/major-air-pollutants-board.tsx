@@ -7,15 +7,15 @@ import { ChevronRight, CloudFog, Droplets, Wind, Zap } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { getAQIBorderClass } from "@/helpers/aqi-color-pallet"
 import { useLocationStore } from "@/store/location.store"
-import { Skeleton } from "../ui/skeleton"
-import { useEffect, useMemo } from "react"
-import { detectIpLocation } from "@/store/location.actions"
+import { useMemo } from "react"
+import { getPollutantGradientClass, PollutantType } from "@/helpers/pollutant-color-pallet"
 
 interface Pollutant {
   name: string
   formula: string
   value: number | null
   unit: string
+  pollutantType: PollutantType,
   icon: React.ReactNode
   hasAlert?: boolean
 }
@@ -49,6 +49,7 @@ export default function AirQualityDashboard() {
     {
       name: "Particulate Matter",
       formula: "(PM2.5)",
+      pollutantType: "pm25",
       value: pm25 ?? null,
       unit: "µg/m³",
       icon: <CloudFog className="w-10 h-10 text-muted-foreground" />,
@@ -56,6 +57,7 @@ export default function AirQualityDashboard() {
     {
       name: "Particulate Matter",
       formula: "(PM10)",
+      pollutantType: "pm10",
       value: pm10 ?? null,
       unit: "µg/m³",
       icon: <CloudFog className="w-10 h-10 text-muted-foreground" />,
@@ -64,6 +66,7 @@ export default function AirQualityDashboard() {
     {
       name: "Carbon Monoxide",
       formula: "(CO)",
+      pollutantType: "co",
       value: co ?? null,
       unit: "ppb",
       icon: (
@@ -82,6 +85,7 @@ export default function AirQualityDashboard() {
     {
       name: "Sulfur Dioxide",
       formula: "(SO2)",
+      pollutantType: "so2",
       value: so2 ?? null,
       unit: "ppb",
       icon: <Droplets className="w-10 h-10 text-muted-foreground" />,
@@ -90,12 +94,14 @@ export default function AirQualityDashboard() {
       name: "Nitrogen Dioxide",
       formula: "(NO2)",
       value: no2 ?? null,
+      pollutantType: "no2",
       unit: "ppb",
       icon: <Wind className="w-10 h-10 text-muted-foreground" />,
     },
     {
       name: "Ozone",
       formula: "(O3)",
+      pollutantType: "o3",
       value: o3 ?? null,
       unit: "ppb",
       icon: <Zap className="w-10 h-10 text-muted-foreground" />,
@@ -124,11 +130,7 @@ export default function AirQualityDashboard() {
             <p className="text-lg text-blue-600 font-medium">Kolkata</p>
           </div>
           <Button variant="outline" className="border-blue-500 text-blue-600 bg-transparent">
-            <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
-              <line x1="12" y1="18" x2="12" y2="18" />
-            </svg>
-            Get AQI App
+            Powered By - A2mation Solutions
           </Button>
         </div>
 
@@ -138,7 +140,8 @@ export default function AirQualityDashboard() {
               key={index}
               className={cn(
                 "relative border-l-4 bg-card hover:shadow-md transition-shadow cursor-pointer",
-                pollutant.value !== null ? getAQIBorderClass(pollutant.value) : "border-gray-300"
+                pollutant.value !== null ? getAQIBorderClass(pollutant.value) : "border-gray-300",
+                "bg-gray-50"
               )}
             >
               {pollutant.hasAlert && (

@@ -106,6 +106,9 @@ export function AQIDashboard() {
                 <div className="text-sm text-muted-foreground">
                   {lastUpdated ? `Last updated: ${lastUpdated}` : ""}
                 </div>
+                <div className="text-sm text-muted-foreground">
+                  Powered by A2mation Solution
+                </div>
               </div>
 
               <div className="flex gap-2">
@@ -207,6 +210,12 @@ export function AQIDashboard() {
                     </span>
                     <span>
                       {typeof wind === "number" ? `${parseFloat(wind.toString()).toFixed(2)} km/h` : "--"}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-center">
+                    <span className="text-sm text-muted-foreground" >
+                      Powered by A2mation Solution
                     </span>
                   </div>
                 </div>
