@@ -11,6 +11,7 @@ import {
   SquareDashed,
 } from "lucide-react"
 import dynamic from "next/dynamic"
+import Image from 'next/image'
 
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -106,8 +107,18 @@ export function AQIDashboard() {
                 <div className="text-sm text-muted-foreground">
                   {lastUpdated ? `Last updated: ${lastUpdated}` : ""}
                 </div>
-                <div className="text-sm text-muted-foreground">
-                  Powered by A2mation Solution
+                <div className="flex items-center justify-start mt-4">
+                  <span className="text-sm text-muted-foreground pr-2">
+                    Powered by
+                  </span>
+                  <div>
+                    <Image
+                      src="/assets/a2mation-logo.png"
+                      width={90}
+                      height={5}
+                      alt="Picture of the author"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -214,9 +225,19 @@ export function AQIDashboard() {
                   </div>
 
                   <div className="flex justify-center">
-                    <span className="text-sm text-muted-foreground" >
-                      Powered by A2mation Solution
-                    </span>
+                    <div className="flex items-center justify-start mt-4">
+                      <span className="text-sm text-muted-foreground pr-2">
+                        Powered by
+                      </span>
+                      <div>
+                        <Image
+                          src="/assets/a2mation-logo.png"
+                          width={90}
+                          height={5}
+                          alt="Picture of the author"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

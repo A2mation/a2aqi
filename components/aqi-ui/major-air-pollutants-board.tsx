@@ -1,13 +1,15 @@
 'use client'
 
 import type React from "react"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import { useMemo } from "react"
 import { ChevronRight, CloudFog, Droplets, Wind, Zap } from "lucide-react"
+import Image from 'next/image'
+
 import { cn } from "@/lib/utils"
+import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { getAQIBorderClass } from "@/helpers/aqi-color-pallet"
 import { useLocationStore } from "@/store/location.store"
-import { useMemo } from "react"
 import { getPollutantGradientClass, PollutantType } from "@/helpers/pollutant-color-pallet"
 
 interface Pollutant {
@@ -129,9 +131,21 @@ export default function AirQualityDashboard() {
             </h1>
             <p className="text-lg text-blue-600 font-medium">Kolkata</p>
           </div>
-          <Button variant="outline" className="border-blue-500 text-blue-600 bg-transparent">
-            Powered By - A2mation Solutions
-          </Button>
+
+          <div className="flex items-center justify-start mt-4 px-4 py-2 rounded-xl border-2 border-blue-500 text-blue-600 bg-transparent">
+            <span className="text-sm text-muted-foreground pr-2">
+              Powered by
+            </span>
+            <div>
+              <Image
+                src="/assets/a2mation-logo.png"
+                width={90}
+                height={5}
+                alt="Picture of the author"
+              />
+            </div>
+          </div>
+
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
