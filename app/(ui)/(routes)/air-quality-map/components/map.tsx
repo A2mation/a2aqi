@@ -1,15 +1,15 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import axios from "axios";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import dynamic from "next/dynamic";
 import { Popup, useMapEvents } from "react-leaflet";
+import { useEffect, useRef, useState } from "react";
 
 import { getAQIBgColor } from "@/helpers/aqi-color-pallet";
 import { AirQualityCard } from "./air-quality-card";
 import { AQIMarker } from "../page";
-import { http } from "@/lib/http";
 
 const MapContainer = dynamic(
   () => import("react-leaflet").then((m) => m.MapContainer),
@@ -90,7 +90,7 @@ export default function Map({
       requestRef.current = controller;
 
       try {
-        const res = await http.get("/api/maps/aqi", {
+        const res = await axios.get("/api/maps/aqi", {
           params: bounds,
           signal: controller.signal,
         });
