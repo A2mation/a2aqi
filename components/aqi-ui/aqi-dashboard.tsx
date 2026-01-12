@@ -209,7 +209,7 @@ export function AQIDashboard() {
 
               {/* Image */}
               <div className="lg:col-span-1 flex items-center justify-center">
-                <div className="relative w-full h-[420px] rounded-3xl overflow-hidden">
+                <div className="relative w-full h-full rounded-3xl overflow-hidden">
 
                   {/* Particle background (fills whole card) */}
                   <SparklesCore
