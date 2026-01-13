@@ -12,7 +12,7 @@ const AboutUsPage = () => {
             <section className='bg-blue-100 my-20'>
                 <IntroSection />
             </section>
-            <section className='max-w-7xl mx-auto flex items-center justify-center gap-10 mb-10'>
+            <section className='max-w-7xl mx-auto flex items-center justify-center flex-col md:flex-row gap-10 mb-10'>
                 <MissonVision />
             </section>
         </>

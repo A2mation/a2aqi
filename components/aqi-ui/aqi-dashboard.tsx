@@ -246,7 +246,7 @@ export function AQIDashboard() {
                     <Cloud className="h-12 w-12" />
                     <div>
                       <p className="text-4xl md:text-7xl font-bold">
-                        {typeof temp === "number" ? `${temp}°C` : "--"}
+                        {typeof temp === "number" ? `${parseFloat(temp.toString()).toFixed(1)}°C` : "--"}
                       </p>
                       <p className="text-sm md:text-xl md:ml-2 opacity-70">Weather</p>
                     </div>

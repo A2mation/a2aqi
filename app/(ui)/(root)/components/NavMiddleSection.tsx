@@ -1,8 +1,8 @@
 "use client";
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
+
 import { HoveredLink, Menu, MenuItem, ProductItem } from "@/components/ui/navbar-menu";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 
 export function NavbarMiddleSection({ className }: { className?: string }) {
   const [active, setActive] = useState<string | null>(null);
@@ -23,7 +23,7 @@ export function NavbarMiddleSection({ className }: { className?: string }) {
   return (
     <div className={cn("z-50", className)}>
       <Menu setActive={setActive}>
-        <Link
+        <a
           href={"/learn"}
           className={cn(
             "group flex flex-col gap-0.5 cursor-pointer text-lg font-bold  dark:text-white",
@@ -32,9 +32,9 @@ export function NavbarMiddleSection({ className }: { className?: string }) {
         >
           Learn
           <div className={`${isScrolled ? "bg-gray-700" : "bg-blue-500"} h-1 w-0 group-hover:w-full transition-all duration-300`} />
-        </Link>
+        </a>
 
-        <Link
+        <a
           href={"/#blogs"}
           className={cn(
             "group flex flex-col gap-0.5 cursor-pointer text-lg font-bold dark:text-white",
@@ -43,7 +43,7 @@ export function NavbarMiddleSection({ className }: { className?: string }) {
         >
           Blogs
           <div className={`${isScrolled ? "bg-gray-700" : "bg-blue-500"} h-1 w-0 group-hover:w-full transition-all duration-300`} />
-        </Link>
+        </a>
 
         <MenuItem setActive={setActive} active={active} item="Sectors">
           <div className="text-sm grid grid-cols-1 md:grid-cols-2 gap-10 p-4">
