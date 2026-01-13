@@ -43,7 +43,7 @@ export function Footer() {
                         <h3 className="mb-4 text-sm font-medium text-gray-400">About AQI</h3>
                         <ul className="space-y-3">
                             <li>
-                                <Link href="#" className="text-sm text-gray-900 hover:text-blue-600">
+                                <Link href="/about-us" className="text-sm text-gray-900 hover:text-blue-600">
                                     About Us
                                 </Link>
                             </li>
@@ -57,26 +57,7 @@ export function Footer() {
                                     AQI Monitor
                                 </Link>
                             </li>
-                            <li>
-                                <Link href="#" className="text-sm text-gray-900 hover:text-blue-600">
-                                    Air Quality Blog
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="#" className="text-sm text-gray-900 hover:text-blue-600">
-                                    Climate Change
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="#" className="text-sm text-gray-900 hover:text-blue-600">
-                                    Community AQI Monitor
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="#" className="text-sm text-gray-900 hover:text-blue-600">
-                                    World Air Quality Report
-                                </Link>
-                            </li>
+                           
                         </ul>
                     </div>
 
@@ -84,41 +65,18 @@ export function Footer() {
                     <div>
                         <h3 className="mb-4 text-sm font-medium text-gray-400">Air Quality</h3>
                         <ul className="space-y-3">
+                           
                             <li>
-                                <Link href="#" className="text-sm text-gray-900 hover:text-blue-600">
-                                    AQI App
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="#" className="text-sm text-gray-900 hover:text-blue-600">
-                                    AQI TV App
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="#" className="text-sm text-gray-900 hover:text-blue-600">
+                                <Link href="/air-quality-map" className="text-sm text-gray-900 hover:text-blue-600">
                                     AQI Map
                                 </Link>
                             </li>
-                            <li>
-                                <Link href="#" className="text-sm text-gray-900 hover:text-blue-600">
-                                    AQI APIs
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="#" className="text-sm text-gray-900 hover:text-blue-600">
-                                    AQI Widgets
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="#" className="text-sm text-gray-900 hover:text-blue-600">
-                                    Web Dashboard
-                                </Link>
-                            </li>
+                            
                         </ul>
                     </div>
 
                     {/* Rankings Column */}
-                    <div>
+                    {/* <div>
                         <h3 className="mb-4 text-sm font-medium text-gray-400">Rankings</h3>
                         <ul className="space-y-3">
                             <li>
@@ -142,7 +100,7 @@ export function Footer() {
                                 </Link>
                             </li>
                         </ul>
-                    </div>
+                    </div> */}
 
                     {/* Location Column */}
                     <div>

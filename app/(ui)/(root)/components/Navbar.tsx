@@ -5,13 +5,15 @@ import {
   NavItems,
   MobileNav,
   NavbarLogo,
-  NavbarButton,
   MobileNavHeader,
   MobileNavToggle,
   MobileNavMenu,
 } from "@/components/ui/resizable-navbar";
 import { useState } from "react";
+
+import Searchbar from "./Searchbar";
 import { NavbarMiddleSection } from "./NavMiddleSection";
+import { Button } from "@/components/ui/button";
 
 export function NavbarMain() {
 
@@ -24,14 +26,15 @@ export function NavbarMain() {
         <NavBody>
           <NavbarLogo />
 
+          <Searchbar />
           <div className="flex justify-center md:justify-start" >
-            <NavbarMiddleSection className="bg-inherit"/>
+            <NavbarMiddleSection className="bg-inherit" />
           </div>
 
 
           <div className="flex items-center gap-4">
-            <NavbarButton variant="secondary">Login</NavbarButton>
-            <NavbarButton variant="primary">Book a call</NavbarButton>
+            <Button variant="secondary">Login</Button>
+            <Button variant="default">Book a call</Button>
           </div>
         </NavBody>
 
@@ -39,6 +42,10 @@ export function NavbarMain() {
         <MobileNav>
           <MobileNavHeader>
             <NavbarLogo />
+            <div className="flex items-center justify-center">
+              <Searchbar />
+            </div>
+
             <MobileNavToggle
               isOpen={isMobileMenuOpen}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -53,20 +60,20 @@ export function NavbarMain() {
 
             <div className="flex w-full flex-col gap-4">
               <NavbarMiddleSection className="top-10" />
-              <NavbarButton
+              <Button
                 onClick={() => setIsMobileMenuOpen(false)}
-                variant="primary"
+                variant="default"
                 className="w-full"
               >
                 Login
-              </NavbarButton>
-              <NavbarButton
+              </Button>
+              <Button
                 onClick={() => setIsMobileMenuOpen(false)}
-                variant="primary"
+                variant="default"
                 className="w-full"
               >
                 Book a call
-              </NavbarButton>
+              </Button>
             </div>
           </MobileNavMenu>
         </MobileNav>

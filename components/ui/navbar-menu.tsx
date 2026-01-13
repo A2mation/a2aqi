@@ -1,6 +1,7 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "motion/react";
+import { cn } from "@/lib/utils";
 
 
 
@@ -24,13 +25,36 @@ export const MenuItem = ({
   item: string;
   children?: React.ReactNode;
 }) => {
+
+  const [isScrolled, setIsScrolled] = React.useState(false);
+  const ref = React.useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const handleScroll = () => {
+      setIsScrolled(el.scrollTop > 10);
+    };
+
+    el.addEventListener("scroll", handleScroll);
+
+    return () => {
+      el.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
     <div onMouseEnter={() => setActive(item)} className="relative ">
       <motion.p
         transition={{ duration: 0.3 }}
-        className="cursor-pointer text-lg font-bold text-black hover:opacity-[0.9] dark:text-white"
+        className={cn(
+          "group flex flex-col gap-0.5 cursor-pointer text-lg font-bold text-black hover:opacity-[0.9] dark:text-white",
+          isScrolled ? "text-blue-700" : "text-blue-500"
+        )}
       >
         {item}
+        <span className={`${isScrolled ? "bg-gray-700" : "bg-blue-500"} h-1 w-0 group-hover:w-full transition-all duration-300`} />
       </motion.p>
       {active !== null && (
         <motion.div
@@ -70,7 +94,7 @@ export const Menu = ({
   return (
     <nav
       onMouseLeave={() => setActive(null)} // resets the state
-      className="relative rounded-full md:w-1/2 flex flex-col md:flex-row mx-auto border border-transparent dark:bg-black dark:border-white/[0.2] bg-inherit shadow-input justify-start md:justify-center space-x-4 px-8 py-6 "
+      className="relative rounded-full md:w-1/2 flex flex-col md:flex-row mx-auto border border-transparent dark:bg-black dark:border-white/[0.2] bg-inherit shadow-input justify-start md:justify-center space-x-4 px-0 py-3 gap-0 md:gap-4"
     >
       {children}
     </nav>

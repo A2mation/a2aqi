@@ -18,7 +18,7 @@ interface Pollutant {
   value: number | null
   unit: string
   pollutantType: PollutantType,
-  icon: React.ReactNode
+  icon: string
   hasAlert?: boolean
 }
 
@@ -54,7 +54,7 @@ export default function AirQualityDashboard() {
       pollutantType: "pm25",
       value: pm25 ?? null,
       unit: "µg/m³",
-      icon: <CloudFog className="w-10 h-10 text-muted-foreground" />,
+      icon: "/assets/pm2.5-parameter.png",
     },
     {
       name: "Particulate Matter",
@@ -62,7 +62,7 @@ export default function AirQualityDashboard() {
       pollutantType: "pm10",
       value: pm10 ?? null,
       unit: "µg/m³",
-      icon: <CloudFog className="w-10 h-10 text-muted-foreground" />,
+      icon: "/assets/pm10-perameter.png",
       hasAlert: typeof pm10 === "number" && pm10 > 150,
     },
     {
@@ -71,18 +71,7 @@ export default function AirQualityDashboard() {
       pollutantType: "co",
       value: co ?? null,
       unit: "ppb",
-      icon: (
-        <svg
-          className="w-10 h-10 text-muted-foreground"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <ellipse cx="8" cy="12" rx="6" ry="8" />
-          <path d="M14 8c2.5 0 4.5 1.8 4.5 4s-2 4-4.5 4" />
-        </svg>
-      ),
+      icon: "/assets/co-icon.png",
     },
     {
       name: "Sulfur Dioxide",
@@ -90,7 +79,7 @@ export default function AirQualityDashboard() {
       pollutantType: "so2",
       value: so2 ?? null,
       unit: "ppb",
-      icon: <Droplets className="w-10 h-10 text-muted-foreground" />,
+      icon: "/assets/so2-icon.png",
     },
     {
       name: "Nitrogen Dioxide",
@@ -98,7 +87,7 @@ export default function AirQualityDashboard() {
       value: no2 ?? null,
       pollutantType: "no2",
       unit: "ppb",
-      icon: <Wind className="w-10 h-10 text-muted-foreground" />,
+      icon: "/assets/no2-icon.png",
     },
     {
       name: "Ozone",
@@ -106,7 +95,7 @@ export default function AirQualityDashboard() {
       pollutantType: "o3",
       value: o3 ?? null,
       unit: "ppb",
-      icon: <Zap className="w-10 h-10 text-muted-foreground" />,
+      icon: "/assets/o3.svg",
     },
   ], [pm10, pm25, so2, o3, co, no2])
 
@@ -165,7 +154,14 @@ export default function AirQualityDashboard() {
               )}
               <div className="p-6 flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="flex-shrink-0">{pollutant.icon}</div>
+                  <div className="flex-shrink-0">{
+                    <Image
+                      src={pollutant.icon}
+                      width={80}
+                      height={80}
+                      alt="Picture of the author"
+                    />
+                  }</div>
                   <div>
                     <div className="text-sm md:text-xl font-medium text-foreground mb-1">
                       {pollutant.name}
