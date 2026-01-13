@@ -208,36 +208,29 @@ export function AQIDashboard() {
               </div>
 
               {/* Image */}
-              <div className="lg:col-span-1 flex items-center justify-center">
-                <div className="relative w-full h-full rounded-3xl overflow-hidden">
+              <div className="lg:col-span-1 flex items-center justify-center min-h-[300px] md:min-h-[360px]">
+                <div className="relative w-full h-full max-w-[360px] rounded-3xl overflow-hidden">
 
-                  {/* Particle background (fills whole card) */}
                   <SparklesCore
+                    className="absolute inset-0"
                     background="transparent"
-                    className="absolute inset-0 z-0"
                     minSize={0.6}
-                    maxSize={2.5}
-                    particleDensity={aqi ? aqi*10 : 100}
+                    maxSize={1.4}
+                    particleDensity={900}
                     particleColor="#000000"
                   />
 
-
-
-                  {/* Centered AQI character */}
                   {moodImage && (
                     <div className="absolute inset-0 flex items-center justify-center z-10">
                       <Image
                         src={moodImage}
-                        width={160}
-                        height={160}
+                        width={150}
+                        height={150}
                         alt="Air quality mood"
-                        className="object-contain drop-shadow-xl"
-                        priority
+                        className="object-contain"
                       />
                     </div>
                   )}
-
-                  
 
                 </div>
               </div>
