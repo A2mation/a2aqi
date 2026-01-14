@@ -4,7 +4,7 @@ import { motion } from 'motion/react'
 const Intro = () => {
   return (
     <section
-      className=" h-full max-w-7xl mx-auto my-25"
+      className="h-fit max-w-7xl mx-auto my-25"
     >
       <div
         className="flex flex-col justify-center items-center w-full"
