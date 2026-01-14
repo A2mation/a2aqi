@@ -5,7 +5,7 @@ import { OutdoorHarmfulItemsCard } from "./components/outdoor-harmful-items-card
 import { Tooltip } from "@/components/ui/tooltip-card";
 import { DangerousAirContaminantsCard } from "./components/dangerous-air-contaminants-card";
 import HealthImpactByPollution from "./components/health-impact-pl";
-import AdBanner from "./components/ad-banner";
+import AdBanner from "@/components/ad-banner";
 
 const AirPollutionArticle = () => {
     return (
