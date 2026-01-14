@@ -21,7 +21,6 @@ import { useLocationStore } from "@/store/location.store"
 import { Skeleton } from "@/components/ui/skeleton"
 import { AQIScale } from "./aqi-scale"
 import { cn } from "@/lib/utils"
-import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision";
 import { SparklesCore } from "../ui/sparkles"
 import { BackgroundGradient } from "../ui/background-gradient"
 

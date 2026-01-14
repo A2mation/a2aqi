@@ -61,7 +61,7 @@ export function NavbarMiddleSection({ className }: { className?: string }) {
             />
             <ProductItem
               title="Smart Cities"
-              href="#smart-cities"
+              href="/air-quality-monitoring-smart-cities"
               src="https://www.shutterstock.com/image-vector/smart-city-graphic-one-blue-260nw-2476922281.jpg"
               description="Empowering Smart Cities with Environmental Monitoring Solutions"
             />

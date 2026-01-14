@@ -128,7 +128,7 @@ export default function AirQualityDashboard() {
             <div>
               <Image
                 src="/assets/a2mation-logo.png"
-                width={90}
+                width={80}
                 height={5}
                 alt="Picture of the author"
               />
@@ -157,7 +157,7 @@ export default function AirQualityDashboard() {
                   <div className="flex-shrink-0">{
                     <Image
                       src={pollutant.icon}
-                      width={80}
+                      width={60}
                       height={80}
                       alt="Picture of the author"
                     />
@@ -166,7 +166,7 @@ export default function AirQualityDashboard() {
                     <div className="text-sm md:text-xl font-medium text-foreground mb-1">
                       {pollutant.name}
                     </div>
-                    <div className="text-base font-semibold">
+                    <div className="text-lg font-semibold">
                       {pollutant.formula}
                     </div>
                   </div>
@@ -176,7 +176,7 @@ export default function AirQualityDashboard() {
                     <div className="text-2xl font-bold text-foreground">
                       {pollutant.value ?? "--"}
                     </div>
-                    <div className="text-base font-semibold">
+                    <div className="text-lg font-semibold">
                       {pollutant.unit}
                     </div>
                   </div>

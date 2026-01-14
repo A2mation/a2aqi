@@ -44,7 +44,7 @@ export function CTASection() {
                             transition={{ duration: 0.6, delay: 0.3 }}
                             className="font-serif text-4xl md:text-5xl font-bold mb-6"
                         >
-                            SMART Monitoring Solutions
+                            Best Air Quality Monitor
                         </motion.h2>
 
                         <motion.p
@@ -54,7 +54,7 @@ export function CTASection() {
                             transition={{ duration: 0.6, delay: 0.4 }}
                             className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed"
                         >
-                            for Healthcare Industry
+                            for Smart Cities.
                         </motion.p>
 
                         <motion.div
