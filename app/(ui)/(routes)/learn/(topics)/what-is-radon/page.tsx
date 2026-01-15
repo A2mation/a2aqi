@@ -1,10 +1,12 @@
-import React from 'react'
+import Hero from './components/Hero'
+import Info from './components/Info'
 
 const Page = () => {
   return (
-    <div className='flex items-center justify-center text-red-500'>
-      Available soon.
-    </div>
+    <>
+      <Hero />
+      <Info />
+    </>
   )
 }
 
