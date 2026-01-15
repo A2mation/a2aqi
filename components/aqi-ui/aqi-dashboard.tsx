@@ -117,11 +117,11 @@ export function AQIDashboard() {
 
                 <div className={`font-semibold text-sm md:text-2xl underline  ${theme.text}`}>
                   {city || state || country ? (
-                    `${city ?? ""}${city && state ? ", " : ""}${state ?? ""}${(city || state) && country ? ", " : ""}${country ?? ""}`
+                    city ? `${city.split(", ").slice(-2).join(", ")}` : `${state},${country}`
                   ) : (
-                    <span className="text-muted-foreground">
-                      Location unavailable
-                    </span>
+                  <span className="text-muted-foreground">
+                    Location unavailable
+                  </span>
                   )}
                 </div>
 
