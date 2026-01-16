@@ -1,9 +1,23 @@
 import { http } from "@/lib/http";
 import { BarChart3 } from "lucide-react";
+export const dynamic = "force-dynamic";
 
 async function getViews() {
-    const res = await http.get(`${process.env.NEXT_PUBLIC_SITE_URL}/api/visit`);
-    return res.data;
+    try {
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_SITE_URL}/api/visit`,
+            { cache: "no-store" }
+        );
+
+        if (!res.ok) {
+            return { total: 0, today: 0 };
+        }
+
+        return res.json();
+    } catch {
+        // Build-time fallback
+        return { total: 0, today: 0 };
+    }
 }
 
 export default async function ViewStats() {
