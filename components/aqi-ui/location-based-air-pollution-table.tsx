@@ -133,10 +133,10 @@ export function AirPollutionTable() {
             <div className="mx-auto max-w-7xl px-6">
                 <div className="space-y-6">
                     <div className="space-y-1 border-b-2 pb-4">
-                        <h1 className="text-3xl font-bold text-balance">
+                        <h1 className="text-4xl font-bold text-balance">
                             {"Nearby Locations"}
                         </h1>
-                        <p className="text-lg text-blue-500">
+                        <p className="text-2xl text-blue-500">
                             Real-time Air Pollution Level
                         </p>
                     </div>
@@ -147,25 +147,25 @@ export function AirPollutionTable() {
                                 <table className="w-full">
                                     <thead className="sticky top-0 bg-card z-10">
                                         <tr className="border-b border-border">
-                                            <th onClick={() => handleSort("name")} className="px-6 py-4 text-left text-sm font-medium cursor-pointer">
+                                            <th onClick={() => handleSort("name")} className="px-6 py-4 text-left text-xl font-medium cursor-pointer">
                                                 Location <SortIcon column="name" />
                                             </th>
-                                            <th onClick={() => handleSort("status")} className="px-6 py-4 text-left text-sm font-medium cursor-pointer">
+                                            <th onClick={() => handleSort("status")} className="px-6 py-4 text-left text-xl font-medium cursor-pointer">
                                                 Status <SortIcon column="status" />
                                             </th>
-                                            <th onClick={() => handleSort("aqi")} className="px-6 py-4 text-center text-sm font-medium cursor-pointer">
+                                            <th onClick={() => handleSort("aqi")} className="px-6 py-4 text-center text-xl font-medium cursor-pointer">
                                                 AQI (US) <SortIcon column="aqi" />
                                             </th>
-                                            <th onClick={() => handleSort("pm25")} className="px-6 py-4 text-center text-sm font-medium cursor-pointer">
+                                            <th onClick={() => handleSort("pm25")} className="px-6 py-4 text-center text-xl font-medium cursor-pointer">
                                                 PM2.5
                                             </th>
-                                            <th onClick={() => handleSort("pm10")} className="px-6 py-4 text-center text-sm font-medium cursor-pointer">
+                                            <th onClick={() => handleSort("pm10")} className="px-6 py-4 text-center text-xl font-medium cursor-pointer">
                                                 PM10
                                             </th>
-                                            <th onClick={() => handleSort("temp")} className="px-6 py-4 text-center text-sm font-medium cursor-pointer">
+                                            <th onClick={() => handleSort("temp")} className="px-6 py-4 text-center text-xl font-medium cursor-pointer">
                                                 Temp.
                                             </th>
-                                            <th onClick={() => handleSort("humidity")} className="px-6 py-4 text-center text-sm font-medium cursor-pointer">
+                                            <th onClick={() => handleSort("humidity")} className="px-6 py-4 text-center text-xl font-medium cursor-pointer">
                                                 Humidity.
                                             </th>
                                         </tr>
@@ -174,20 +174,20 @@ export function AirPollutionTable() {
                                     <tbody>
                                         {sortedLocations.map((location, index) => (
                                             <tr key={index} className="border-b last:border-0 hover:bg-muted/50">
-                                                <td className="px-6 py-4 font-medium">{location.name}</td>
+                                                <td className="px-6 py-4 text-lg font-medium">{location.name}</td>
                                                 <td className="px-6 py-4">
                                                     <Badge
                                                         style={{ backgroundColor: getAQIColor(location.aqi) }}
-                                                        className="text-white"
+                                                        className="text-white text-lg"
                                                     >
                                                         {location.status}
                                                     </Badge>
                                                 </td>
-                                                <td className="px-6 py-4 text-center">{location.aqi}</td>
-                                                <td className="px-6 py-4 text-center">{location.pm25}</td>
-                                                <td className="px-6 py-4 text-center">{location.pm10}</td>
-                                                <td className="px-6 py-4 text-center">{location.temp}</td>
-                                                <td className="px-6 py-4 text-center">{location.humidity.toFixed(1)}</td>
+                                                <td className="px-6 py-4 text-lg text-center">{location.aqi}</td>
+                                                <td className="px-6 py-4 text-lg text-center">{location.pm25}</td>
+                                                <td className="px-6 py-4 text-lg text-center">{location.pm10}</td>
+                                                <td className="px-6 py-4 text-lg text-center">{location.temp}</td>
+                                                <td className="px-6 py-4 text-lg text-center">{location.humidity.toFixed(1)}</td>
                                             </tr>
                                         ))}
                                     </tbody>

@@ -49,7 +49,7 @@ export const MenuItem = ({
       <motion.p
         transition={{ duration: 0.3 }}
         className={cn(
-          "group flex flex-col gap-0.5 cursor-pointer text-lg font-bold text-black hover:opacity-[0.9] dark:text-white",
+          "group flex flex-col gap-0.5 cursor-pointer text-lg md:text-xl font-bold text-black hover:opacity-[0.9] dark:text-white",
           isScrolled ? "text-blue-700" : "text-blue-500"
         )}
       >
@@ -94,7 +94,7 @@ export const Menu = ({
   return (
     <nav
       onMouseLeave={() => setActive(null)} // resets the state
-      className="relative rounded-full md:w-1/2 flex flex-col md:flex-row mx-auto border border-transparent dark:bg-black dark:border-white/[0.2] bg-inherit shadow-input justify-start md:justify-center space-x-4 px-0 py-3 gap-0 md:gap-4"
+      className="relative rounded-full md:w-1/2 flex flex-col md:flex-row mx-auto border border-transparent dark:bg-black dark:border-white/[0.2] bg-inherit shadow-input justify-start md:justify-center space-x-4 px-0 py-3 gap-0 md:gap-8"
     >
       {children}
     </nav>
@@ -103,31 +103,27 @@ export const Menu = ({
 
 export const ProductItem = ({
   title,
-  description,
+  // description,
   href,
   src,
 }: {
   title: string;
-  description: string;
+  // description: string;
   href: string;
   src: string;
 }) => {
   return (
-    <a href={href} className="flex space-x-2">
+    <a href={href} className="flex items-center space-x-2 bg-blue-200 hover:bg-blue-300 border border-blue-600  p-4 rounded-2xl">
       <img
         src={src}
-        width={140}
-        height={70}
         alt={title}
-        className="shrink-0 rounded-md shadow-2xl"
+        className="shrink-0 h-20 w-20 rounded-full shadow-2xl "
       />
       <div>
         <h4 className="text-xl font-bold mb-1 text-black dark:text-white">
           {title}
         </h4>
-        <p className="text-neutral-700 text-sm max-w-[10rem] dark:text-neutral-300">
-          {description}
-        </p>
+        
       </div>
     </a>
   );

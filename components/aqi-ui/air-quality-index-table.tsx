@@ -37,7 +37,7 @@ const AirQualityIndexTable = () => {
                 {/* Tab Navigation */}
                 <div className="bg-white ">
                     <h2 className="text-2xl md:text-4xl font-bold text-slate-900 mb-6">{TAB_CONTENT[activeTab].title}</h2>
-                    <p className="text-slate-600 text-base md:text-lg mb-6">{TAB_CONTENT[activeTab].description}</p>
+                    <p className="text-slate-600 text-lg md:text-xl mb-6">{TAB_CONTENT[activeTab].description}</p>
                 </div>
 
                 {/* Main Content */}
@@ -49,7 +49,7 @@ const AirQualityIndexTable = () => {
                                 <button
                                     key={tab}
                                     onClick={() => setActiveTab(tab)}
-                                    className={` md:mx-1 my-1 md:my-4 px-2 md:px-10 py-2 rounded-full font-medium transition-all ${activeTab === tab ? "bg-slate-200 text-blue-500 shadow-md" : "text-slate-600 hover:text-slate-900"
+                                    className={` md:mx-1 my-1 md:my-4 px-2 md:px-10 py-2 text-base md:text-xl rounded-full font-medium transition-all ${activeTab === tab ? "bg-slate-200 text-blue-500 shadow-md" : "text-slate-600 hover:text-slate-900"
                                         }`}
                                 >
                                     {tabLabels[tab]}
@@ -70,10 +70,10 @@ const AirQualityIndexTable = () => {
                                     {/* Content */}
                                     <div className="flex-1">
                                         <div className="flex items-baseline gap-4">
-                                            <h3 className="font-bold text-slate-900 text-lg">{level.level}</h3>
-                                            <p className="text-slate-500 text-sm">({level.range})</p>
+                                            <h3 className="font-bold text-slate-900 text-xl md:text-2xl">{level.level}</h3>
+                                            <p className="text-slate-500 text-sm md:text-lg">({level.range})</p>
                                         </div>
-                                        <p className="text-slate-600 mt-1 text-base leading-relaxed">{level.description}</p>
+                                        <p className="text-slate-800 mt-1 text-base md:text-xl leading-relaxed">{level.description}</p>
                                     </div>
 
                                     <div>
