@@ -7,8 +7,11 @@ html,
 body {
   height: 100%;
   width: 100%;
+  min-height: 100dvh;
   box-sizing: border-box;
 }
+
+
 
 @theme inline {
   --font-display: var(--font-rebels);
@@ -200,6 +203,7 @@ body {
   0% {
     transform: translate3d(0, 0, 0);
   }
+
   100% {
     transform: translate3d(0, -50%, 0);
   }
@@ -209,25 +213,30 @@ body {
   0% {
     transform: translate3d(0, -50%, 0);
   }
+
   100% {
     transform: translate3d(0, 0, 0);
   }
 }
 
 @keyframes marquee-pulse {
+
   0%,
   100% {
     opacity: 0.15;
     transform: scale(1) translateY(0);
   }
+
   25% {
     opacity: 0.4;
     transform: scale(1.02) translateY(-1px);
   }
+
   50% {
     opacity: 0.8;
     transform: scale(1.05) translateY(-2px);
   }
+
   75% {
     opacity: 0.6;
     transform: scale(1.02) translateY(-1px);
@@ -251,6 +260,7 @@ body {
   0% {
     transform: translateX(0);
   }
+
   100% {
     /* Move exactly the width of one set (5 images * 600px + 4 gaps * 24px = 3096px) */
     transform: translateX(calc(-3096px));

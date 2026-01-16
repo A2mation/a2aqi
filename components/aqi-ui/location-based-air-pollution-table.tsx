@@ -130,7 +130,7 @@ export function AirPollutionTable() {
 
     return (
         <section className="min-h-xl bg-background p-5 md:p-8">
-            <div className="mx-auto max-w-7xl px-6">
+            <div className="mx-auto max-w-[90rem] px-6">
                 <div className="space-y-6">
                     <div className="space-y-1 border-b-2 pb-4">
                         <h1 className="text-4xl font-bold text-balance">

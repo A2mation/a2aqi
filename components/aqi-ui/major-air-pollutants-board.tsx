@@ -30,6 +30,7 @@ export default function AirQualityDashboard() {
     o3,
     co,
     no2,
+    city,
     loading,
     error
   } = useLocationStore()
@@ -112,13 +113,15 @@ export default function AirQualityDashboard() {
 
   return (
     <div className="min-h-full bg-background p-6">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-[90rem] mx-auto">
         <div className="flex items-start justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-1">
+            <h1 className="text-4xl font-bold text-foreground mb-1">
               Major Air Pollutants
             </h1>
-            <p className="text-lg text-blue-600 font-medium">Kolkata</p>
+            <p className="text-lg text-blue-600 font-medium">
+              {city && city.split(", ").slice(-2).join(", ")}
+            </p>
           </div>
 
           <div className="flex items-center justify-start mt-4 px-4 py-2 rounded-xl border-2 border-blue-500 text-blue-600 bg-transparent">

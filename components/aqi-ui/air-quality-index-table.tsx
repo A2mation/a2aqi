@@ -33,7 +33,7 @@ const AirQualityIndexTable = () => {
 
     return (
         <>
-            <div className="max-w-7xl mx-auto p-4 mt-5">
+            <div className="max-w-[90rem] mx-auto p-4 mt-5">
                 {/* Tab Navigation */}
                 <div className="bg-white ">
                     <h2 className="text-2xl md:text-4xl font-bold text-slate-900 mb-6">{TAB_CONTENT[activeTab].title}</h2>

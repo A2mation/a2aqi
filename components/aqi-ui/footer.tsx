@@ -4,7 +4,7 @@ import Link from "next/link"
 export function Footer() {
     return (
         <footer className=" px-6 py-12 md:px-12 lg:px-16">
-            <div className="mx-auto max-w-7xl">
+            <div className="mx-auto w-full">
                 <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-5 bg-gray-50 p-10 rounded-xl">
                     {/* Logo and Tagline Section */}
                     <div className="lg:col-span-1 max-h-screen flex items-center ">

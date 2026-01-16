@@ -79,7 +79,7 @@ export default function PopularCityCards() {
 
     return (
         <main className="min-h-xl p-8">
-            <div className="max-w-7xl mx-auto">
+            <div className="max-w-[90rem] mx-auto">
                 <div className="mb-8 border-b-2 pb-4">
                     <h1 className="text-3xl font-semibold text-gray-900 mb-1">
                         India&apos;s Metro Cities

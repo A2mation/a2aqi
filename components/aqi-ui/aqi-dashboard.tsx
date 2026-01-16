@@ -101,12 +101,12 @@ export function AQIDashboard() {
   return (
     <div className="min-h-screen bg-background">
       {/* Map */}
-      <div className="relative h-[40vh] bg-muted">
+      <div className="relative h-[35vh] bg-muted">
         <AQIMap />
       </div>
 
       {/* Dashboard */}
-      <div className="max-w-7xl min-w-[85vw] mx-auto px-4 -mt-32 relative z-10 pb-12">
+      <div className="max-w-[100rem] h-full mx-auto px-4 -mt-32 relative z-10 pb-12">
         <Card className={`overflow-hidden shadow-2xl bg-gradient-to-br ${theme.bg}`}>
 
           <div className="p-6 sm:p-8 lg:p-10 backdrop-blur-sm">
@@ -284,7 +284,7 @@ export function AQIDashboard() {
               {/* Weather */}
 
               <BackgroundGradient className="rounded-[22px] bg-inherit mx-auto p-4 sm:p-10 dark:bg-zinc-900">
-                <div className={`${theme.card} rounded-2xl w-full p-6 space-y-6`}>
+                <div className={`${theme.card} rounded-2xl p-6 space-y-6`}>
                   <div className="flex items-center gap-4">
                     <Cloud className="h-12 w-12" />
                     <div>
