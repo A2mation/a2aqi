@@ -7,16 +7,17 @@ import AirQualityIndexTable from "@/components/aqi-ui/air-quality-index-table";
 
 
 export default function Home() {
-  
-  
+
+
   return (
     <>
       <AQIDashboard />
       <AirQualityDashboard />
       {/* <AQIGraph /> */}
       <AirQualityIndexTable />
-      <AirPollutionTable/>
+      <AirPollutionTable />
       <PopularCityCards />
+      
     </>
   );
 }

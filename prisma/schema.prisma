@@ -45,11 +45,11 @@ model AQIReading {
   // Creation Date
   createdAt DateTime @default(now())
 
+  @@unique([lat, lng, source, measuredAt], name: "lat_lng_source_measuredAt")
   @@index([lat, lng])
   @@index([measuredAt])
   @@index([source])
   @@index([location, measuredAt])
-  @@unique([lat, lng, source, measuredAt], name: "lat_lng_source_measuredAt")
 }
 
 model HourlyAggregateReading {
@@ -121,4 +121,11 @@ model DailyAggregateReading {
   @@index([date])
   @@index([city, date])
   @@index([lat, lng])
+}
+
+model SiteStats {
+  id         String   @id @default("views") @map("_id")
+  totalViews Int      @default(0)
+  dailyViews Int      @default(0)
+  lastReset  DateTime @default(now())
 }

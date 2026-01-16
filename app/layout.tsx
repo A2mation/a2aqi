@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import { Footer } from "@/components/aqi-ui/footer";
 import "./globals.css";
 import { NavbarMain } from "./(ui)/(root)/components/Navbar";
+import VisitCounter from "@/components/VisitCounter";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -74,6 +75,7 @@ export default function RootLayout({
         <NavbarMain />
         {children}
         <Footer />
+        <VisitCounter />
       </body>
     </html>
   );

@@ -1,5 +1,6 @@
 import { Mail, MapPin } from "lucide-react"
 import Link from "next/link"
+import ViewStats from "../ViewStats"
 
 export function Footer() {
     return (
@@ -90,7 +91,7 @@ export function Footer() {
                     </div> */}
 
                     {/* Location Column */}
-                    <div>
+                    <div className="">
                         <h3 className="mb-4 text-sm font-medium text-gray-400">Location</h3>
                         <div className="space-y-4">
                             <Link
@@ -114,6 +115,7 @@ export function Footer() {
                                 </span>
                             </div>
                         </div>
+                        <ViewStats />
                     </div>
                 </div>
 
@@ -147,6 +149,7 @@ export function Footer() {
                             </svg>
                         </Link>
                     </div>
+                    
                 </div>
 
                 {/* Bottom Legal Links */}
