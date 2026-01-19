@@ -18,7 +18,8 @@ export async function GET(req: Request) {
             })
         }
 
-        const { startOfToday, startOfTomorrow } = getTodayWindow();
+        const { startOfToday, endOfToday } = getTodayWindow();
+        console.log(startOfToday, endOfToday)
 
         const countires = await prisma.aQIReading.aggregate({
             where: {
@@ -28,7 +29,7 @@ export async function GET(req: Request) {
                 },
                 measuredAt: {
                     gte: startOfToday,
-                    lt: startOfTomorrow
+                    lt: endOfToday
                 }
             },
             _avg: {

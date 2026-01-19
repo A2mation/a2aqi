@@ -24,14 +24,30 @@ export function getPreviousDayWindow() {
 }
 
 export function getTodayWindow() {
-    const startOfToday = new Date()
-    startOfToday.setHours(0, 0, 0, 0)
+    const now = new Date()
 
-    const startOfTomorrow = new Date(startOfToday)
-    startOfTomorrow.setDate(startOfToday.getDate() + 1)
+    // Build IST midnight
+    const istOffsetMinutes = 5 * 60 + 30
 
-    return { startOfToday, startOfTomorrow };
+    const utcYear = now.getUTCFullYear()
+    const utcMonth = now.getUTCMonth()
+    const utcDate = now.getUTCDate()
+
+    // Start: 00:00:01 IST
+    const startOfToday = new Date(
+        Date.UTC(utcYear, utcMonth, utcDate, 0, 0, 1)
+    )
+    startOfToday.setUTCMinutes(startOfToday.getUTCMinutes() - istOffsetMinutes)
+
+    // End: 23:59:59 IST
+    const endOfToday = new Date(
+        Date.UTC(utcYear, utcMonth, utcDate, 23, 59, 59, 999)
+    )
+    endOfToday.setUTCMinutes(endOfToday.getUTCMinutes() - istOffsetMinutes)
+
+    return { startOfToday, endOfToday }
 }
+
 
 
 export function adjustTemperature(baseTemp: number | null) {
