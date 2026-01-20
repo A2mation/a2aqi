@@ -120,9 +120,9 @@ export function AQIDashboard() {
                   {city || state || country ? (
                     city ? `${city.split(", ").slice(-2).join(", ")}` : `${state},${country}`
                   ) : (
-                  <span className="text-muted-foreground">
-                    Location unavailable
-                  </span>
+                    <span className="text-muted-foreground">
+                      Location unavailable
+                    </span>
                   )}
                 </div>
 
@@ -131,7 +131,10 @@ export function AQIDashboard() {
                 </div>
                 <div className="flex items-center justify-start">
                   <span className="text-sm pr-2">
-                    Powered by A2mation
+                    Powered by
+                    <a href="https://a2mation.in/" className="pl-1">
+                      A2mation
+                    </a>
                   </span>
                   <div>
                     {/* <Image
@@ -312,14 +315,16 @@ export function AQIDashboard() {
                         <span className="text-sm text-muted-foreground pr-2">
                           Powered by
                         </span>
-                        <div>
+                        <a
+                          href="https://a2mation.in/"
+                        >
                           <Image
                             src="/assets/a2mation-logo.png"
                             width={90}
                             height={5}
                             alt="Picture of the author"
                           />
-                        </div>
+                        </a>
                       </div>
                     </div>
                   </div>

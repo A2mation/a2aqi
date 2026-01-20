@@ -128,14 +128,16 @@ export default function AirQualityDashboard() {
             <span className="text-sm text-muted-foreground pr-2">
               Powered by
             </span>
-            <div>
+            <a
+              href="https://a2mation.in/"
+            >
               <Image
                 src="/assets/a2mation-logo.png"
                 width={80}
                 height={5}
                 alt="Picture of the author"
               />
-            </div>
+            </a>
           </div>
 
         </div>

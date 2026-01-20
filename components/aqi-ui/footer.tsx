@@ -6,7 +6,7 @@ export function Footer() {
     return (
         <footer className=" px-6 py-12 md:px-12 lg:px-16">
             <div className="mx-auto w-full">
-                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-5 bg-gray-50 p-10 rounded-xl">
+                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 bg-gray-50 p-10 rounded-xl">
                     {/* Logo and Tagline Section */}
                     <div className="lg:col-span-1 max-h-screen flex items-center ">
                         <div className="rounded-2xl bg-gradient-to-br from-blue-50 to-purple-50 p-8">
@@ -20,7 +20,7 @@ export function Footer() {
                                     className="aspect-3/2"
                                 />
                             </div>
-                            <p className="text-center text-sm leading-relaxed text-blue-600">
+                            <p className="text-center text-lg leading-relaxed text-blue-600">
                                 Real-time Air quality and Weather data around the world
                             </p>
                         </div>
@@ -28,20 +28,20 @@ export function Footer() {
 
                     {/* About AQI Column */}
                     <div>
-                        <h3 className="mb-4 text-sm font-medium text-gray-400">About AQI INDIA</h3>
+                        <h3 className="mb-4 text-xl font-medium text-gray-400">About A2AQI</h3>
                         <ul className="space-y-3">
                             <li>
-                                <Link href="/about-us" className="text-sm text-gray-900 hover:text-blue-600">
+                                <Link href="/about-us" className="text-lg text-gray-900 hover:text-blue-600">
                                     About Us
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/contact-us" className="text-sm text-gray-900 hover:text-blue-600">
+                                <Link href="/contact-us" className="text-lg text-gray-900 hover:text-blue-600">
                                     Contact Us
                                 </Link>
                             </li>
                             <li>
-                                <Link href="#" className="text-sm text-gray-900 hover:text-blue-600">
+                                <Link href="#" className="text-lg text-gray-900 hover:text-blue-600">
                                     AQI Monitor
                                 </Link>
                             </li>
@@ -51,11 +51,11 @@ export function Footer() {
 
                     {/* Air Quality Column */}
                     <div>
-                        <h3 className="mb-4 text-sm font-medium text-gray-400">Air Quality</h3>
+                        <h3 className="mb-4 text-xl font-medium text-gray-400">Air Quality</h3>
                         <ul className="space-y-3">
 
                             <li>
-                                <Link href="/air-quality-map" className="text-sm text-gray-900 hover:text-blue-600">
+                                <Link href="/air-quality-map" className="text-lg text-gray-900 hover:text-blue-600">
                                     AQI Map
                                 </Link>
                             </li>
@@ -65,25 +65,25 @@ export function Footer() {
 
                     {/* Rankings Column */}
                     {/* <div>
-                        <h3 className="mb-4 text-sm font-medium text-gray-400">Rankings</h3>
+                        <h3 className="mb-4 text-lg font-medium text-gray-400">Rankings</h3>
                         <ul className="space-y-3">
                             <li>
-                                <Link href="#" className="text-sm text-gray-900 hover:text-blue-600">
+                                <Link href="#" className="text-lg text-gray-900 hover:text-blue-600">
                                     Live AQI City Ranking
                                 </Link>
                             </li>
                             <li>
-                                <Link href="#" className="text-sm text-gray-900 hover:text-blue-600">
+                                <Link href="#" className="text-lg text-gray-900 hover:text-blue-600">
                                     Historic AQI City Ranking
                                 </Link>
                             </li>
                             <li>
-                                <Link href="#" className="text-sm text-gray-900 hover:text-blue-600">
+                                <Link href="#" className="text-lg text-gray-900 hover:text-blue-600">
                                     Historic AQI Country Ranking
                                 </Link>
                             </li>
                             <li>
-                                <Link href="#" className="text-sm text-gray-900 hover:text-blue-600">
+                                <Link href="#" className="text-lg text-gray-900 hover:text-blue-600">
                                     Weather Ranking
                                 </Link>
                             </li>
@@ -92,24 +92,24 @@ export function Footer() {
 
                     {/* Location Column */}
                     <div className="">
-                        <h3 className="mb-4 text-sm font-medium text-gray-400">Location</h3>
+                        <h3 className="mb-4 text-xl font-medium text-gray-400">Location</h3>
                         <div className="space-y-4">
                             <Link
                                 href="#"
-                                className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700"
+                                className="inline-flex items-center gap-2 text-lg font-medium text-blue-600 hover:text-blue-700"
                             >
                                 Support Desk
                                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-xs text-white">
                                     ?
                                 </span>
                             </Link>
-                            <div className="flex items-start gap-2 text-sm text-gray-900">
-                                <Mail className="mt-0.5 h-4 w-4  text-gray-600" />
+                            <div className="flex items-start gap-2 text-lg text-gray-900">
+                                <Mail className="mt-0.5 h-5 w-5  text-gray-600" />
                                 <span>a2mationsolution@gmail.com
                                 </span>
                             </div>
-                            <div className="flex items-start gap-2 text-sm text-gray-900">
-                                <MapPin className="mt-0.5 h-4 w-4  text-gray-600" />
+                            <div className="flex items-start gap-2 text-lg text-gray-900">
+                                <MapPin className="mt-0.5 h-8 w-8  text-gray-600" />
                                 <span>
                                     129/1, Sodla Tank Road, North 24 Parganas, West Bengal, Kolkata- 743133
                                 </span>
@@ -121,7 +121,7 @@ export function Footer() {
 
                 {/* Social Media Section */}
                 <div className="mt-12 flex items-center justify-end gap-4">
-                    <span className="text-sm text-gray-600">Find us on:</span>
+                    <span className="text-lg text-gray-600">Find us on:</span>
                     <div className="flex items-center gap-3">
                         <Link href="#" className="text-gray-600 hover:text-gray-900" aria-label="Instagram">
                             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -153,7 +153,7 @@ export function Footer() {
                 </div>
 
                 {/* Bottom Legal Links */}
-                <div className="mt-8 flex flex-wrap items-center justify-end gap-4 border-t border-gray-200 pt-8 text-sm text-gray-600">
+                <div className="mt-8 flex flex-wrap items-center justify-end gap-4 border-t border-gray-200 pt-8 text-lg text-gray-600">
                     <Link href="#" className="hover:text-gray-900">
                         Terms & Conditions
                     </Link>
