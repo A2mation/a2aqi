@@ -1,10 +1,20 @@
-import React from 'react'
+import Hero from './components/Hero'
+import Info from './components/Info'
+import Environment from './components/Environment'
+import Source from './components/Source'
+import Awarness from './components/Awarness'
+import Prevention from './components/Prevention'
 
 const Page = () => {
   return (
-    <div className='flex items-center justify-center text-red-500'>
-      Available soon.
-    </div>
+    <>
+      <Hero />
+      <Info />
+      <Environment />
+      <Source />
+      <Awarness />
+      <Prevention />
+    </>
   )
 }
 
