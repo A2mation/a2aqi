@@ -140,7 +140,7 @@ const Awarness = () => {
 
                     <div className="w-full h-px bg-border mb-8" />
 
-                    <p className="text-base sm:text-xg text-muted-foreground max-w-3xl leading-relaxed">
+                    <p className="text-base sm:text-xl text-muted-foreground max-w-3xl leading-relaxed">
                         Methane is a highly flammable gas that can pose serious health hazards if it accumulates in enclosed spaces or if it is ingested or inhaled. Some of the health hazards associated with methane poisoning include:
                     </p>
                 </div>
