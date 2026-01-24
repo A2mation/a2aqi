@@ -51,7 +51,7 @@ interface Props {
 
 export function BlogLoginCard({ title, desc, type }: Props) {
     const isSignup = type === BLOGPAGEAUTHTYPE.SIGNUP
-    console.log(type)
+    // console.log(type)
 
     const form = useForm<SignInValues | SignUpValues>({
         resolver: zodResolver(isSignup ? signUpSchema : signInSchema),
