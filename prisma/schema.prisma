@@ -180,8 +180,9 @@ model BlogPost {
   categories BlogPostCategory[]
   comments   Comment[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  editorPick EditorPick?
 
   @@index([authorId])
 }
@@ -197,6 +198,17 @@ model BlogPostCategory {
   createdAt DateTime @default(now())
 
   @@unique([postId, categoryId])
+}
+
+model EditorPick {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  postId String @db.ObjectId
+
+  post BlogPost @relation(fields: [postId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([postId])
 }
 
 model Comment {
