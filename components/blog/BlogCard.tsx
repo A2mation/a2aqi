@@ -2,27 +2,15 @@ import Link from "next/link";
 import Image from "next/image";
 import { useMemo } from "react";
 import { format } from "date-fns";
-import { truncateText } from "@/helpers/truncateText";
 
-export interface BlogContentProps {
-    id: string;
-    createdAt: Date
-    updatedAt: Date
-    slug: string
-    title: string
-    desc: string
-    img?: string
-    views?: number
-    authorId: string
-    likesCount: number
-    author: {}
-}
+import { truncateText } from "@/helpers/truncateText";
+import { BlogContentProps } from "@/types/type";
+
+
 
 export interface PropsBlogCard {
     item: BlogContentProps
 }
-
-
 
 
 export const BlogCard = ({ item }: PropsBlogCard) => {
@@ -66,7 +54,11 @@ export const BlogCard = ({ item }: PropsBlogCard) => {
                             <p className="text-gray-900 leading-none">{createdAt}</p>
                             <Link
                                 className="text-blue-500 hover:text-red-400 hover:underline"
-                                href={`blogs/${item?.id}`}
+                                href={`blogs/${item.author.username}/${item.title
+                                    .toLowerCase()
+                                    .replace(/[^a-z0-9]+/g, "-")
+                                    .replace(/^-+|-+$/g, "")}-${item.id}`}
+
                             >
                                 Read More
                             </Link>

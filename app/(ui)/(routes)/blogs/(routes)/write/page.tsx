@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button"
 import ImageUpload from "@/components/blog/ImageUpload"
 import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
-import { dummyBlogContents } from "@/components/blog/BlogCardList"
 import BlogEditor from "@/components/blog/BlogEditor"
 import { useEditorStore } from "@/store/use-editor-store"
 import { MultiSelect } from "@/components/ui/multi-select"
@@ -41,16 +40,9 @@ const WriteYourBlogPage = () => {
   const [blog, setBlog] = useState("")
   const [title, setTitle] = useState("")
   const [img, setImg] = useState<string | undefined>()
-  const [category, setCategory] = useState<CategoriesProps[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
-  useEffect(() => {
-    setCategory(dummyBlogContents)
-  }, [])
 
-  if (!category.length) {
-    return <Skeleton />
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

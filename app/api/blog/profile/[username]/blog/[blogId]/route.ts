@@ -41,10 +41,10 @@ export async function GET(
 // Delete a Post
 export async function DELETE(
     req: NextRequest,
-    params: { params: Promise<{ blogId: string, profileId: string }> }
+    params: { params: Promise<{ blogId: string, username: string }> }
 ) {
     try {
-        const { blogId, profileId } = await params.params;
+        const { blogId, username } = await params.params;
 
 
         if (!blogId) {

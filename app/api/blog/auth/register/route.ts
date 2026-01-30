@@ -13,9 +13,9 @@ export async function POST(req: Request) {
         { status: 401 }
     );
     try {
-        const { name, email, password } = await req.json();
+        const { name, username, email, password } = await req.json();
 
-        if (!name || !email || !password) {
+        if (!name || !username || !email || !password) {
             return NextResponse.json(
                 { message: "All fields are required" },
                 { status: 400 }
@@ -39,6 +39,7 @@ export async function POST(req: Request) {
             data: {
                 name,
                 email,
+                username,
                 password: hashedPassword,
                 status: ContentWriterStatus.ACTIVE,
             },

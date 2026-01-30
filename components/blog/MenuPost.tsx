@@ -5,11 +5,8 @@ import { http } from "@/lib/http";
 import { useEffect, useState } from "react";
 import Image from 'next/image'
 
-
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton"
 import { truncateText } from "@/helpers/truncateText";
-import { dummyBlogContents } from "./BlogCardList";
 
 interface MenuPostProps {
     withImage: boolean;
