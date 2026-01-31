@@ -17,10 +17,16 @@ export async function GET(
 
         const post = await prisma.blogPost.findUnique({
             where: { id: blogId },
-            include: {
+            select:{
+                id: true,
+                title: true,
+                likedIds: true,
+                desc: true,
+                likesCount: true,
+                createdAt: true,
+                authorId: true,
                 author: true,
-                comments: true,
-                
+                comments: true
             }
         });
 
