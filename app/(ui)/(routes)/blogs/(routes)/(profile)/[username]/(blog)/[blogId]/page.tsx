@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Header } from './components/Header'
 import { BlogContentProps } from "@/types/type";
 import { http } from "@/lib/http";
+import { Comments } from '@/components/blog/Comments';
 
 const SingleBlogPage = ({
   params,
@@ -97,7 +98,7 @@ const SingleBlogPage = ({
             <section>
               <p dangerouslySetInnerHTML={{ __html: blogContent?.desc }} />
             </section>
-            {/* Handel Comment section */}
+            <Comments postId={blogContent.id} />
           </div>
           <aside className="w-full lg:w-56 flex-shrink-0 mt-8 lg:mt-0">
             <div className="sticky top-12 p-6 rounded-lg">
