@@ -16,6 +16,8 @@ interface PopularPost {
     id: string;
     title: string;
     author: {
+        id: string;
+        usernmae: string;
         name: string;
     };
     img: string
@@ -58,7 +60,12 @@ const MenuPosts = ({ withImage }: MenuPostProps) => {
         <div className="mt-9 mb-16 flex flex-col gap-9">
             <div className="flex items-stretch gap-4">
                 {posts.map((items: PopularPost, index: number) => (
-                    <Link key={index} href="/" >
+                    <Link key={index} href={`
+                        /blogs/${items.author.usernmae}/${items.title
+                            .toLowerCase()
+                            .replace(/[^a-z0-9]+/g, "-")
+                            .replace(/^-+|-+$/g, "")}-${items.id}
+                        `} >
                         <div
 
                             className="flex-1 flex flex-col justify-between min-h-[160px]"

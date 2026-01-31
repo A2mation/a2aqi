@@ -100,8 +100,9 @@ export const Comments = ({ postId }: Props) => {
                 toast.success("Comment added!");
                 form.reset();
                 fetchComments();
+            } else {
+                toast.error("Something went wrong");
             }
-            toast.error("Something went wrong");
         } catch {
             toast.error("Something went wrong");
         } finally {
@@ -120,7 +121,7 @@ export const Comments = ({ postId }: Props) => {
                     <p className="text-gray-600 mb-3">
                         You need to be logged in to comment.
                     </p>
-                    <Button variant="outline" onClick={()=>router.push('/blogs/sign-in')}>
+                    <Button variant="outline" onClick={() => router.push('/blogs/sign-in')}>
                         Login to comment
                     </Button>
                 </div>

@@ -112,7 +112,7 @@ export default function Map({
   if (!mounted || loading || lat == null || lng == null) return null;
 
   return (
-    <div className=" w-full h-full rounded-2xl overflow-hidden bg-white shadow">
+    <div className=" w-full h-screen rounded-2xl overflow-hidden bg-white shadow">
       <MapContainer
         center={[lat, lng]}
         zoom={10}
@@ -144,7 +144,7 @@ export default function Map({
       </MapContainer>
 
       {/* CARD OVERLAY */}
-      <div className="absolute top-3/4 md:top-1/4 left-8 md:left-15 z-80">
+      <div className="absolute top-3/4 md:top-1/4 left-3 sm:-8 md:left-15 z-80">
         <AirQualityCard station={selectedStation} />
       </div>
     </div>
