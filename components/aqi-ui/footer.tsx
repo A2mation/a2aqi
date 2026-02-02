@@ -15,9 +15,9 @@ export function Footer() {
                                     src={"/favicon.png"}
 
                                     alt={"LOGO"}
-                                    // width={10}
-                                    // height={10}
-                                    className="aspect-3/2"
+                                    width={200}
+                                    height={100}
+                                    // className="aspect-2/1"
                                 />
                             </div>
                             <p className="text-center text-lg leading-relaxed text-blue-600">
