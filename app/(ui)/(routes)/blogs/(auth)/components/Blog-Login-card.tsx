@@ -80,9 +80,10 @@ export function BlogLoginCard({ title, desc, type }: Props) {
 
             // 🟢 SIGNUP stays manual
             if (isSignup) {
-                await http.post("api/blog/auth/register", values);
+                // await http.post("api/blog/auth/register", values);
 
-                toast.success("Account created successfully 🎉", { id: toastId });
+                // toast.success("Account created successfully 🎉", { id: toastId });
+                toast.error("Account Creation closed please contact with the Admin", { id: toastId });
                 form.reset();
                 router.push("/blogs");
                 return;
