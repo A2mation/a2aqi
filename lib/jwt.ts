@@ -14,3 +14,14 @@ export function signToken(
         { expiresIn: "7d" }
     );
 }
+
+export function signAdminToken(
+    id: string,
+    email: string
+) {
+    return jwt.sign(
+        { id: id, email },
+        NEXTAUTH_SECRET,
+        { expiresIn: "7d" }
+    );
+}

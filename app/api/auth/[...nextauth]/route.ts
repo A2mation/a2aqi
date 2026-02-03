@@ -12,11 +12,13 @@ export const authOptions: NextAuthOptions = {
             name: "Admin Login",
             credentials: { email: {}, password: {} },
             async authorize(credentials) {
+                // console.log("ADMIN LOGIN ATTEMPT", credentials?.email, credentials?.password);
                 try {
                     if (!credentials?.email || !credentials?.password) return null;
 
-                    const res = await http.post("/api/admin/login", credentials);
-                    return normalizeUser(res.data, "ADMIN");
+                    const res = await http.post("api/admin/auth/sign-in", credentials);
+                    console.log(res)
+                    return res.data;
                 } catch (error) {
                     console.error("Admin login failed:", error);
                     return null;

@@ -1,7 +1,5 @@
-type NormalizedUser = {
-    id: string;
-    role: "ADMIN" | "WRITER" | "USER";
-    accessToken: string;
+export enum ROLE {
+    "ADMIN", "WRITER", "USER"
 };
 
 export interface Author {

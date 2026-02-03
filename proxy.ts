@@ -7,21 +7,36 @@ export async function proxy(req: NextRequest) {
         secret: process.env.NEXTAUTH_SECRET,
     });
 
-    if (!token) {
-        return NextResponse.redirect(
-            new URL("/blogs/sign-in", req.url)
-        );
+    const { pathname } = req.nextUrl;
+
+    // Public admin sign-in
+    if (pathname === "/admin/sign-in" || pathname === "/admin-unauthorized") {
+        return NextResponse.next();
     }
 
-    if (token.role !== "WRITER") {
-        return NextResponse.redirect(
-            new URL("/403", req.url)
-        );
+    // Not authenticated
+    if (!token) {
+        if (pathname.startsWith("/admin")) {
+            return NextResponse.redirect(new URL("/admin/sign-in", req.url));
+        }
+
+        if (pathname.startsWith("/blogs/write")) {
+            return NextResponse.redirect(new URL("/blogs/sign-in", req.url));
+        }
+    }
+
+    // WRITER-only
+    if (pathname.startsWith("/blogs/write") && token?.role !== "WRITER") {
+        return NextResponse.redirect(new URL("/writer-unauthorized", req.url));
+    }
+
+    // ADMIN-only
+    if (pathname.startsWith("/admin") && token?.role !== "ADMIN") {
+        return NextResponse.redirect(new URL("/admin-unauthorized", req.url));
     }
 
     return NextResponse.next();
 }
-
 export const config = {
-    matcher: ["/blogs/write"],
-};
+    matcher: ["/blogs/write", "/admin/:path*"]
+}

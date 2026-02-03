@@ -1,7 +1,7 @@
 import React from 'react'
 
 import AuthSessionProviders from '@/providers/auth-session-provider';
-import { NavbarMain } from "@/app/(ui)/(root)/components/Navbar";
+import AdminNavbar from '@/components/admin-ui/admin-nav';
 
 
 const layout = async ({
@@ -13,8 +13,8 @@ const layout = async ({
     return (
         <>
             <AuthSessionProviders>
-                <NavbarMain />
-                <section className="relative w-full">
+                <AdminNavbar />
+                <section className="relative w-full max-w-7xl mx-auto">
                     {children}
                 </section>
             </AuthSessionProviders>

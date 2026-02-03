@@ -7,9 +7,10 @@ const layout = async ({
 }: {
     children: React.ReactNode
 }) => {
-    
+
     return (
         <>
+            <NavbarMain />
             <section className="relative w-full">
                 {children}
             </section>
