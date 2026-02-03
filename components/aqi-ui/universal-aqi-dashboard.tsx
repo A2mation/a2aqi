@@ -108,7 +108,7 @@ export function UniversalAQIDashboard({ data }: UniversalAQIDashboardProps) {
 
                 {/* Dashboard */}
                 <div className="max-w-[100rem] h-full mx-auto px-4 -mt-32 relative z-10 pb-12">
-                    <Card className={`overflow-hidden border `}>
+                    <Card className={` border `}>
                         <DynamicPagination
                             items={[
                                 slugify(averages.country),
@@ -239,7 +239,7 @@ export function UniversalAQIDashboard({ data }: UniversalAQIDashboardProps) {
 
                                 {/* Image */}
                                 <div className="lg:col-span-1 flex items-center justify-center min-h-[300px] md:min-h-[360px]">
-                                    <div className="relative w-full h-full max-w-[360px] rounded-3xl overflow-hidden">
+                                    <div className="relative w-full h-full max-w-[360px] rounded-3xl ">
 
                                         <SparklesCore
                                             className="absolute inset-0"

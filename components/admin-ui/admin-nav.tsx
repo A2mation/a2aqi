@@ -73,7 +73,7 @@ const AdminNavbar = () => {
 
                             <DropdownMenuItem
                                 className="cursor-pointer text-red-600 focus:text-red-600"
-                                onClick={() => signOut({ callbackUrl: "/sign-in" })}
+                                onClick={() => signOut({ callbackUrl: "/admin/sign-in" })}
                             >
                                 <LogOut className="mr-2 h-4 w-4" />
                                 Logout

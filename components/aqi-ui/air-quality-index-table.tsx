@@ -98,7 +98,7 @@ const AirQualityIndexTable = () => {
                     </div>
 
                     {/* Product Showcase */}
-                    <div className="bg-gradient-to-br from-amber-400 to-amber-600 rounded-2xl overflow-hidden shadow-xl h-full">
+                    <div className="bg-gradient-to-br from-amber-400 to-amber-600 rounded-2xl shadow-xl h-full">
                         <div className="relative aspect-square bg-gradient-to-br from-amber-300 to-amber-600 flex items-center justify-center">
                             <svg className="w-32 h-32 text-white opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path
