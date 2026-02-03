@@ -6,6 +6,13 @@ import Precaution from './components/Precaution'
 import Knowledege from './components/Knowledege'
 import AdBanner from '@/components/ad-banner'
 
+import { createLearnMetadata } from "../seo";
+
+export const metadata = createLearnMetadata(
+  "Humidity",
+  "what-is-humidity"
+);
+
 const Page = () => {
   return (
     <>

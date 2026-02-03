@@ -7,6 +7,13 @@ import { DangerousAirContaminantsCard } from "./components/dangerous-air-contami
 import HealthImpactByPollution from "./components/health-impact-pl";
 import AdBanner from "@/components/ad-banner";
 
+import { createLearnMetadata } from "../seo";
+
+export const metadata = createLearnMetadata(
+    "Air Pollution",
+    "what-is-air-pollution"
+);
+
 const AirPollutionArticle = () => {
     return (
         <>

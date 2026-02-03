@@ -4,6 +4,13 @@ import Source from './components/Source'
 import Precautions from './components/Precautions'
 import AdBanner from '@/components/ad-banner'
 
+import { createLearnMetadata } from "../seo";
+
+export const metadata = createLearnMetadata(
+  "Ozone",
+  "what-is-ozone"
+);
+
 const Page = () => {
   return (
     <>

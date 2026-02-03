@@ -10,6 +10,13 @@ import Table from './components/Table'
 import Cure from './components/Cure'
 import AdBanner from '@/components/ad-banner'
 
+import { createLearnMetadata } from "../seo";
+
+export const metadata = createLearnMetadata(
+  "Noise Pollution",
+  "what-is-noise-pollution"
+);
+
 const Page = () => {
   return (
     <>

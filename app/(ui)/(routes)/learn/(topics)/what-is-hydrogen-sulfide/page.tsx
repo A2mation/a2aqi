@@ -5,6 +5,13 @@ import HealthHazards from './components/HealthHazards'
 import AdBanner from "@/components/ad-banner";
 
 
+import { createLearnMetadata } from "../seo";
+
+export const metadata = createLearnMetadata(
+  "Hydrogen Sulfide",
+  "what-is-hydrogen-sulfide"
+);
+
 const Page = () => {
   return (
     <>

@@ -4,6 +4,13 @@ import Source from './components/Source'
 import HealthEffect from './components/HealthEffect'
 import AdBanner from '@/components/ad-banner'
 
+import { createLearnMetadata } from "../seo";
+
+export const metadata = createLearnMetadata(
+  "Carbon dioxide",
+  "what-is-carbon-dioxide"
+);
+
 const Page = () => {
   return (
     <>

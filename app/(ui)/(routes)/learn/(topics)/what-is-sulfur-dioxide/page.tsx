@@ -4,6 +4,13 @@ import Environment from './components/Environment'
 import HarmAndReduce from './components/HarmAndReduce'
 import AdBanner from '@/components/ad-banner'
 
+import { createLearnMetadata } from "../seo";
+
+export const metadata = createLearnMetadata(
+  "Sulfur Dioxide",
+  "what-is-sulfur-dioxide"
+);
+
 const Page = () => {
   return (
     <>

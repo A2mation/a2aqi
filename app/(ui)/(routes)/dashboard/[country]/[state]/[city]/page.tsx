@@ -3,6 +3,7 @@
 import axios from 'axios'
 import { use, useEffect, useState } from 'react'
 
+
 import { UniversalAQIDashboard } from '@/components/aqi-ui/universal-aqi-dashboard'
 import { http } from '@/lib/http'
 

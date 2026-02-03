@@ -8,6 +8,13 @@ import HealthHazard from './components/HealthHazard'
 import Solution from './components/Solution'
 import AdBanner from '@/components/ad-banner'
 
+import { createLearnMetadata } from "../seo";
+
+export const metadata = createLearnMetadata(
+  "Ammonia",
+  "what-is-ammonia"
+);
+
 const Page = () => {
   return (
     <>

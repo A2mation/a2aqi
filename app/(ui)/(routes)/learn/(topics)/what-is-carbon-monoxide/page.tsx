@@ -5,6 +5,13 @@ import Tables from './components/Tables'
 import Solution from './components/Solution'
 import AdBanner from '@/components/ad-banner'
 
+import { createLearnMetadata } from "../seo";
+
+export const metadata = createLearnMetadata(
+  "Carbon Monoxide",
+  "what-is-carbon-monoxide"
+);
+
 
 const Page = () => {
   return (

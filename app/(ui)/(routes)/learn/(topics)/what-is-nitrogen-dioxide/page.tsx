@@ -6,6 +6,13 @@ import Reduce from './components/Reduce'
 import Table from './components/Table'
 import AdBanner from '@/components/ad-banner'
 
+import { createLearnMetadata } from "../seo";
+
+export const metadata = createLearnMetadata(
+  "Nitrogen Dioxide",
+  "what-is-nitrogen-dioxide"
+);
+
 const Page = () => {
   return (
     <>

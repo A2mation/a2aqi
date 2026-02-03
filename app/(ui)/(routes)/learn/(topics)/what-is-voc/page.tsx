@@ -4,6 +4,13 @@ import Effects from './components/Effects'
 import Reduce from './components/Reduce'
 import AdBanner from '@/components/ad-banner'
 
+import { createLearnMetadata } from "../seo";
+
+export const metadata = createLearnMetadata(
+  "voc",
+  "what-is-voc"
+);
+
 const Page = () => {
   return (
     <>

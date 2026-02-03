@@ -55,6 +55,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
         "what-is-voc",
     ];
 
+    urls.push({
+        url: `${BASE_URL}/learn`,
+        lastModified: new Date(),
+        changeFrequency: "monthly",
+        priority: 0.6,
+    })
+
     learnTopics.forEach(topic => {
         urls.push({
             url: `${BASE_URL}/learn/${topic}`,

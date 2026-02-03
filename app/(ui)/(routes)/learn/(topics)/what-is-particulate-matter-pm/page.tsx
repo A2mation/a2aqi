@@ -6,6 +6,13 @@ import Info from './components/Info'
 import Solution from './components/Solution'
 import AdBanner from '@/components/ad-banner'
 
+import { createLearnMetadata } from "../seo";
+
+export const metadata = createLearnMetadata(
+  "Particulate Matter (PM)",
+  "what-is-particulate-matter-pm"
+);
+
 const Page = () => {
   return (
     <>

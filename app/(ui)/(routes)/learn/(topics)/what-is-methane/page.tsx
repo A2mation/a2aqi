@@ -5,6 +5,13 @@ import Source from './components/Source'
 import Awarness from './components/Awarness'
 import Prevention from './components/Prevention'
 
+import { createLearnMetadata } from "../seo";
+
+export const metadata = createLearnMetadata(
+  "Methane",
+  "what-is-methane"
+);
+
 const Page = () => {
   return (
     <>
