@@ -1,6 +1,9 @@
 export enum ROLE {
-    "ADMIN", "WRITER", "USER"
-};
+  ADMIN = "ADMIN",
+  WRITER = "WRITER",
+  USER = "USER"
+}
+
 
 export interface Author {
     name: string

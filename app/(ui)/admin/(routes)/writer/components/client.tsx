@@ -27,7 +27,7 @@ export const WriterClient = ({
                     title={`Manage Writers (${data.length})`}
                     description="Manage writer of a2aqi.com"
                 />
-                <Button onClick={() => router.push(`/admin/writer/new`)}>
+                <Button onClick={() => router.push(`/admin/writer/new`)} className="cursor-pointer">
                     <Plus className="w-4 h-4 mr-2" />
                     Add New
                 </Button>

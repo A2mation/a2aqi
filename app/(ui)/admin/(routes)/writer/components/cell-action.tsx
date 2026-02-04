@@ -1,6 +1,6 @@
 "use client"
 
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { WriterColumn } from "./columns";
 import AlertModal from "@/components/modals/alert-modal";
+import { http } from "@/lib/http";
 
 
 interface CellActionProps {
@@ -37,19 +38,32 @@ export const CellAction = ({ data }: CellActionProps) => {
 
     const onDelete = async () => {
         try {
-
             setLoading(true);
-            await axios.delete(`/api/admin/writter`);
-            router.refresh();
-            toast.success("Size Deleted.");
 
-        } catch (error) {
-            toast.error("Make sure you remove all the blogs that the Writer was written");
+            const res = await http.delete(`/api/admin/writer/${data.id}`);
+            
+            if (res.status === 200) {
+                toast.success(res.data.message || "Writer deleted successfully");
+                router.refresh();
+            }
+            else if (res.status === 409) {
+                toast.error(res.data.message || "Please delete all blogs written by this writer first");
+            } else if (res.status === 401) {
+                toast.error("You are not authorized to perform this action");
+            } else if (res.status === 400) {
+                toast.error("Invalid writer ID or ID not found");
+            } else {
+                toast.error(res.data.message || "Something went wrong");
+            }
+
+
+        } catch (error: any) {
+            toast.error("Unexpected error occurred");
         } finally {
             setLoading(false);
             setOpen(false);
         }
-    }
+    };
 
     return (
         <>

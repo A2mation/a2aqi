@@ -31,6 +31,7 @@ import { Button } from "@/components/ui/button"
 import Heading from "@/components/ui/Heading"
 import { Separator } from "@/components/ui/separator"
 import AlertModal from "@/components/modals/alert-modal";
+import { http } from "@/lib/http";
 
 
 interface WriterFormProps {
@@ -84,23 +85,62 @@ export const WriterForm = ({ initialData }: WriterFormProps) => {
             };
 
             if (!initialData && !payload.password) {
-                form.setError('password', {
-                    message: "Passoword cannot be empty for new user"
-                })
-                return
+                form.setError("password", {
+                    message: "Password cannot be empty for new user",
+                });
+                return;
             }
-            console.log(payload)
-            // if (initialData) {
-            //     await axios.patch(`/api/admin/${params.writerId}`, payload);
-            // } else {
-            //     await axios.post(`/api/admin`, payload);
-            // }
 
-            // router.push("/admin/writer");
-            router.refresh();
-            toast.success(toastMsg);
-        } catch (error) {
-            toast.error("Something went wrong");
+            let res;
+
+            if (initialData) {
+                res = await http.patch(`/api/admin/writer/${params.writerId}`, payload);
+            } else {
+                res = await http.post(`/api/admin/writer`, payload);
+            }
+
+            const status = res.status;
+            const message = res.data.message
+
+            switch (status) {
+                case 200:
+                    toast.success(toastMsg);
+                    form.reset();
+                    router.push('/admin/writer');
+                    break;
+
+                case 201:
+                    toast.success(toastMsg);
+                    form.reset();
+                    router.push('/admin/writer');
+                    break;
+
+                case 400:
+                    toast.error(message || "Invalid input");
+                    break;
+
+                case 401:
+                    toast.error("You are not authorized");
+                    break;
+
+                case 409:
+                    if (typeof message === "string") {
+                        if (message.toLowerCase().includes("email")) {
+                            form.setError("email", { message });
+                        } else if (message.toLowerCase().includes("username")) {
+                            form.setError("username", { message });
+                        }
+                    }
+                    toast.error(message || "Conflict error");
+                    break;
+
+                default:
+                    toast.error("Something went wrong");
+            }
+
+
+        } catch (error: any) {
+            toast.error("Unexpected error occurred");
         } finally {
             setLoading(false);
         }
@@ -111,13 +151,22 @@ export const WriterForm = ({ initialData }: WriterFormProps) => {
         try {
 
             setLoading(true);
-            await axios.delete(`/api/admin/${params.writerId}`);
-            router.push(`/admin/writer`);
-            router.refresh();
-            toast.success("Writer Deleted.");
+            const res = await axios.delete(`/api/admin/writer/${params.writerId}`);
+
+            if (res.status === 200) {
+                toast.success(res.data.message || "Writer deleted successfully");
+                router.push(`/admin/writer`);
+            }
+            else if (res.status === 409) {
+                toast.error(res.data.message || "Please delete all blogs written by this writer first");
+            } else if (res.status === 401) {
+                toast.error("You are not authorized to perform this action");
+            } else if (res.status === 400) {
+                toast.error("Invalid writer ID or ID not found");
+            }
 
         } catch (error) {
-            toast.error("Make sure you remove all Blogs written by the writer.");
+            toast.error("Unexpected error occurred");
         } finally {
             setLoading(false);
             setOpen(false);

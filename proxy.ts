@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { ROLE } from "./types/type";
 
 export async function proxy(req: NextRequest) {
     const token = await getToken({
@@ -26,12 +27,12 @@ export async function proxy(req: NextRequest) {
     }
 
     // WRITER-only
-    if (pathname.startsWith("/blogs/write") && token?.role !== "WRITER") {
+    if (pathname.startsWith("/blogs/write") && token?.role !== ROLE.WRITER) {
         return NextResponse.redirect(new URL("/writer-unauthorized", req.url));
     }
 
     // ADMIN-only
-    if (pathname.startsWith("/admin") && token?.role !== "ADMIN") {
+    if (pathname.startsWith("/admin") && token?.role !== ROLE.ADMIN) {
         return NextResponse.redirect(new URL("/admin-unauthorized", req.url));
     }
 
