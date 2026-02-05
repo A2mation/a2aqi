@@ -13,7 +13,6 @@ import {
     Wand2,
     ChevronLeft,
     ChevronRight,
-    FileText,
     MapPin,
 } from "lucide-react"
 import Link from "next/link"
@@ -41,7 +40,6 @@ const menuItems = [
     { icon: MapPin, label: "Map", href: "/user/map" },
     { icon: BarChart3, label: "Analytics", href: "/user/analytics" },
     { icon: Users, label: "Team", href: "/user/team" },
-    { icon: FileText, label: "Templates", href: "/user/templates/new" },
 ]
 
 const aiItems = [
