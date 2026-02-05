@@ -1,5 +1,4 @@
 import React from 'react'
-import { NavbarMain } from './components/Navbar'
 import { Footer } from '@/components/aqi-ui/footer'
 
 
@@ -11,8 +10,7 @@ const layout = async ({
 
     return (
         <>
-            <NavbarMain />
-            <section className="relative w-full">
+            <section>
                 {children}
             </section>
             <Footer />

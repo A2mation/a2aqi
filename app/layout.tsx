@@ -124,7 +124,6 @@ export default function RootLayout({
       <body className="font-poppins">
 
         {children}
-        <Footer />
         <VisitCounter />
         <Toaster position="top-center" reverseOrder={false} />
       </body>
