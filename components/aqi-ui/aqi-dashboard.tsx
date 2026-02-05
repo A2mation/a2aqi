@@ -253,9 +253,9 @@ export function AQIDashboard() {
                   <SparklesCore
                     className="absolute inset-0 pointer-events-none"
                     background="transparent"
-                    minSize={0.6}
-                    maxSize={1.4}
-                    particleDensity={900}
+                    minSize={0.4}
+                    maxSize={1.6}
+                    particleDensity={10 * (aqi ? aqi : 1)}
                     particleColor="#000000"
                   />
 

@@ -244,9 +244,9 @@ export function UniversalAQIDashboard({ data }: UniversalAQIDashboardProps) {
                                         <SparklesCore
                                             className="absolute inset-0"
                                             background="transparent"
-                                            minSize={0.6}
-                                            maxSize={1.4}
-                                            particleDensity={6 * (averages.aqi ? averages.aqi : 1)}
+                                            minSize={0.4}
+                                            maxSize={1.6}
+                                            particleDensity={10 * (averages.aqi ? averages.aqi : 1)}
                                             particleColor="#000000"
                                         />
 
