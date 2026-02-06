@@ -6,6 +6,7 @@ import { Sidebar } from "@/components/users-ui/dashboard/Sidebar"
 import { Header } from "@/components/users-ui/dashboard/Header"
 import { DeviceContent } from "@/components/users-ui/devices/device-content"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 export default function TasksPage() {
     const [isCollapsed, setIsCollapsed] = useState(false)
@@ -14,7 +15,10 @@ export default function TasksPage() {
             <div className="hidden lg:block">
                 <Sidebar isCollapsed={isCollapsed} onToggle={() => setIsCollapsed(!isCollapsed)} />
             </div>
-            <main className="flex-1 p-4 lg:p-6 lg:ml-64">
+            <main className={cn(
+                "flex-1 p-4 md:p-5 lg:p-6 transition-all duration-300 px-4",
+                isCollapsed ? "lg:ml-16" : "lg:ml-60",
+            )}>
                 <Header
                     title="Devices"
                     description="Manage and organize your devices efficiently."
