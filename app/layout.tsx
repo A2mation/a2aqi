@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 
-import { Footer } from "@/components/aqi-ui/footer";
+import NextTopLoader from "nextjs-toploader";
 import VisitCounter from "@/components/VisitCounter";
 import "./globals.css";
 
@@ -122,6 +122,12 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.png" sizes="32x32" type="image/png" />
       </head>
       <body className="font-poppins">
+        <NextTopLoader
+          color="#3b82f6"
+          height={3}
+          showSpinner={false}
+          speed={200}
+        />
 
         {children}
         <VisitCounter />
