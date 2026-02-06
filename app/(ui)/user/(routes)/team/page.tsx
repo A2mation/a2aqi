@@ -6,6 +6,7 @@ import { Sidebar } from "@/components/users-ui/dashboard/Sidebar"
 import { Header } from "@/components/users-ui/dashboard/Header"
 import { TeamContent } from "@/components//users-ui/team/team-content"
 import { AddTeamMember } from "@/components//users-ui/team/add-team"
+import { cn } from "@/lib/utils"
 
 
 
@@ -20,7 +21,10 @@ export default function TeamPage() {
                 <Sidebar isCollapsed={isCollapsed} onToggle={() => setIsCollapsed(!isCollapsed)} />
             </div>
 
-            <main className="flex-1 p-4 lg:p-6 lg:ml-64">
+            <main className={cn(
+                "flex-1 p-4 md:p-5 lg:p-6 transition-all duration-300 px-4",
+                isCollapsed ? "lg:ml-16" : "lg:ml-60",
+            )}>
                 <Header
                     title="Team"
                     description="Manage your team members and their roles."

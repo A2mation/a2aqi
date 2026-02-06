@@ -1,11 +1,12 @@
 'use client'
 
+import { useState } from "react"
+
 import { Sidebar } from "@/components/users-ui/dashboard/Sidebar"
 import { Header } from "@/components/users-ui/dashboard/Header"
 import { AnalyticsContent } from "@/components/users-ui/analytics/analytics-content"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
-
+import { cn } from "@/lib/utils"
 
 export default function AnalyticsPage() {
     const [isCollapsed, setIsCollapsed] = useState(false)
@@ -15,7 +16,10 @@ export default function AnalyticsPage() {
                 <Sidebar isCollapsed={isCollapsed} onToggle={() => setIsCollapsed(!isCollapsed)} />
             </div>
 
-            <main className="flex-1 p-4 lg:p-6 lg:ml-64">
+            <main className={cn(
+                "flex-1 p-4 md:p-5 lg:p-6 transition-all duration-300 px-4",
+                isCollapsed ? "lg:ml-16" : "lg:ml-60",
+            )}>
                 <Header
                     title="Analytics"
                     description="Track your performance and productivity metrics."
