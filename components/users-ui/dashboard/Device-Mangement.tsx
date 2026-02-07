@@ -5,6 +5,7 @@ import { Plus, MapPin } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useDeviceModal } from "@/hooks/use-device-store"
 
 const members = [
     {
@@ -41,7 +42,9 @@ const members = [
     },
 ]
 
-export function TeamCollaboration() {
+export function DeviceManagement() {
+    const deviceModal = useDeviceModal();
+
     return (
         <Card
             className="p-6 transition-all duration-500 hover:shadow-xl animate-slide-in-up"
@@ -49,7 +52,12 @@ export function TeamCollaboration() {
         >
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold text-foreground">Device Management</h2>
-                <Button variant="outline" size="sm" className="transition-all duration-300 hover:scale-105 bg-transparent">
+                <Button
+                    onClick={deviceModal.onOpen}
+                    variant="outline"
+                    size="sm"
+                    className="transition-all duration-300 hover:scale-105 bg-transparent cursor-pointer"
+                >
                     <Plus className="w-4 h-4 mr-1" />
                     Add New Device
                 </Button>
@@ -68,7 +76,7 @@ export function TeamCollaboration() {
                         <div className="flex-1 min-w-0">
                             <p className="font-semibold text-foreground text-sm">{member.name}</p>
                             <p className="text-xs text-muted-foreground truncate flex items-center gap-1">
-                               <MapPin size={12}/>  <span className="font-medium">{member.location}</span>
+                                <MapPin size={12} />  <span className="font-medium">{member.location}</span>
                             </p>
                         </div>
                         <span
