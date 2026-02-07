@@ -19,6 +19,11 @@ const MainNav = ({
             active: pathName === `/admin`
         },
         {
+            href: `/admin/device`,
+            label: 'Devices',
+            active: pathName === `/admin/device` || pathName === `/admin/device/new` || pathName === `/admin/device/${params.deviceId}`
+        },
+        {
             href: `/admin/device-model`,
             label: 'Device Models',
             active: pathName === `/admin/device-model` || pathName === `/admin/device-model/new` || pathName === `/admin/device-model/${params.deviceModelId}`
