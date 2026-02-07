@@ -70,7 +70,7 @@ model Admin {
 model DeviceModel {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String // ex: "PurpleAir PA-II"
-  
+
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
 
@@ -79,6 +79,7 @@ model DeviceModel {
 
 model Device {
   id       String @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
   serialNo String @unique
   modelId  String @db.ObjectId
 
@@ -86,7 +87,6 @@ model Device {
 
   createdAt DateTime @default(now())
 
-  readings       AQIReading[]
   sensorReadings SensorReading[]
 }
 
@@ -121,8 +121,6 @@ model AQIReading {
 
   // Creation Date
   createdAt DateTime @default(now())
-  device    Device?  @relation(fields: [deviceId], references: [id])
-  deviceId  String?  @db.ObjectId
 
   @@unique([lat, lng, source, measuredAt], name: "lat_lng_source_measuredAt")
   @@index([lat, lng])

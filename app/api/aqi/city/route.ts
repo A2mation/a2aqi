@@ -36,7 +36,7 @@ export async function GET(req: Request) {
                     equals: country,
                     mode: "insensitive",
                 },
-                measuredAt: {
+                createdAt: {
                     gte: startOfToday,
                     lt: endOfToday,
                 },
@@ -52,7 +52,6 @@ export async function GET(req: Request) {
                 _all: true,
             },
         })
-
 
         if (cities._count._all === 0) {
             return new NextResponse("No data for today", {
@@ -70,7 +69,7 @@ export async function GET(req: Request) {
                 pm10: cities._avg.pm10,
                 pm25: cities._avg.pm25,
                 temperature: adjustedTemperature,
-                humidity: cities._avg.humidity,
+                humidity: cities._avg.humidity?.toFixed(2),
                 city: city,
                 state: state,
                 country: country

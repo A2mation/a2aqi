@@ -27,7 +27,7 @@ export async function GET(req: Request) {
                     equals: country,
                     mode: "insensitive",
                 },
-                measuredAt: {
+                createdAt: {
                     gte: startOfToday,
                     lt: endOfToday
                 }
