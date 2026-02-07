@@ -19,29 +19,34 @@ const MainNav = ({
             active: pathName === `/admin`
         },
         {
+            href: `/admin/device-model`,
+            label: 'Device Models',
+            active: pathName === `/admin/device-model` || pathName === `/admin/device-model/new` || pathName === `/admin/device-model/${params.deviceModelId}`
+        },
+        {
             href: `/admin/sensors`,
             label: 'Sensors',
-            active: pathName === `/admin/sensors`
+            active: pathName === `/admin/sensors`|| pathName === `/admin/sensors/new` || pathName === `/admin/sensors/${params.sensorId}`
         },
         {
             href: `/admin/aqi`,
             label: 'AQI',
-            active: pathName === `/admin/aqi`
+            active: pathName === `/admin/aqi` || pathName === `/admin/aqi/new` || pathName === `/admin/aqi/${params.aqiId}`
         },
         {
             href: `/admin/blogs`,
             label: 'Blogs',
-            active: pathName === `/admin/blogs`
+            active: pathName === `/admin/blogs` || pathName === `/admin/blogs/new` || pathName === `/admin/blogs/${params.blogId}`
         },
         {
             href: `/admin/writer`,
             label: 'Writer',
-            active: pathName === `/admin/writer`
+            active: pathName === `/admin/writer` || pathName === `/admin/writer/new` || pathName === `/admin/writer/${params.writerId}`
         },
         {
             href: `/admin/settings`,
             label: 'Settings',
-            active: pathName === `/admin/settings`
+            active: pathName === `/admin/settings` || pathName === `/admin/settings/new` || pathName === `/admin/settings/${params.settingId}`
         }
     ];
 
