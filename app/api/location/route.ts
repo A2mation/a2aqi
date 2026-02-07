@@ -5,6 +5,7 @@ import { redis } from "@/lib/redis"
 import { rateLimit } from "@/helpers/rateLimiter"
 import { getLocationCacheKey } from "@/helpers/cashKeys"
 import { fetchAqiByCoordinates } from "@/services/air-quality/fetchAqiByCoordinates"
+import { resolveLocationAqi } from "@/services/resolveLocationApi"
 
 let geoip: any = null
 
@@ -24,8 +25,6 @@ const http = axios.create({
         "User-Agent": "AQI-App/1.0",
     },
 })
-
-const CACHE_TTL = 60 * 60 // 1 hour
 
 
 /* -----------------------------------
@@ -111,67 +110,29 @@ export async function GET(req: NextRequest) {
     }
 
     /* Try IP providers */
-    for (const p of PROVIDERS) {
+
+    for (const provider of PROVIDERS) {
         try {
-            const { data } = await http.get(p.url(ip))
-            const location = p.normalize(data)
-
-            if (!location) continue
-
-            const cacheKey = getLocationCacheKey(
-                location.lat,
-                location.lng
-            )
-
-            /* Cache hit (lat/lng) */
-            const cached = await redis.get(cacheKey)
-            if (cached) {
-                return NextResponse.json({ ...cached, cached: true })
-            }
-
-            const airQualityResponse = await fetchAqiByCoordinates(
-                location.lat,
-                location.lng
-            )
-
-            if (airQualityResponse?.status === "ok") {
-                const payload = {
-                    lat: location.lat,
-                    lng: location.lng,
-                    city: airQualityResponse.data.city?.name,
-                    state: location.state,
-                    country: location.country,
-
-                    aqi: airQualityResponse.data.aqi,
-                    pm25: airQualityResponse.data.iaqi?.pm25?.v,
-                    pm10: airQualityResponse.data.iaqi?.pm10?.v,
-                    no2: airQualityResponse.data.iaqi?.no2?.v,
-                    o3: airQualityResponse.data.iaqi?.o3?.v,
-                    so2: airQualityResponse.data.iaqi?.so2?.v,
-                    co: airQualityResponse.data.iaqi?.co?.v,
-                    temp: airQualityResponse.data.iaqi?.t?.v,
-                    humidity: airQualityResponse.data.iaqi?.h?.v,
-                    wind: airQualityResponse.data.iaqi?.w?.v,
-
-                    source: p.name,
-                }
-
-                await redis.set(cacheKey, payload, {
-                    ex: CACHE_TTL,
-                })
-
-                return NextResponse.json(payload)
-            }
+            const { data } = await http.get(provider.url(ip))
+            console.log(`IP location resolved via ${provider.name}`)
+            const location = provider.normalize(data)
+            // console.log(location)
+            const result = await resolveLocationAqi(location, provider.name)
+            // console.log(result)
+            if (result) return result
         } catch {
-            // try next provider
+            continue
         }
     }
+
 
     /* -----------------------------------
        GeoIP fallback
     ----------------------------------- */
     try {
+        // console.log(`Attempting GeoIP lookup for IP: ${ip}`)
         const geo = await (await getGeoIp()).lookup(ip)
+        
         if (!geo) {
             return new NextResponse("INVALID IP ADDRESS", {
                 status: 400,
@@ -185,50 +146,14 @@ export async function GET(req: NextRequest) {
             state: geo.region,
             country: geo.country,
         }
+        console.log(`IP location resolved via geoip-lite` + `(IP: ${ip})` + `(Location: ${location.city}, ${location.state}, ${location.country})`)
 
-        const cacheKey = getLocationCacheKey(
-            location.lat,
-            location.lng
-        )
+        const result = await resolveLocationAqi(location, "geoip-lite")
+        if (result) return result
 
-        const cached = await redis.get(cacheKey)
-        if (cached) {
-            return NextResponse.json({ ...cached, cached: true })
-        }
 
-        const airQualityResponse = await fetchAqiByCoordinates(
-            location.lat,
-            location.lng
-        )
-
-        if (airQualityResponse?.status === "ok") {
-            const payload = {
-                lat: location.lat,
-                lng: location.lng,
-                city: airQualityResponse.data.city?.name,
-                state: location.state,
-                country: location.country,
-
-                aqi: airQualityResponse.data.aqi,
-                pm25: airQualityResponse.data.iaqi?.pm25?.v,
-                pm10: airQualityResponse.data.iaqi?.pm10?.v,
-                no2: airQualityResponse.data.iaqi?.no2?.v,
-                o3: airQualityResponse.data.iaqi?.o3?.v,
-                temp: airQualityResponse.data.iaqi?.t?.v,
-                humidity: airQualityResponse.data.iaqi?.h?.v,
-                wind: airQualityResponse.data.iaqi?.w?.v,
-
-                source: "geoip-lite",
-            }
-
-            await redis.set(cacheKey, payload, {
-                ex: CACHE_TTL,
-            })
-
-            return NextResponse.json(payload)
-        }
-    } catch {
-        return new NextResponse("IP not found", { status: 404 })
+    } catch(error: any) {
+        return new NextResponse(error, { status: 404 })
     }
 
     return new NextResponse("Internal Server Error", { status: 500 })

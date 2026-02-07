@@ -1,0 +1,1 @@
+export const LOCATION_CACHE_TTL = 60 * 60 // 1 hour

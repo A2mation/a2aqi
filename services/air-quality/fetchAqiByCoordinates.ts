@@ -37,6 +37,7 @@ export async function fetchAqiByCoordinates(
 
     const res = await http.get(url);
     const data = res.data as WaqiResponse;
+    console.log( ` Responce from waqi `+ data.data.aqi);
 
     if (!data || data.status !== "ok") {
         return null; // IMPORTANT: don't throw, allow filtering
