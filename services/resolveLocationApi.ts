@@ -25,7 +25,7 @@ export async function resolveLocationAqi(location: any, source: string) {
     const payload = {
         lat: location.lat,
         lng: location.lng,
-        city: airQualityResponse.data.city?.name,
+        city: location.city,
         state: location.state,
         country: location.country,
 

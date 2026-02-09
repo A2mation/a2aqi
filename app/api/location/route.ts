@@ -50,7 +50,7 @@ function getClientIp(req: NextRequest): string {
     const raw =
         req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
         req.headers.get("x-real-ip")
-    
+
     console.log(`Raw client IP: ${raw}`)
 
     const ip = normalizeIp(raw)
@@ -73,28 +73,28 @@ const PROVIDERS = [
         normalize: (d: any) =>
             d?.latitude && d?.longitude
                 ? {
-                    lat: d.latitude,
-                    lng: d.longitude,
+                    lat: d.latitude.toFixed(2),
+                    lng: d.longitude.toFixed(2),
                     city: d.city,
                     state: d.region,
                     country: d.country_name,
                 }
                 : null,
     },
-    {
-        name: "ipwho",
-        url: (ip: string) => `https://ipwho.is/${ip}`,
-        normalize: (d: any) =>
-            d?.latitude && d?.longitude
-                ? {
-                    lat: d.latitude,
-                    lng: d.longitude,
-                    city: d.city,
-                    state: d.region,
-                    country: d.country_name,
-                }
-                : null,
-    },
+    // {
+    //     name: "ipwho",
+    //     url: (ip: string) => `https://ipwho.is/${ip}`,
+    //     normalize: (d: any) =>
+    //         d?.latitude && d?.longitude
+    //             ? {
+    //                 lat: d.latitude,
+    //                 lng: d.longitude,
+    //                 city: d.city,
+    //                 state: d.region,
+    //                 country: d.country_name,
+    //             }
+    //             : null,
+    // },
 ]
 
 /* -----------------------------------
@@ -118,10 +118,10 @@ export async function GET(req: NextRequest) {
             const { data } = await http.get(provider.url(ip))
             console.log(`IP location resolved via ${provider.name}`)
             const location = provider.normalize(data)
-            // console.log(location)
+            console.log(location)
             const result = await resolveLocationAqi(location, provider.name)
-            // console.log(result)
-            if (result) return result
+            console.log(result)
+            if (result) return NextResponse.json(result)
         } catch {
             continue
         }
@@ -129,34 +129,9 @@ export async function GET(req: NextRequest) {
 
 
     /* -----------------------------------
-       GeoIP fallback
+      TODO:: GeoIP fallback
     ----------------------------------- */
-    try {
-        // console.log(`Attempting GeoIP lookup for IP: ${ip}`)
-        const geo = await (await getGeoIp()).lookup(ip)
-        
-        if (!geo) {
-            return new NextResponse("INVALID IP ADDRESS", {
-                status: 400,
-            })
-        }
 
-        const location = {
-            lat: geo.ll[0],
-            lng: geo.ll[1],
-            city: geo.city,
-            state: geo.region,
-            country: geo.country,
-        }
-        console.log(`IP location resolved via geoip-lite` + `(IP: ${ip})` + `(Location: ${location.city}, ${location.state}, ${location.country})`)
-
-        const result = await resolveLocationAqi(location, "geoip-lite")
-        if (result) return result
-
-
-    } catch(error: any) {
-        return new NextResponse(error, { status: 404 })
-    }
 
     return new NextResponse("Internal Server Error", { status: 500 })
 }
