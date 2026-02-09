@@ -50,6 +50,8 @@ function getClientIp(req: NextRequest): string {
     const raw =
         req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
         req.headers.get("x-real-ip")
+    
+    console.log(`Raw client IP: ${raw}`)
 
     const ip = normalizeIp(raw)
 
