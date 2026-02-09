@@ -31,7 +31,7 @@ const Tooltip = dynamic(
 
 type AQIMarker = {
   id: string;
-  name: string;
+  location: string;
   lat: number;
   lng: number;
   aqi: number;
@@ -93,10 +93,10 @@ export default function AQIMap() {
           name: city.name,
           lat: city.lat,
           lng: city.lon,
-          aqi: city.aqi?.data.aqi ?? 0,
+          aqi: city.aqi,
         }));
 
-        setMarkers(normalized);
+        setMarkers(data);
       } catch (err) {
         console.error("Failed to load AQI data", err);
       } finally {
@@ -128,9 +128,9 @@ export default function AQIMap() {
         lat != null && lng != null && (
           <MapContainer
             center={[lat, lng]}
-            zoom={13}
-            scrollWheelZoom={false}
-            dragging={false}
+            zoom={8}
+            scrollWheelZoom={true}
+            dragging={true}
             className="h-full w-full z-0"
           >
             <TileLayer
@@ -151,7 +151,7 @@ export default function AQIMap() {
                   sticky
                 >
                   <div className="text-sm">
-                    <strong>{station.name}</strong>
+                    <strong>{station.location}</strong>
                     <br />
                     AQI: <b>{station.aqi}</b>
                   </div>

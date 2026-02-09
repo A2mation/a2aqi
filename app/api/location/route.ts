@@ -3,9 +3,12 @@ import { NextRequest, NextResponse } from "next/server"
 
 import { redis } from "@/lib/redis"
 import { rateLimit } from "@/helpers/rateLimiter"
+import { prisma } from "@/lib/prisma"
 import { getLocationCacheKey } from "@/helpers/cashKeys"
 import { fetchAqiByCoordinates } from "@/services/air-quality/fetchAqiByCoordinates"
 import { resolveLocationAqi } from "@/services/resolveLocationApi"
+import { haversine } from "@/helpers/haversine"
+import { AQIReading } from "@prisma/client"
 
 let geoip: any = null
 
@@ -101,37 +104,72 @@ const PROVIDERS = [
    GET handler
 ----------------------------------- */
 export async function GET(req: NextRequest) {
-    const ip = getClientIp(req)
 
-    /* Rate limit */
-    if (!rateLimit(ip)) {
-        return new NextResponse(
-            "Too many requests",
-            { status: 429 }
-        )
-    }
+    try {
 
-    /* Try IP providers */
+        const ip = getClientIp(req)
 
-    for (const provider of PROVIDERS) {
-        try {
-            const { data } = await http.get(provider.url(ip))
-            console.log(`IP location resolved via ${provider.name}`)
-            const location = provider.normalize(data)
-            console.log(location)
-            const result = await resolveLocationAqi(location, provider.name)
-            console.log(result)
-            if (result) return NextResponse.json(result)
-        } catch {
-            continue
+        /* Rate limit */
+        if (!rateLimit(ip)) {
+            return new NextResponse(
+                "Too many requests",
+                { status: 429 }
+            )
         }
+
+        /* Try IP providers */
+
+
+        const { data } = await http.get(PROVIDERS[0].url(ip))
+        console.log(`IP location resolved via ${PROVIDERS[0].name}`)
+        const location = PROVIDERS[0].normalize(data)
+        console.log(location)
+        // const result = await resolveLocationAqi(location, provider.name)
+        // console.log(result)
+        // if (result) return NextResponse.json(result)
+
+        if (!location) {
+            console.warn("IP provider failed, falling back to GeoIP")
+            return new NextResponse("Location not found", { status: 404 })
+        }
+
+        const radiusKm = 50; // adjust
+        const lat = Number(location.lat)
+        const lng = Number(location.lng)
+
+        // Caching layer here - store recent queries in Redis with a TTL, key by rounded lat/lon
+        // bounding box filter
+        const latDelta = radiusKm / 111;
+        const lngDelta = radiusKm / (111 * Math.cos((lat * Math.PI) / 180));
+
+        const candidates = await prisma.aQIReading.findMany({
+            where: {
+                lat: { gte: lat - latDelta, lte: lat + latDelta },
+                lng: { gte: lng - lngDelta, lte: lng + lngDelta },
+            },
+            orderBy: { createdAt: "desc" },
+            take: 50, 
+        });
+
+        const nearest = candidates.reduce((best, curr) => {
+            const dist = haversine(lat, lng, curr.lat, curr.lng);
+
+            if (!best) return { curr, dist };
+            return dist < best.dist ? { curr, dist } : best;
+        }, null as null | { curr: AQIReading; dist: number });
+
+        if (!nearest) {
+            return new NextResponse("No nearby AQI data", { status: 404 })
+        }
+
+        return NextResponse.json(nearest.curr)
+
+
+
+        /* -----------------------------------
+          TODO:: GeoIP fallback
+        ----------------------------------- */
+    } catch (error: any) {
+        return new NextResponse(error, { status: 500 })
     }
-
-
-    /* -----------------------------------
-      TODO:: GeoIP fallback
-    ----------------------------------- */
-
-
-    return new NextResponse("Internal Server Error", { status: 500 })
 }

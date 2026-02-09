@@ -5,7 +5,9 @@ import { NextRequest, NextResponse } from "next/server"
 import { fetchAqiByCoordinates } from "@/services/air-quality/fetchAqiByCoordinates"
 import { getNearbyCitiesCacheKey } from "@/helpers/cashKeys"
 import { rateLimit } from "@/helpers/rateLimiter"
+import { prisma } from "@/lib/prisma"
 import { normalizeCachedCities } from "@/helpers/normalizeCachedCities"
+import { haversine } from "@/helpers/haversine"
 
 
 type GeoNamesCity = {
@@ -31,24 +33,7 @@ function getClientIp(req: NextRequest): string {
 }
 
 
-function haversine(
-    lat1: number,
-    lon1: number,
-    lat2: number,
-    lon2: number
-): number {
-    const R = 6371 // km
-    const dLat = ((lat2 - lat1) * Math.PI) / 180
-    const dLon = ((lon2 - lon1) * Math.PI) / 180
 
-    const a =
-        Math.sin(dLat / 2) ** 2 +
-        Math.cos((lat1 * Math.PI) / 180) *
-        Math.cos((lat2 * Math.PI) / 180) *
-        Math.sin(dLon / 2) ** 2
-
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-}
 
 function cityScore(city: GeoNamesCity): number {
     let score = 0
@@ -80,72 +65,110 @@ export async function GET(req: NextRequest) {
             })
         }
 
-        const cacheKey = getNearbyCitiesCacheKey(Number(lat), Number(lon))
 
-        /* Redis cache hit */
-        const cached = await redis.get(cacheKey) as object
-        if (cached) {
-            const cities = normalizeCachedCities(cached)
+        const latNum = Math.round(Number(lat) * 100) / 100
+        const lonNum = Math.round(Number(lon) * 100) / 100
 
-            return NextResponse.json(cities)
+        const radiusKm = 200;
+        const latDelta = radiusKm / 111;
+        const lngDelta = radiusKm / (111 * Math.cos((latNum * Math.PI) / 180));
 
-        }
+        // TODO: Caching layer here - store recent queries in Redis with a TTL, key by rounded lat/lon
 
-        const username = process.env.GEONAMES_USERNAME
-        if (!username) {
-            return new NextResponse("GeoNames username missing", {
-                status: 500,
+        const candidates = await prisma.aQIReading.findMany({
+            where: {
+                lat: { gte: latNum - latDelta, lte: latNum + latDelta },
+                lng: { gte: lonNum - lngDelta, lte: lonNum + lngDelta },
+            },
+            orderBy: { createdAt: "desc" },
+            take: 500,
+        });
+
+        const nearest10 = candidates
+            .map((c) => ({
+                ...c,
+                distanceKm: haversine(latNum, lonNum, c.lat, c.lng),
+            }))
+            .sort((a, b) => a.distanceKm - b.distanceKm)
+            .filter((item, index, self) => {
+                return (
+                    index ===
+                    self.findIndex(
+                        (x) => x.lat === item.lat && x.lng === item.lng
+                    )
+                )
             })
-        }
+            .slice(0, 10);
 
-        const geoNamesURL =
-            `http://api.geonames.org/findNearbyPlaceNameJSON` +
-            `?lat=${lat}` +
-            `&lng=${lon}` +
-            `&cities=5000` +
-            `&radius=50` +
-            `&maxRows=15` +
-            `&username=${username}`
 
-        const response = await http.get(geoNamesURL)
-        const data = response.data
+        return NextResponse.json(nearest10);
 
-        const cities = (data.geonames as GeoNamesCity[]).map((city) => ({
-            name: city.name,
-            country: city.countryName,
-            lat: Number(city.lat),
-            lon: Number(city.lng),
-            population: city.population,
-            distanceKm: haversine(
-                Number(lat),
-                Number(lon),
-                Number(city.lat),
-                Number(city.lng)
-            ),
-            score: cityScore(city),
-        }))
-
-        // const rankedCities = cities
-        //     .sort((a, b) => b.score - a.score || a.distanceKm - b.distanceKm)
-        //     .slice(0, 6)
-
-        const citiesWithAqi = await Promise.all(
-            cities.map(async (city) => {
-                const aqi = await fetchAqiByCoordinates(city.lat, city.lon)
-                return {
-                    ...city,
-                    aqi,
-                }
-            })
-        )
-
-        /* Save to Redis */
-        await redis.set(cacheKey, citiesWithAqi, {
-            ex: CACHE_TTL,
-        })
-
-        return NextResponse.json(citiesWithAqi)
     } catch {
         return new NextResponse("Internal Server Error", { status: 500 })
     }
 }
+
+
+// const cacheKey = getNearbyCitiesCacheKey(Number(lat), Number(lon))
+
+// /* Redis cache hit */
+// const cached = await redis.get(cacheKey) as object
+// if (cached) {
+//     const cities = normalizeCachedCities(cached)
+
+//     return NextResponse.json(cities)
+
+// }
+
+// const username = process.env.GEONAMES_USERNAME
+// if (!username) {
+//     return new NextResponse("GeoNames username missing", {
+//         status: 500,
+//     })
+// }
+
+// const geoNamesURL =
+//     `http://api.geonames.org/findNearbyPlaceNameJSON` +
+//     `?lat=${lat}` +
+//     `&lng=${lon}` +
+//     `&cities=5000` +
+//     `&radius=50` +
+//     `&maxRows=15` +
+//     `&username=${username}`
+
+// const response = await http.get(geoNamesURL)
+// const data = response.data
+
+// const cities = (data.geonames as GeoNamesCity[]).map((city) => ({
+//     name: city.name,
+//     country: city.countryName,
+//     lat: Number(city.lat),
+//     lon: Number(city.lng),
+//     population: city.population,
+//     distanceKm: haversine(
+//         Number(lat),
+//         Number(lon),
+//         Number(city.lat),
+//         Number(city.lng)
+//     ),
+//     score: cityScore(city),
+// }))
+
+// // const rankedCities = cities
+// //     .sort((a, b) => b.score - a.score || a.distanceKm - b.distanceKm)
+// //     .slice(0, 6)
+
+// const citiesWithAqi = await Promise.all(
+//     cities.map(async (city) => {
+//         const aqi = await fetchAqiByCoordinates(city.lat, city.lon)
+//         return {
+//             ...city,
+//             aqi,
+//         }
+//     })
+// )
+
+// /* Save to Redis */
+// await redis.set(cacheKey, citiesWithAqi, {
+//     ex: CACHE_TTL,
+// })
