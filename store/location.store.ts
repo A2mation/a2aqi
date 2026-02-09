@@ -5,11 +5,12 @@ import { create } from "zustand"
 export type LocationState = {
     lat: number | null
     lng: number | null
+    location: string | null
     city: string | null
     state: string | null
     country: string | null
     source: string | null
-    loading: boolean | null
+    loading: boolean
     aqi: number | null,
     pm25: number | null,
     pm10: number | null,
@@ -29,6 +30,7 @@ export type LocationState = {
 export const useLocationStore = create<LocationState>((set) => ({
     lat: null,
     lng: null,
+    location: null,
     source: null,
     state: null,
     city: null,

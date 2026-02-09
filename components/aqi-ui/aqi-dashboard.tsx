@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { use, useEffect, useState } from "react"
 import {
   Heart,
   Share2,
@@ -9,6 +9,7 @@ import {
   Wind,
   MapPin,
   SquareDashed,
+  Locate,
 } from "lucide-react"
 import dynamic from "next/dynamic"
 import Image from 'next/image'
@@ -22,7 +23,7 @@ import {
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { AQITheme, getAQITheme } from "@/helpers/aqi-color-pallet"
-import { detectIpLocation } from "@/store/location.actions"
+import { detectIpLocation, detectGpsLocation } from "@/store/location.actions"
 import { useLocationStore } from "@/store/location.store"
 import { Skeleton } from "@/components/ui/skeleton"
 import { AQIScale } from "./aqi-scale"
@@ -31,12 +32,13 @@ import { SparklesCore } from "../ui/sparkles"
 import { BackgroundGradient } from "../ui/background-gradient"
 import { ShareDialog } from "@/components/Share-Button";
 import { ViewMapsButton } from "../ViewMapsButton"
+import { de } from "zod/v4/locales"
 
 const AQIMap = dynamic(() => import("./aqi-map"), { ssr: false })
 
 export function AQIDashboard() {
   const {
-    city,
+    location,
     state,
     country,
     loading,
@@ -47,7 +49,7 @@ export function AQIDashboard() {
     pm10,
     pm25,
     aqi,
-    error,
+    error
   } = useLocationStore()
   const [open, setOpen] = useState(false);
 
@@ -72,8 +74,18 @@ export function AQIDashboard() {
 
 
   useEffect(() => {
-    detectIpLocation()
+    const initLocation = async () => {
+      try {
+        await detectGpsLocation()
+      } catch {
+        await detectIpLocation()
+      }
+    }
+
+    initLocation()
   }, [])
+
+
 
 
   useEffect(() => {
@@ -94,7 +106,7 @@ export function AQIDashboard() {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center text-red-500">
-        Failed to load air quality data.
+        {error}
       </div>
     )
   }
@@ -117,8 +129,8 @@ export function AQIDashboard() {
                 <h1 className="text-3xl md:text-5xl font-semibold">Real-time Air Quality Index (AQI)</h1>
 
                 <div className={`font-semibold text-sm md:text-2xl underline  ${theme.text}`}>
-                  {city || state || country ? (
-                    city ? `${city.split(", ").slice(-2).join(", ")}` : `${state},${country}`
+                  {location || state || country ? (
+                    `${location},${state},${country}`
                   ) : (
                     <span className="text-muted-foreground">
                       Location unavailable
@@ -149,6 +161,23 @@ export function AQIDashboard() {
 
               <div className="flex items-center gap-3">
                 {/* Map Button – Primary Action */}
+                <Button
+                  disabled={loading}
+                  onClick={async () => {
+                    if (loading) return
+
+                    try {
+                      await detectGpsLocation()
+                    } catch {
+                      await detectIpLocation()
+                    }
+                  }}
+                  className="flex items-center"
+                  variant="outline"
+                >
+                  <Locate className="h-5 w-5 mr-2" /> Locate me
+                </Button>
+
                 <a href="/air-quality-map">
                   <ViewMapsButton />
                 </a>

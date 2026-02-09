@@ -104,72 +104,76 @@ const PROVIDERS = [
    GET handler
 ----------------------------------- */
 export async function GET(req: NextRequest) {
-
     try {
-
         const ip = getClientIp(req)
 
-        /* Rate limit */
         if (!rateLimit(ip)) {
-            return new NextResponse(
-                "Too many requests",
-                { status: 429 }
-            )
+            return new NextResponse("Too many requests", { status: 429 })
         }
 
-        /* Try IP providers */
+        const { searchParams } = new URL(req.url)
+        const latParam = searchParams.get("lat")
+        const lonParam = searchParams.get("lng")
+        // console.log(`Received location request from IP: ${ip} with params lat=${latParam}, lon=${lonParam}`)
 
+        let lat: number
+        let lng: number
 
-        const { data } = await http.get(PROVIDERS[0].url(ip))
-        console.log(`IP location resolved via ${PROVIDERS[0].name}`)
-        const location = PROVIDERS[0].normalize(data)
-        console.log(location)
-        // const result = await resolveLocationAqi(location, provider.name)
-        // console.log(result)
-        // if (result) return NextResponse.json(result)
+        // If params exist, use them
+        if (latParam && lonParam) {
+            lat = Number(latParam)
+            lng = Number(lonParam)
 
-        if (!location) {
-            console.warn("IP provider failed, falling back to GeoIP")
-            return new NextResponse("Location not found", { status: 404 })
+            if (Number.isNaN(lat) || Number.isNaN(lng)) {
+                return new NextResponse("Invalid lat/lon params", { status: 400 })
+            }
+        } else {
+            // Else fallback to IP based location
+            console.log(`No lat/lng params, resolving location for IP: ${ip}`)
+            const { data } = await http.get(PROVIDERS[0].url(ip))
+            console.log(data)
+            const location = PROVIDERS[0].normalize(data)
+            // console.log(`IP-based location for IP ${ip}:`, location)
+            if (!location) {
+                return new NextResponse("Location not found", { status: 404 })
+            }
+
+            lat = Number(location.lat)
+            lng = Number(location.lng)
+
+            if (Number.isNaN(lat) || Number.isNaN(lng)) {
+                return new NextResponse("Invalid location coordinates", { status: 500 })
+            }
         }
 
-        const radiusKm = 50; // adjust
-        const lat = Number(location.lat)
-        const lng = Number(location.lng)
+        const radiusKm = 200
 
-        // Caching layer here - store recent queries in Redis with a TTL, key by rounded lat/lon
-        // bounding box filter
-        const latDelta = radiusKm / 111;
-        const lngDelta = radiusKm / (111 * Math.cos((lat * Math.PI) / 180));
+        const latDelta = radiusKm / 111
+        const lngDelta = radiusKm / (111 * Math.cos((lat * Math.PI) / 180))
 
         const candidates = await prisma.aQIReading.findMany({
             where: {
                 lat: { gte: lat - latDelta, lte: lat + latDelta },
                 lng: { gte: lng - lngDelta, lte: lng + lngDelta },
             },
-            orderBy: { createdAt: "desc" },
-            take: 50, 
-        });
+            take: 300,
+        })
 
         const nearest = candidates.reduce((best, curr) => {
-            const dist = haversine(lat, lng, curr.lat, curr.lng);
+            const dist = haversine(lat, lng, curr.lat, curr.lng)
 
-            if (!best) return { curr, dist };
-            return dist < best.dist ? { curr, dist } : best;
-        }, null as null | { curr: AQIReading; dist: number });
+            if (!best || dist < best.dist) return { curr, dist }
+            return best
+        }, null as null | { curr: AQIReading; dist: number })
 
         if (!nearest) {
             return new NextResponse("No nearby AQI data", { status: 404 })
         }
 
         return NextResponse.json(nearest.curr)
-
-
-
-        /* -----------------------------------
-          TODO:: GeoIP fallback
-        ----------------------------------- */
     } catch (error: any) {
-        return new NextResponse(error, { status: 500 })
+        console.error(error)
+        return new NextResponse("Internal Server Error", { status: 500 })
     }
 }
+
