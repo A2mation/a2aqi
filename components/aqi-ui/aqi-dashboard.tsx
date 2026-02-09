@@ -334,14 +334,14 @@ export function AQIDashboard() {
                       </span>
                     </div>
 
-                    <div className="flex justify-between text-lg md:text-2xl">
+                    {/* <div className="flex justify-between text-lg md:text-2xl">
                       <span className="flex gap-2">
                         <Wind className="h-8 w-8 items-center" /> Wind
                       </span>
                       <span>
                         {typeof wind === "number" ? `${parseFloat(wind.toString()).toFixed(2)} km/h` : "--"}
                       </span>
-                    </div>
+                    </div> */}
 
                     <div className="flex justify-center">
                       <div className="flex items-center justify-start mt-4">
