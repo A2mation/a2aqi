@@ -159,7 +159,7 @@ export function AQIDashboard() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-start md:items-center flex-col md:flex-row gap-3">
                 {/* Map Button – Primary Action */}
                 <Button
                   disabled={loading}
@@ -172,18 +172,20 @@ export function AQIDashboard() {
                       await detectIpLocation()
                     }
                   }}
-                  className="flex items-center"
+                  className="flex items-center cursor-pointer"
                   variant="outline"
                 >
                   <Locate className="h-5 w-5 mr-2" /> Locate me
                 </Button>
 
-                <a href="/air-quality-map">
-                  <ViewMapsButton />
-                </a>
+                <div className="flex flex-row gap-4">
 
-                {/* Favorite Button */}
-                {/* <Button
+                  <a href="/air-quality-map">
+                    <ViewMapsButton />
+                  </a>
+
+                  {/* Favorite Button */}
+                  {/* <Button
                   variant="outline"
                   size="lg"
                   className="h-12 w-12 rounded-xl border-blue-300 
@@ -194,27 +196,29 @@ export function AQIDashboard() {
                   <Heart className="h-5 w-5" />
                 </Button> */}
 
-                {/* Share Button */}
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        onClick={() => setOpen(true)}
-                        variant="outline"
-                        size="icon"
-                        className="h-12 w-12 rounded-xl border-blue-300
+                  {/* Share Button */}
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          onClick={() => setOpen(true)}
+                          variant="outline"
+                          size="icon"
+                          className="h-12 w-12 rounded-xl border-blue-300
                          transition-all duration-300
                          hover:bg-blue-50 hover:text-blue-600
                          hover:scale-110 hover:shadow-md"
-                      >
-                        <Share2 className="h-5 w-5" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom">Share</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                        >
+                          <Share2 className="h-5 w-5" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">Share</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
 
-                <ShareDialog open={open} onOpenChange={setOpen} />
+                  <ShareDialog open={open} onOpenChange={setOpen} />
+                </div>
+
               </div>
 
             </div>

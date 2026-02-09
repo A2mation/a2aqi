@@ -82,10 +82,14 @@ export const detectGpsLocation = () => {
                         params: { lat, lng },
                     })
 
+                    const actualLocation = await http.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+
+                    // console.log(actualLocation.data)
+
                     setState({
                         lat,
                         lng,
-                        location: data.location,
+                        location: actualLocation.data ? actualLocation.data.address.city : data.location,
                         city: data.city,
                         state: data.state,
                         country: data.country,
