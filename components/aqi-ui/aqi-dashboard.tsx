@@ -128,15 +128,16 @@ export function AQIDashboard() {
               <div className="flex gap-y-2 flex-col">
                 <h1 className="text-3xl md:text-5xl font-semibold">Real-time Air Quality Index (AQI)</h1>
 
-                <div className={`font-semibold text-sm md:text-2xl underline  ${theme.text}`}>
+                <div className={`font-semibold text-sm md:text-2xl underline ${theme.text}`}>
                   {location || state || country ? (
-                    `${location},${state},${country}`
+                    `${(location ?? "").split(",").slice(0, 3).map(s => s.trim()).join(", ")}, ${state}`
                   ) : (
                     <span className="text-muted-foreground">
                       Location unavailable
                     </span>
                   )}
                 </div>
+
 
                 <div className="text-sm md:text-lg text-muted-foreground">
                   {lastUpdated ? `Last updated: ${lastUpdated}` : ""}

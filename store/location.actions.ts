@@ -89,7 +89,7 @@ export const detectGpsLocation = () => {
                     setState({
                         lat,
                         lng,
-                        location: actualLocation.data ? actualLocation.data.address.city : data.location,
+                        location: actualLocation.data.display_name ? actualLocation.data.display_name : data.location,
                         city: data.city,
                         state: data.state,
                         country: data.country,
