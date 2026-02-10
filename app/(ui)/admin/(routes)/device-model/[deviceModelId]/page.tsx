@@ -20,6 +20,9 @@ const SingleDeviceModelPage = async ({
         select: {
             id: true,
             name: true,
+            description: true,
+            manufacturer: true,
+            isActive: true,
             createdAt: true,
         }
     });

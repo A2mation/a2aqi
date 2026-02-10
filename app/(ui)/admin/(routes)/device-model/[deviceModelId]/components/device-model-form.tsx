@@ -11,6 +11,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useParams, useRouter } from "next/navigation";
 
 import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import {
     Form,
     FormControl,
     FormDescription,
@@ -25,6 +32,7 @@ import Heading from "@/components/ui/Heading"
 import { Separator } from "@/components/ui/separator"
 import AlertModal from "@/components/modals/alert-modal";
 import { http } from "@/lib/http";
+import { Textarea } from "@/components/ui/textarea";
 
 
 interface DeviceModelPops {
@@ -32,7 +40,10 @@ interface DeviceModelPops {
 }
 
 const formSchema = z.object({
-    name: z.string().min(2, "Name is required"),
+    name: z.string().min(2, "Name is required."),
+    description: z.string().min(10, "Minimum 10 letters needed."),
+    manufacturer: z.string().min(2, "Manufacturer name is required."),
+    isActive: z.boolean()
 });
 
 
@@ -56,6 +67,10 @@ export const DeviceModelForm = ({ initialData }: DeviceModelPops) => {
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: initialData?.name ?? "",
+            description: initialData?.description ?? "",
+            manufacturer: initialData?.manufacturer ?? "",
+            isActive: initialData?.isActive ?? true,
+
         },
     });
     // console.log(form.formState.errors);
@@ -66,10 +81,23 @@ export const DeviceModelForm = ({ initialData }: DeviceModelPops) => {
 
             if (!initialData && !data.name) {
                 form.setError("name", {
-                    message: "Password cannot be empty for new user",
+                    message: "Name cannot be empty",
                 });
                 return;
             }
+
+            if (!initialData && !data.description) {
+                form.setError("description", {
+                    message: "Description cannot be empty"
+                })
+            }
+
+            if (!initialData && !data.manufacturer) {
+                form.setError("manufacturer", {
+                    message: "Manufacturer cannot be empty"
+                })
+            }
+
 
             let res;
 
@@ -86,13 +114,13 @@ export const DeviceModelForm = ({ initialData }: DeviceModelPops) => {
                 case 200:
                     toast.success(toastMsg);
                     form.reset();
-                    router.push('/admin/Device Model');
+                    router.push('/admin/device-model');
                     break;
 
                 case 201:
                     toast.success(toastMsg);
                     form.reset();
-                    router.push('/admin/Device Model');
+                    router.push('/admin/device-model');
                     break;
 
                 case 400:
@@ -120,7 +148,7 @@ export const DeviceModelForm = ({ initialData }: DeviceModelPops) => {
         try {
 
             setLoading(true);
-            const res = await axios.delete(`/api/admin/device-model/${params.writerId}`);
+            const res = await axios.delete(`/api/admin/device-model/${params.deviceModelId}`);
 
             if (res.status === 200) {
                 toast.success(res.data.message || "Device Model deleted successfully");
@@ -189,6 +217,94 @@ export const DeviceModelForm = ({ initialData }: DeviceModelPops) => {
                                 </FormItem>
                             )}
                         />
+
+
+                        <FormField
+                            control={form.control}
+                            name="manufacturer"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Manufacturer</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            placeholder="Device Model Manufacturer"
+                                            className="cursor-none"
+                                            disabled={
+                                                initialData ? true : loading
+                                            }
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormDescription>
+                                        {
+                                            initialData
+                                                ? `Manufacturer cannot be edited.`
+                                                : `This is your public display Device Model Manufacturer.`
+                                        }
+
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="isActive"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Status</FormLabel>
+
+                                    <Select
+                                        disabled={loading}
+                                        onValueChange={(value) => field.onChange(value === "true")}
+                                        value={field.value ? "true" : "false"}
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select status" />
+                                            </SelectTrigger>
+                                        </FormControl>
+
+                                        <SelectContent>
+                                            <SelectItem value="true">Active</SelectItem>
+                                            <SelectItem value="false">Inactive</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+
+                                    <FormDescription>
+                                        Controls whether the Device Model can publish content.
+                                    </FormDescription>
+
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+
+                        <FormField
+                            control={form.control}
+                            name="description"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Description</FormLabel>
+                                    <FormControl>
+                                        <Textarea
+                                            placeholder="Device Model description"
+                                            disabled={loading}
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormDescription className="text-red-600">
+                                        Please elaborately mention which model contains which fields.
+                                        (EX: AQI, PM2.5, So2 etc.)
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+
 
 
                     </div>
