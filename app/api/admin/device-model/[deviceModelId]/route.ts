@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
+
 import { prisma } from "@/lib/prisma"
+import { getAuthSession } from "@/auth";
+import { ROLE } from "@/types/type";
 
 export async function GET(
     req: Request,
@@ -39,6 +42,27 @@ export async function PATCH(
     }
 ) {
     try {
+
+        const session = await getAuthSession();
+
+        if (!session || session.user.role !== ROLE.ADMIN) {
+            return new NextResponse("ADMIN ACCESS ONLY ROUTE", {
+                status: 401
+            })
+        }
+
+        const admin = await prisma.admin.findUnique({
+            where: {
+                id: session.user.id
+            }
+        })
+
+        if (!admin) {
+            return new NextResponse("Unauthorized", {
+                status: 401
+            })
+        }
+
         const { deviceModelId } = await params.params;
         if (!deviceModelId) {
             return new NextResponse("Device Model ID not Found", {
@@ -47,9 +71,9 @@ export async function PATCH(
         }
 
         const {
-            name
-        }: {
-            name: string
+            name,
+            description,
+            isActive
         } = await req.json();
 
         const updatedDeviceModel = await prisma.deviceModel.update({
@@ -57,7 +81,9 @@ export async function PATCH(
                 id: deviceModelId
             },
             data: {
-                name
+                name,
+                description,
+                isActive
             }
         })
 
@@ -81,7 +107,26 @@ export async function DELETE(
 ) {
     try {
 
-        // Admin authentication
+        const session = await getAuthSession();
+
+        if (!session || session.user.role !== ROLE.ADMIN) {
+            return new NextResponse("ADMIN ACCESS ONLY ROUTE", {
+                status: 401
+            })
+        }
+
+        const admin = await prisma.admin.findUnique({
+            where: {
+                id: session.user.id
+            }
+        })
+
+        if (!admin) {
+            return new NextResponse("Unauthorized", {
+                status: 401
+            })
+        }
+
         const { deviceModelId } = await params.params;
         if (!deviceModelId) {
             return new NextResponse("Device Model ID not Found", {

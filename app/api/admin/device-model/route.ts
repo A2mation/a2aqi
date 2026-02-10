@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { getAuthSession } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { ROLE } from "@/types/type";
 
 export async function GET() {
     try {
@@ -21,13 +22,27 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
 
-        // TODO: Authenticate ADMIN and check if they have permission to create device models
-        // const session = await getAuthSession();
-        // if (!session) {
-        //     return new NextResponse("Unauthorized", { status: 401 });
-        // }
+        const session = await getAuthSession();
 
-        const { name } = await request.json();
+        if (!session || session.user.role !== ROLE.ADMIN) {
+            return new NextResponse("ADMIN ACCESS ONLY ROUTE", {
+                status: 401
+            })
+        }
+
+        const admin = await prisma.admin.findUnique({
+            where: {
+                id: session.user.id
+            }
+        })
+
+        if (!admin) {
+            return new NextResponse("Unauthorized", {
+                status: 401
+            })
+        }
+
+        const { name, description, manufacturer } = await request.json();
 
         if (!name) {
             return new NextResponse("Name and manufacturer are required", { status: 400 });
@@ -36,6 +51,8 @@ export async function POST(request: Request) {
         const newDeviceModel = await prisma.deviceModel.create({
             data: {
                 name,
+                description,
+                manufacturer
             },
         });
 
