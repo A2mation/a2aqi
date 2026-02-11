@@ -9,10 +9,10 @@ import { Separator } from "@/components/ui/separator"
 import { DataTable } from "@/components/ui/data-table"
 import { ApiList } from "@/components/ui/api-list"
 
-import { DeviceColumn, columns } from "./columns"
+import { Device, columns } from "./columns"
 
 interface DeviceClientProps {
-    data: DeviceColumn[]
+    data: Device[]
 }
 
 export const DeviceClient = ({
