@@ -4,16 +4,19 @@ import { ColumnDef } from "@tanstack/react-table"
 
 import { CellAction } from "./cell-action"
 
-export type DeviceColumn
+export type Device
     = {
         id: string
         name: string
         serialNo: string
+        status: string
         model: string
+        user: string
+        assignedAt: string
         createdAt: string
     }
 
-export const columns: ColumnDef<DeviceColumn>[] = [
+export const columns: ColumnDef<Device>[] = [
     {
         accessorKey: "name",
         header: "Name",
@@ -23,8 +26,20 @@ export const columns: ColumnDef<DeviceColumn>[] = [
         header: "Serial No.",
     },
     {
+        accessorKey: "status",
+        header: "Status",
+    },
+    {
         accessorKey: "model",
         header: "Device Model",
+    },
+    {
+        accessorKey: "user",
+        header: "User",
+    },
+    {
+        accessorKey: "assignedAt",
+        header: "Assigned At",
     },
     {
         accessorKey: "createdAt",

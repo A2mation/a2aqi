@@ -2,10 +2,10 @@
 
 import * as z from "zod";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Trash } from "lucide-react"
-import { Device } from "@prisma/client"
+import { DeviceModel, DeviceStatus } from "@prisma/client"
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useParams, useRouter } from "next/navigation";
@@ -32,15 +32,21 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Label } from '@/components/ui/label'
 
 
 interface DeviceInterface {
     id: string;
-    serialNo: string;
     name: string;
-    model: {
-        name: string;
-    };
+    serialNo: string;
+    status: DeviceStatus;
+    modelId: string;
+    modelName: string;
+    user: string;
+    lat: string;
+    lng: string;
+    createdAt: Date;
 }
 
 interface DevicePops {
@@ -50,7 +56,11 @@ interface DevicePops {
 const formSchema = z.object({
     name: z.string().min(2, "Name is required"),
     serialNo: z.string().min(2, "Serial Number is required"),
-    model: z.string().min(2, "Model is required"),
+    modelId: z.string().min(2, "Model is required"),
+    lat: z.string().optional(),
+    lng: z.string().optional(),
+    user: z.string().optional(),
+    status: z.enum(DeviceStatus).optional()
 });
 
 
@@ -63,17 +73,34 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
 
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [isUserMode, setIsUserMode] = useState(false);
+
+    const [deviceModel, setDeviceModel] = useState<DeviceModel[]>()
 
     const title = initialData ? "Edit Device" : "Create Device";
     const description = initialData ? "Edit a Device" : "Add a new Device";
     const toastMsg = initialData ? "Device updated." : "Device created.";
     const action = initialData ? "Save Changes" : "Create";
 
+    useEffect(() => {
+        const getDeviceModels = async () => {
+            const deviceModels = await http.get('/api/admin/device-model')
+            setDeviceModel(deviceModels.data)
+        }
+        getDeviceModels();
+    }, [])
+
 
     const form = useForm<DeviceFormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: initialData?.name ?? "",
+            serialNo: initialData?.serialNo ?? "",
+            modelId: initialData?.modelId ?? "",
+            status: initialData?.status ? DeviceStatus[initialData.status as keyof typeof DeviceStatus] : "UNASSIGNED",
+            lat: initialData?.lat ?? "",
+            lng: initialData?.lng ?? "",
+            user: initialData?.user ?? ""
         },
     });
     // console.log(form.formState.errors);
@@ -83,23 +110,17 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
             setLoading(true);
 
             if (!initialData && !data.name) {
-                form.setError("name", {
-                    message: "NAME cannot be empty for new DEIVCE",
-                });
+                form.setError("name", { message: "NAME cannot be empty for new DEVICE" });
                 return;
             }
 
             if (!initialData && !data.serialNo) {
-                form.setError("serialNo", {
-                    message: "SERIAL NUMBER cannot be empty for new DEIVCE",
-                });
+                form.setError("serialNo", { message: "SERIAL NUMBER cannot be empty for new DEVICE" });
                 return;
             }
 
-            if (!initialData && !data.model) {
-                form.setError("model", {
-                    message: "MODEL cannot be empty for new DEIVCE",
-                });
+            if (!initialData && !data.modelId) {
+                form.setError("modelId", { message: "MODEL cannot be empty for new DEVICE" });
                 return;
             }
 
@@ -152,18 +173,15 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
         try {
 
             setLoading(true);
-            const res = await axios.delete(`/api/admin/device/${params.writerId}`);
+            const res = await axios.delete(`/api/admin/device/${params.deviceId}`);
 
             if (res.status === 200) {
                 toast.success(res.data.message || "Device deleted successfully");
                 router.push(`/admin/device`);
-            }
-            else if (res.status === 409) {
-                toast.error(res.data.message || "Please delete all blogs written by this Device first");
             } else if (res.status === 401) {
                 toast.error("You are not authorized to perform this action");
             } else if (res.status === 400) {
-                toast.error("Invalid Device ID or ID not found");
+                toast.error("Invalid Serial ID or Model ID not found");
             }
 
         } catch (error) {
@@ -187,7 +205,16 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
                     title={title}
                     description={description}
                 />
-                {initialData && (
+
+                {initialData && (<div className="flex flex-row gap-4">
+                    <div className="flex items-center space-x-2">
+                        <Label htmlFor="user-mode">User Mode</Label>
+                        <Switch
+                            id="user-mode"
+                            checked={isUserMode}
+                            onCheckedChange={setIsUserMode}
+                        />
+                    </div>
                     <Button
                         disabled={loading}
                         variant="destructive"
@@ -196,6 +223,7 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
                     >
                         <Trash className="h-4 w-4" />
                     </Button>
+                </div>
                 )}
             </div>
             <Separator />
@@ -210,7 +238,7 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
                             name="name"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Name</FormLabel>
+                                    <FormLabel>Device Name</FormLabel>
                                     <FormControl>
                                         <Input placeholder="Device Name" disabled={loading} {...field} />
                                     </FormControl>
@@ -229,7 +257,7 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
                                 <FormItem>
                                     <FormLabel>Serial No.</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Serial No." disabled={loading} {...field} />
+                                        <Input type="text" placeholder="Serial No." disabled={loading} {...field} />
                                     </FormControl>
                                     <FormDescription>
                                         This is your public display serial no.
@@ -239,42 +267,138 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
                             )}
                         />
 
-                        <FormField
-                            control={form.control}
-                            name="model"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Model</FormLabel>
-                                    <Select
-                                        disabled={loading}
-                                        onValueChange={field.onChange}
-                                        value={field.value}
-                                        defaultValue={field.value}
-                                    >
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select status" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            <SelectItem value={"Mobile"}>
-                                                Mobile
-                                            </SelectItem>
-                                            <SelectItem value={"PC"}>
-                                                Computer
-                                            </SelectItem>
-                                            <SelectItem value={"Web"}>
-                                                Web
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <FormDescription>
-                                        Controls whether the writer can publish content.
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                        {deviceModel && (
+                            <FormField
+                                control={form.control}
+                                name="modelId"
+                                render={({ field }) => {
+                                    const selectedModel = deviceModel.find((m) => m.id === field.value);
+
+                                    return (
+                                        <FormItem>
+                                            <FormLabel>Model</FormLabel>
+
+                                            <Select
+                                                disabled={loading}
+                                                onValueChange={field.onChange}
+                                                value={field.value}
+                                            >
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select model" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+
+                                                <SelectContent>
+                                                    {deviceModel.map((item) => (
+                                                        <SelectItem key={item.id} value={item.id}>
+                                                            {item.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+
+                                            <FormDescription>
+                                                {selectedModel?.description || "No description available"}
+                                            </FormDescription>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    );
+                                }}
+                            />
+                        )}
+
+                        {
+                            isUserMode && (
+                                <>
+                                    <FormField
+                                        control={form.control}
+                                        name="user"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Name of the Device user</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="XYZ" disabled={loading} {...field} />
+                                                </FormControl>
+                                                <FormDescription>
+                                                    This is Device User.
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name="lat"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Latitude</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="Latitude" disabled={loading} {...field} />
+                                                </FormControl>
+                                                <FormDescription>
+                                                    This is your public display latitude.
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name="lng"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Longitude</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="Longitude" disabled={loading} {...field} />
+                                                </FormControl>
+                                                <FormDescription>
+                                                    This is your public display longitude.
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name="status"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Device State</FormLabel>
+                                                <Select
+                                                    disabled={loading}
+                                                    onValueChange={field.onChange}
+                                                    value={field.value}
+                                                    defaultValue={field.value}
+                                                >
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select Device status" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        <SelectItem value={DeviceStatus.ASSIGNED}>
+                                                            ASSIGNED
+                                                        </SelectItem>
+                                                        <SelectItem value={DeviceStatus.UNASSIGNED}>
+                                                            UNASSIGNED
+                                                        </SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormDescription className="text-red-500">
+                                                    If you register user from the admin pannel Select Assigned.
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </>
+                            )
+                        }
 
                     </div>
                     <div className="flex justify-end">

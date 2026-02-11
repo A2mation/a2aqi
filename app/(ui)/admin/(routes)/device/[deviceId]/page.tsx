@@ -21,19 +21,45 @@ const SingleDeviceModelPage = async ({
             id: true,
             name: true,
             serialNo: true,
+            status: true,
+            lat: true,
+            lng: true,
             model: {
                 select: {
+                    id: true,
                     name: true,
+                }
+            },
+            user: {
+                select: {
+                    name: true
                 }
             },
             createdAt: true,
         }
     });
 
+    const formattedDevice = device
+        ? {
+            id: device.id,
+            name: device.name ?? "",
+            serialNo: device.serialNo,
+            status: device.status,
+            modelId: device.model.id,
+            modelName: device.model.name,
+            user: device.user?.name ?? "",
+            lat: device.lat?.toString() ?? "",
+            lng: device.lng?.toString() ?? "",
+            createdAt: device.createdAt,
+        }
+        : null;
+
+        // console.log(formattedDevice)
+
     return (
         <div className='flex-col'>
             <div className='flex-1 space-y-4 p-8'>
-                <DeviceForm initialData={device} />
+                <DeviceForm initialData={formattedDevice} />
             </div>
         </div>
     )

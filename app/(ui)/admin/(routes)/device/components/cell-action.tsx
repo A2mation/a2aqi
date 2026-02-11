@@ -15,13 +15,13 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button";
-import { DeviceColumn } from "./columns";
+import { Device } from "./columns";
 import AlertModal from "@/components/modals/alert-modal";
 import { http } from "@/lib/http";
 
 
 interface CellActionProps {
-    data: DeviceColumn;
+    data: Device;
 }
 
 
