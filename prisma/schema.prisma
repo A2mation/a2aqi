@@ -33,6 +33,11 @@ enum AccountType {
   ORGANIZATION
 }
 
+enum DeviceStatus {
+  UNASSIGNED
+  ASSIGNED
+}
+
 //////////////////////////////////////////////////////
 // USER & ADMIN
 //////////////////////////////////////////////////////
@@ -53,6 +58,7 @@ model User {
   comments  Comment[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  devices   Device[]
 }
 
 model Admin {
@@ -83,14 +89,24 @@ model DeviceModel {
 }
 
 model Device {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  name     String
-  serialNo String @unique
-  modelId  String @db.ObjectId
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  name     String?
+  serialNo String  @unique
 
-  model DeviceModel @relation(fields: [modelId], references: [id])
+  lat Float?
+  lng Float?
 
-  createdAt DateTime @default(now())
+  userId String? @db.ObjectId
+  user   User?   @relation(fields: [userId], references: [id])
+
+  status DeviceStatus @default(UNASSIGNED)
+
+  modelId String      @db.ObjectId
+  model   DeviceModel @relation(fields: [modelId], references: [id])
+
+  assignedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   sensorReadings SensorReading[]
 }
