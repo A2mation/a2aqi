@@ -7,21 +7,22 @@ const SingleDeviceModelPage = async ({
 }: {
     params: Promise<{ deviceId: string }>
 }) => {
-    const deviceModelId = (await params).deviceId;
+    const deviceId = (await params).deviceId;
 
-    if (!deviceModelId) {
+    if (!deviceId) {
         return null;
     }
 
     const device = await prisma.device.findFirst({
         where: {
-            id: deviceModelId == 'new' ? '60530408203d565918dc80e7' : deviceModelId // dummy id for new device model
+            id: deviceId == 'new' ? '60530408203d565918dc80e7' : deviceId // dummy id for new device model
         },
         select: {
             id: true,
             name: true,
             serialNo: true,
             status: true,
+            apiKey: true,
             lat: true,
             lng: true,
             model: {
@@ -45,6 +46,7 @@ const SingleDeviceModelPage = async ({
             name: device.name ?? "",
             serialNo: device.serialNo,
             status: device.status,
+            apiKey: device.apiKey,
             modelId: device.model.id,
             modelName: device.model.name,
             user: device.user?.name ?? "",

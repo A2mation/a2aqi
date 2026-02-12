@@ -41,6 +41,7 @@ interface DeviceInterface {
     name: string;
     serialNo: string;
     status: DeviceStatus;
+    apiKey: string;
     modelId: string;
     modelName: string;
     user: string;
@@ -57,6 +58,7 @@ const formSchema = z.object({
     name: z.string().min(2, "Name is required"),
     serialNo: z.string().min(2, "Serial Number is required"),
     modelId: z.string().min(2, "Model is required"),
+    apiKey: z.string(),
     lat: z.string().optional(),
     lng: z.string().optional(),
     user: z.string().optional(),
@@ -97,6 +99,7 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
             name: initialData?.name ?? "",
             serialNo: initialData?.serialNo ?? "",
             modelId: initialData?.modelId ?? "",
+            apiKey: initialData?.apiKey ?? '',
             status: initialData?.status ? DeviceStatus[initialData.status as keyof typeof DeviceStatus] : "UNASSIGNED",
             lat: initialData?.lat ?? "",
             lng: initialData?.lng ?? "",
@@ -111,6 +114,11 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
 
             if (!initialData && !data.name) {
                 form.setError("name", { message: "NAME cannot be empty for new DEVICE" });
+                return;
+            }
+
+            if (!initialData && !data.apiKey) {
+                form.setError("apiKey", { message: "APIKEY cannot be empty for new DEVICE" });
                 return;
             }
 
@@ -261,6 +269,31 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
                                     </FormControl>
                                     <FormDescription>
                                         This is your public display serial no.
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="apiKey"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-red-500">APIKEY</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="text"
+                                            placeholder="EX.- AYAN1452AYAN"
+                                            disabled={initialData ? true : loading}
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormDescription>
+                                        Use a strong API KEY to secure your device data
+                                        <span className="text-red-500 pl-1 font-bold">
+                                            And It is a non-editable Field.
+                                        </span>
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
