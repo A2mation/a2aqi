@@ -92,6 +92,8 @@ model Device {
   id       String  @id @default(auto()) @map("_id") @db.ObjectId
   name     String?
   serialNo String  @unique
+  isActive Boolean @default(true)
+  apiKey   String
 
   lat Float?
   lng Float?
@@ -108,7 +110,9 @@ model Device {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
-  sensorReadings SensorReading[]
+  sensorReadings          SensorReading[]
+  hourlyAggregateReadings HourlyAggregateReading[]
+  dailyAggregateReadings  DailyAggregateReading[]
 }
 
 model AQIReading {
@@ -158,22 +162,23 @@ model SensorReading {
   deviceId String @db.ObjectId
   device   Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
 
-  // Location (redundant but useful for queries)
-  lat      Float
-  lng      Float
-  location String
-  city     String
-  state    String
-  country  String @default("India")
-
   // Pollution Data
-  aqi  Int
-  pm25 Float?
-  pm10 Float?
-  no2  Float?
-  so2  Float?
-  o3   Float?
-  co   Float?
+  aqi     Float?
+  pm10    Float?
+  pm25    Float?
+  so2     Float?
+  no2     Float?
+  co2     Float?
+  co      Float?
+  o3      Float?
+  noise   Float?
+  pm1     Float?
+  tvoc    Float?
+  smoke   Float?
+  methane Float?
+  h2      Float?
+  ammonia Float?
+  h2s     Float?
 
   // Weather Data
   temperature Float? // °C
@@ -183,148 +188,192 @@ model SensorReading {
 
   createdAt DateTime @default(now())
 
-  @@unique([lat, lng, deviceId, measuredAt], name: "lat_lng_deviceId_measuredAt")
-  @@index([deviceId, measuredAt])
-  @@index([lat, lng])
-  @@index([measuredAt])
-  @@index([city])
-  @@index([state])
-  @@index([location, measuredAt])
+  @@unique([deviceId, measuredAt], name: "deviceId_measuredAt")
+  @@index([deviceId])
 }
 
 model HourlyAggregateReading {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  // Location
-  lat     Float
-  lng     Float
-  city    String
-  state   String
-  country String @default("India")
+  deviceId String @db.ObjectId
+  device   Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
 
-  // Time window
   hourStart DateTime
-  hourEnd   DateTime
 
-  // AQI aggregates
-  avgAqi Float
-  maxAqi Int
-  minAqi Int
+  // Common count
+  count Int
 
-  // Pm25 aggregates
-  avgPm25 Float?
-  maxPm25 Float?
-  minPm25 Float?
+  // Pollution aggregates
+  sumAqi Float?
+  minAqi Float?
+  maxAqi Float?
 
-  // Pm10 aggregates
-  avgPm10 Float?
-  maxPm10 Float?
+  sumPm10 Float?
   minPm10 Float?
+  maxPm10 Float?
 
-  // No2 aggregates
-  avgNo2 Float?
-  maxNo2 Float?
-  minNo2 Float?
+  sumPm25 Float?
+  minPm25 Float?
+  maxPm25 Float?
 
-  // So2 aggregates
-  avgSo2 Float?
-  maxSo2 Float?
+  sumSo2 Float?
   minSo2 Float?
+  maxSo2 Float?
 
-  // O3 aggregates
-  avgO3 Float?
-  maxO3 Float?
-  minO3 Float?
+  sumNo2 Float?
+  minNo2 Float?
+  maxNo2 Float?
 
-  // Co aggregates
-  avgCo Float?
-  maxCo Float?
+  sumCo2 Float?
+  minCo2 Float?
+  maxCo2 Float?
+
+  sumCo Float?
   minCo Float?
+  maxCo Float?
+
+  sumO3 Float?
+  minO3 Float?
+  maxO3 Float?
+
+  sumNoise Float?
+  minNoise Float?
+  maxNoise Float?
+
+  sumPM1 Float?
+  minPM1 Float?
+  maxPM1 Float?
+
+  sumTvoc Float?
+  minTvoc Float?
+  maxTvoc Float?
+
+  sumSmoke Float?
+  minSmoke Float?
+  maxSmoke Float?
+
+  sumMethane Float?
+  minMethane Float?
+  maxMethane Float?
+
+  sumH2 Float?
+  minH2 Float?
+  maxH2 Float?
+
+  sumAmmonia Float?
+  minAmmonia Float?
+  maxAmmonia Float?
+
+  sumH2s Float?
+  minH2s Float?
+  maxH2s Float?
 
   // Weather aggregates
-  avgTemperature Float?
-  maxTemperature Float?
+  sumTemperature Float?
   minTemperature Float?
+  maxTemperature Float?
 
-  avgHumidity Float?
-  maxHumidity Float?
+  sumHumidity Float?
   minHumidity Float?
-
-  source AQISource
+  maxHumidity Float?
 
   createdAt DateTime @default(now())
 
-  @@unique([lat, lng, source, hourStart])
+  // @@unique([deviceId, hourStart], name: "deviceId_hourStart")
   @@index([hourStart])
-  @@index([city, hourStart])
-  @@index([lat, lng])
+  @@index([deviceId, hourStart])
 }
 
 model DailyAggregateReading {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  // Location
-  lat     Float
-  lng     Float
-  city    String
-  state   String
-  country String @default("India")
+  deviceId String @db.ObjectId
+  device   Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
 
-  // Date bucket (YYYY-MM-DD)
-  date DateTime
+  dayStart DateTime
 
-  // AQI aggregates
-  avgAqi Float
-  maxAqi Int
-  minAqi Int
+  // Common count
+  count Int
 
-  // Pm25 aggregates
-  avgPm25 Float?
-  maxPm25 Float?
-  minPm25 Float?
+  // Pollution aggregates
+  sumAqi Float?
+  minAqi Float?
+  maxAqi Float?
 
-  // Pm10 aggregates
-  avgPm10 Float?
-  maxPm10 Float?
+  sumPm10 Float?
   minPm10 Float?
+  maxPm10 Float?
 
-  // No2 aggregates
-  avgNo2 Float?
-  maxNo2 Float?
-  minNo2 Float?
+  sumPm25 Float?
+  minPm25 Float?
+  maxPm25 Float?
 
-  // So2 aggregates
-  avgSo2 Float?
-  maxSo2 Float?
+  sumSo2 Float?
   minSo2 Float?
+  maxSo2 Float?
 
-  // O3 aggregates
-  avgO3 Float?
-  maxO3 Float?
-  minO3 Float?
+  sumNo2 Float?
+  minNo2 Float?
+  maxNo2 Float?
 
-  // Co aggregates
-  avgCo Float?
-  maxCo Float?
+  sumCo2 Float?
+  minCo2 Float?
+  maxCo2 Float?
+
+  sumCo Float?
   minCo Float?
+  maxCo Float?
+
+  sumO3 Float?
+  minO3 Float?
+  maxO3 Float?
+
+  sumNoise Float?
+  minNoise Float?
+  maxNoise Float?
+
+  sumPM1 Float?
+  minPM1 Float?
+  maxPM1 Float?
+
+  sumTvoc Float?
+  minTvoc Float?
+  maxTvoc Float?
+
+  sumSmoke Float?
+  minSmoke Float?
+  maxSmoke Float?
+
+  sumMethane Float?
+  minMethane Float?
+  maxMethane Float?
+
+  sumH2 Float?
+  minH2 Float?
+  maxH2 Float?
+
+  sumAmmonia Float?
+  minAmmonia Float?
+  maxAmmonia Float?
+
+  sumH2s Float?
+  minH2s Float?
+  maxH2s Float?
 
   // Weather aggregates
-  avgTemperature Float?
-  maxTemperature Float?
+  sumTemperature Float?
   minTemperature Float?
+  maxTemperature Float?
 
-  avgHumidity Float?
-  maxHumidity Float?
+  sumHumidity Float?
   minHumidity Float?
-
-  source AQISource
+  maxHumidity Float?
 
   createdAt DateTime @default(now())
 
-  @@unique([lat, lng, source, date])
-  @@index([date])
-  @@index([city, date])
-  @@index([lat, lng])
+  // @@unique([deviceId, dayStart], name: "deviceId_dayStart")
+  @@index([dayStart])
+  @@index([deviceId, dayStart])
 }
 
 //////////////////////////////////////////////////////
