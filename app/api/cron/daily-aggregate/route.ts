@@ -15,6 +15,6 @@ export async function GET(req: Request) {
 
     return NextResponse.json({
         success: true,
-        ...result,
+        // ...result,
     });
 }
