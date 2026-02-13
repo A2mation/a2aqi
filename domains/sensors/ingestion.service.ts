@@ -37,7 +37,7 @@ export async function ingestSensorData(payload: SensorPayload, deviceId: string)
 
     // Push job to worker queue
     await sensorQueue.add("sensor-data", {
-        serialNo: payload.serialNo,
+        deviceId: deviceId,
         measuredAt: measuredAt.toISOString(),
 
         aqi: payload.aqi,
@@ -59,6 +59,9 @@ export async function ingestSensorData(payload: SensorPayload, deviceId: string)
 
         temperature: payload.temperature,
         humidity: payload.humidity,
+    }, {
+        removeOnComplete: true,
+        removeOnFail: { age: 86400 }, // Storing for 1 day
     });
 
     return raw;
