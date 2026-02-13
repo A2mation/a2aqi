@@ -41,6 +41,14 @@ const StatePage = ({
                     params: { country, state },
                 })
 
+                if (res.status === 404) {
+                    setError('No data available for today')
+                    return;
+                } else if (res.status === 500) {
+                    setError('Server error. Please try again later.')
+                    return;
+                } 
+
                 if (isMounted) {
                     setData(res.data)
                 }

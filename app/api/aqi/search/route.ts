@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/prisma"
+import { getTodayWindow } from "@/helpers/time";
 
 export async function GET(req: Request) {
     try {
@@ -14,15 +15,19 @@ export async function GET(req: Request) {
         }
 
         /* ---------------- CITIES ---------------- */
+
+        const { startOfToday, endOfToday } = getTodayWindow();
+
         const cityResults = await prisma.aQIReading.findMany({
             where: {
                 city: {
                     startsWith: q,
                     mode: "insensitive"
                 },
-            },
-            orderBy: {
-                measuredAt: "desc",
+                createdAt: {
+                    gte: startOfToday,
+                    lt: endOfToday
+                }
             },
             select: {
                 id: true,
@@ -30,9 +35,11 @@ export async function GET(req: Request) {
                 state: true,
                 country: true,
                 aqi: true,
+                createdAt: true
             },
             take: 10,
         })
+        console.log(cityResults[0].createdAt)
 
         const cityMap = new Map()
         for (const r of cityResults) {

@@ -150,7 +150,7 @@ const Results = ({
 
             {(["states", "cities"] as const).map(
                 (section) =>
-                    data[section].length > 0 && (
+                    ( data[section] !== undefined && data[section].length > 0 ) && (
                         <div key={section}>
                             <p className="px-4  pt-4  pb-2 text-base font-semibold text-slate-500 uppercase">
                                 {section}

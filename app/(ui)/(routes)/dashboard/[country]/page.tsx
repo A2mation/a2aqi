@@ -40,6 +40,14 @@ const CountryPage = ({
                     params: { country },
                 })
 
+                if (res.status === 404) {
+                    setError('No data available for today')
+                    return;
+                } else if (res.status === 500) {
+                    setError('Server error. Please try again later.')
+                    return;
+                } 
+
                 if (isMounted) {
                     setData(res.data)
                 }
@@ -103,7 +111,7 @@ const CountryPage = ({
 
     return (
         <section className="relative w-full">
-            <UniversalAQIDashboard  data={data}/>
+            <UniversalAQIDashboard data={data} />
         </section>
     )
 }
