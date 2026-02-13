@@ -3,29 +3,13 @@ import { NextResponse } from "next/server";
 import { getAuthSession } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { ROLE } from "@/types/type";
+import { adminGuard } from "@/lib/adminAuth";
+import { handleAdminError } from "@/lib/handleRoleError";
 
 export async function GET() {
     try {
 
-        const session = await getAuthSession();
-
-        if (!session || session.user.role !== ROLE.ADMIN) {
-            return new NextResponse("ADMIN ACCESS ONLY ROUTE", {
-                status: 401
-            })
-        }
-
-        const admin = await prisma.admin.findUnique({
-            where: {
-                id: session.user.id
-            }
-        })
-
-        if (!admin) {
-            return new NextResponse("Unauthorized", {
-                status: 401
-            })
-        }
+        await adminGuard()
 
         const device = await prisma.device.findMany();
 
@@ -33,7 +17,7 @@ export async function GET() {
 
 
     } catch (error) {
-        return new NextResponse("Failed to fetch device", { status: 500 });
+        return handleAdminError(error);
     }
 }
 
@@ -41,25 +25,7 @@ export async function POST(request: Request) {
     // Admin Registration Pannel for device Registration
     try {
 
-        const session = await getAuthSession();
-
-        if (!session || session.user.role !== ROLE.ADMIN) {
-            return new NextResponse("ADMIN ACCESS ONLY ROUTE", {
-                status: 401
-            })
-        }
-
-        const admin = await prisma.admin.findUnique({
-            where: {
-                id: session.user.id
-            }
-        })
-
-        if (!admin) {
-            return new NextResponse("Unauthorized", {
-                status: 401
-            })
-        }
+        await adminGuard()
 
         const { name, serialNo, modelId, apiKey }: {
             name: string,
@@ -100,6 +66,6 @@ export async function POST(request: Request) {
         return NextResponse.json(newDeviceModel, { status: 201 });
 
     } catch (error) {
-        return new NextResponse("Internal Server Error", { status: 500 });
+        return handleAdminError(error);
     }
 }

@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/prisma"
-import { getAuthSession } from "@/auth";
+import { adminGuard } from "@/lib/adminAuth";
+import { handleAdminError } from "@/lib/handleRoleError";
 import { ROLE } from "@/types/type";
 
 export async function GET(
@@ -10,6 +11,8 @@ export async function GET(
         params: Promise<{ deviceModelId: string }>
     }) {
     try {
+        await adminGuard();
+
         const { deviceModelId } = await params.params;
 
         if (!deviceModelId) {
@@ -30,9 +33,10 @@ export async function GET(
 
         return NextResponse.json(deviceModel);
 
-    } catch (error) {
-        return new NextResponse("Failed to fetch device model", { status: 500 });
+    } catch (err: any) {
+        return handleAdminError(err);
     }
+
 }
 
 export async function PATCH(
@@ -40,28 +44,10 @@ export async function PATCH(
     params: {
         params: Promise<{ deviceModelId: string }>
     }
-) {
+): Promise<NextResponse> {
     try {
 
-        const session = await getAuthSession();
-
-        if (!session || session.user.role !== ROLE.ADMIN) {
-            return new NextResponse("ADMIN ACCESS ONLY ROUTE", {
-                status: 401
-            })
-        }
-
-        const admin = await prisma.admin.findUnique({
-            where: {
-                id: session.user.id
-            }
-        })
-
-        if (!admin) {
-            return new NextResponse("Unauthorized", {
-                status: 401
-            })
-        }
+        await adminGuard();
 
         const { deviceModelId } = await params.params;
         if (!deviceModelId) {
@@ -94,9 +80,10 @@ export async function PATCH(
         return NextResponse.json(updatedDeviceModel);
 
 
-    } catch (error) {
-        return new NextResponse("Failed to update device model", { status: 500 });
+    } catch (err: any) {
+        return handleAdminError(err);
     }
+
 }
 
 export async function DELETE(
@@ -107,25 +94,7 @@ export async function DELETE(
 ) {
     try {
 
-        const session = await getAuthSession();
-
-        if (!session || session.user.role !== ROLE.ADMIN) {
-            return new NextResponse("ADMIN ACCESS ONLY ROUTE", {
-                status: 401
-            })
-        }
-
-        const admin = await prisma.admin.findUnique({
-            where: {
-                id: session.user.id
-            }
-        })
-
-        if (!admin) {
-            return new NextResponse("Unauthorized", {
-                status: 401
-            })
-        }
+        await adminGuard();
 
         const { deviceModelId } = await params.params;
         if (!deviceModelId) {
@@ -145,7 +114,8 @@ export async function DELETE(
         }
 
         return new NextResponse("Device Model deleted successfully", { status: 200 });
-    } catch (error) {
-        return new NextResponse("Failed to delete device model", { status: 500 });
+    } catch (err: any) {
+        return handleAdminError(err);
     }
+
 }
