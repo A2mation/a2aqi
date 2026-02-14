@@ -1,9 +1,10 @@
 import { SensorPayload } from "./sensor.model";
+import { SensorError } from "./sensor.error";
 
 export function validateSensorPayload(body: any): SensorPayload {
     const { serialNo, measuredAt } = body;
 
-    if (!serialNo) throw new Error("serialNo is required");
+    if (!serialNo) throw new SensorError("serialNo is required", 400);
 
     const parsedMeasuredAt = measuredAt ? new Date(measuredAt) : new Date();
 
@@ -14,7 +15,7 @@ export function validateSensorPayload(body: any): SensorPayload {
         if (value === undefined || value === null || value === "") return undefined;
 
         const num = Number(value);
-        if (isNaN(num)) throw new Error(`${field} must be a valid number`);
+        if (isNaN(num)) throw new SensorError("measuredAt must be a valid date", 400);;
 
         return num;
     };

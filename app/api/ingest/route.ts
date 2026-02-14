@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
+
 import { validateSensorPayload } from "@/domains/sensors/sensor.validation";
 import { authenticateSensor } from "@/domains/sensors/sensor.auth";
 import { ingestSensorData } from "@/domains/sensors/ingestion.service";
+import { sensorRateLimit } from "@/domains/sensors/sensor.ratelimit";
+import { SensorError } from "@/domains/sensors/sensor.error";
 
 export async function POST(req: Request) {
     try {
@@ -10,7 +13,7 @@ export async function POST(req: Request) {
         if (!apiKey) {
             return NextResponse.json(
                 { error: "Missing API key" },
-                { status: 401 }
+                { status: 401 } 
             );
         }
 
@@ -22,20 +25,25 @@ export async function POST(req: Request) {
         // Authenticate sensor
         const device = await authenticateSensor(payload.serialNo, apiKey);
 
+        // Rate Limiter
+        await sensorRateLimit(device.id)
+
         // Store raw + push queue job
         const raw = await ingestSensorData(payload, device.id);
 
         return NextResponse.json({
             message: "Raw saved and job queued",
-            rawId: raw.id,
+            rawId: raw,
         });
-        // console.log(body)
-
-        // return NextResponse.json("Good!", {
-        //     status: 200
-        // })
-
+        
     } catch (err: any) {
+        
+        if (err instanceof SensorError) {
+            return NextResponse.json(
+                { error: err.message },
+                { status: err.statusCode }
+            );
+        }
         return NextResponse.json(
             { error: err.message || "Internal server error" },
             { status: 500 }

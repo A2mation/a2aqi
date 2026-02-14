@@ -1,0 +1,1 @@
+export const DEVICE_COOLDOWN_TTL = 60; // 60 sec

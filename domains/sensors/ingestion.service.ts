@@ -7,33 +7,7 @@ export async function ingestSensorData(payload: SensorPayload, deviceId: string)
         ? new Date(payload.measuredAt)
         : new Date();
 
-    // Save raw reading
-    const raw = await storeRawSensorReading({
-        deviceId: deviceId,
-        measuredAt,
-
-        // Pollution Data
-        aqi: payload.aqi,
-        pm10: payload.pm10,
-        pm25: payload.pm25,
-        so2: payload.so2,
-        no2: payload.no2,
-        co2: payload.co2,
-        co: payload.co,
-        o3: payload.o3,
-        noise: payload.noise,
-        pm1: payload.pm1,
-        tvoc: payload.tvoc,
-        smoke: payload.smoke,
-        methane: payload.methane,
-        h2: payload.h2,
-        ammonia: payload.ammonia,
-        h2s: payload.h2s,
-
-        // Weather Data
-        temperature: payload.temperature,
-        humidity: payload.humidity,
-    });
+    const raw = deviceId
 
     // Push job to worker queue
     await sensorQueue.add("sensor-data", {
