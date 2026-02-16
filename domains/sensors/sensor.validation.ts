@@ -15,7 +15,7 @@ export function validateSensorPayload(body: any): SensorPayload {
         if (value === undefined || value === null || value === "") return undefined;
 
         const num = Number(value);
-        if (isNaN(num)) throw new SensorError("measuredAt must be a valid date", 400);;
+        if (isNaN(num)) throw new SensorError("Must be a valid number", 400);;
 
         return num;
     };
