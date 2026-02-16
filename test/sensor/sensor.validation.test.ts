@@ -43,7 +43,7 @@ describe("Sensor Validation", () => {
                 serialNo: "65f123abc456def7890abc12",
                 pm25: "abc",
             })
-        ).toThrow("pm25 must be a valid number")
+        ).toThrow("Must be a valid number")
     });
 
     it("should allow optional fields", () => {

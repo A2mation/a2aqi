@@ -13,7 +13,7 @@ export async function POST(req: Request) {
         if (!apiKey) {
             return NextResponse.json(
                 { error: "Missing API key" },
-                { status: 401 } 
+                { status: 401 }
             );
         }
 
@@ -34,10 +34,12 @@ export async function POST(req: Request) {
         return NextResponse.json({
             message: "Raw saved and job queued",
             rawId: raw,
+        }, {
+            status: 200
         });
-        
+
     } catch (err: any) {
-        
+
         if (err instanceof SensorError) {
             return NextResponse.json(
                 { error: err.message },
