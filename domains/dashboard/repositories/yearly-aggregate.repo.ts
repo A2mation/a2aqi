@@ -1,9 +1,14 @@
 import { prisma } from "@/lib/prisma";
 
+import { getYearRange } from "../utils/date-bucket.util";
+
 export class YearlyAggregateRepo {
     static async findByYear(deviceId: string, year: number) {
-        const start = new Date(Date.UTC(year, 0, 1));
-        const end = new Date(Date.UTC(year + 1, 0, 1));
+
+        const {
+            start,
+            end
+        } = getYearRange(year);
 
         return prisma.dailyAggregateReading.findMany({
             where: {

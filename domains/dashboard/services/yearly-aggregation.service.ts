@@ -1,4 +1,5 @@
 import { YearlyAggregateRepo } from "../repositories/yearly-aggregate.repo";
+import { safeAvg, updateMax, updateMin } from "../utils/average.util";
 
 export class YearlyAggregationService {
     static async getYearly(deviceId: string, year: number) {
@@ -119,12 +120,6 @@ export class YearlyAggregationService {
                 if (r.sumTemperature != null) sumTemperature += r.sumTemperature;
                 if (r.sumHumidity != null) sumHumidity += r.sumHumidity;
 
-                // MIN/MAX HELPERS
-                const updateMin = (current: number | null, value: number | null) =>
-                    value == null ? current : current == null ? value : Math.min(current, value);
-
-                const updateMax = (current: number | null, value: number | null) =>
-                    value == null ? current : current == null ? value : Math.max(current, value);
 
                 // AQI
                 minAqi = updateMin(minAqi, r.minAqi);
@@ -207,92 +202,92 @@ export class YearlyAggregationService {
                 count: totalCount,
 
                 // AQI
-                avgAqi: sumAqi ? sumAqi / safeCount : null,
+                avgAqi: safeAvg(sumAqi, safeCount),
                 minAqi,
                 maxAqi,
 
                 // PM10
-                avgPm10: sumPm10 ? sumPm10 / safeCount : null,
+                avgPm10: safeAvg(sumPm10, safeCount),
                 minPm10,
                 maxPm10,
 
                 // PM2.5
-                avgPm25: sumPm25 ? sumPm25 / safeCount : null,
+                avgPm25: safeAvg(sumPm25, safeCount),
                 minPm25,
                 maxPm25,
 
                 // SO2
-                avgSo2: sumSo2 ? sumSo2 / safeCount : null,
+                avgSo2: safeAvg(sumSo2, safeCount),
                 minSo2,
                 maxSo2,
 
                 // NO2
-                avgNo2: sumNo2 ? sumNo2 / safeCount : null,
+                avgNo2: safeAvg(sumNo2, safeCount),
                 minNo2,
                 maxNo2,
 
                 // CO2
-                avgCo2: sumCo2 ? sumCo2 / safeCount : null,
+                avgCo2: safeAvg(sumCo2, safeCount),
                 minCo2,
                 maxCo2,
 
                 // CO
-                avgCo: sumCo ? sumCo / safeCount : null,
+                avgCo: safeAvg(sumCo, safeCount),
                 minCo,
                 maxCo,
 
                 // O3
-                avgO3: sumO3 ? sumO3 / safeCount : null,
+                avgO3: safeAvg(sumO3, safeCount),
                 minO3,
                 maxO3,
 
                 // Noise
-                avgNoise: sumNoise ? sumNoise / safeCount : null,
+                avgNoise: safeAvg(sumNoise, safeCount),
                 minNoise,
                 maxNoise,
 
                 // PM1
-                avgPM1: sumPM1 ? sumPM1 / safeCount : null,
+                avgPM1: safeAvg(sumPM1, safeCount),
                 minPM1,
                 maxPM1,
 
                 // TVOC
-                avgTvoc: sumTvoc ? sumTvoc / safeCount : null,
+                avgTvoc: safeAvg(sumTvoc, safeCount),
                 minTvoc,
                 maxTvoc,
 
                 // Smoke
-                avgSmoke: sumSmoke ? sumSmoke / safeCount : null,
+                avgSmoke: safeAvg(sumSmoke, safeCount),
                 minSmoke,
                 maxSmoke,
 
                 // Methane
-                avgMethane: sumMethane ? sumMethane / safeCount : null,
+                avgMethane: safeAvg(sumMethane, safeCount),
                 minMethane,
                 maxMethane,
 
                 // H2
-                avgH2: sumH2 ? sumH2 / safeCount : null,
+                avgH2: safeAvg(sumH2, safeCount),
                 minH2,
                 maxH2,
 
                 // Ammonia
-                avgAmmonia: sumAmmonia ? sumAmmonia / safeCount : null,
+                avgAmmonia: safeAvg(sumAmmonia, safeCount),
                 minAmmonia,
                 maxAmmonia,
 
                 // H2S
-                avgH2s: sumH2s ? sumH2s / safeCount : null,
+                avgH2s: safeAvg(sumH2s, safeCount),
                 minH2s,
                 maxH2s,
 
                 // Weather: Temperature
-                avgTemperature: sumTemperature ? sumTemperature / safeCount : null,
+                avgTemperature: safeAvg(sumTemperature, safeCount),
                 minTemperature,
                 maxTemperature,
 
                 // Weather: Humidity
-                avgHumidity: sumHumidity ? sumHumidity / safeCount : null,
+                avgHumidity: safeAvg(sumHumidity, safeCount),
                 minHumidity,
                 maxHumidity,
             };

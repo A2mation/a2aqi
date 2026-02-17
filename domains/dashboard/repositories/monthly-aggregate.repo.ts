@@ -1,9 +1,13 @@
 import { prisma } from "@/lib/prisma";
+import { getMonthRange } from "../utils/date-bucket.util";
 
 export class MonthlyAggregateRepo {
     static async findByMonth(deviceId: string, year: number, month: number) {
-        const start = new Date(Date.UTC(year, month - 1, 1));
-        const end = new Date(Date.UTC(year, month, 1));
+
+        const {
+            start,
+            end
+        } = getMonthRange(year, month);
 
         return prisma.dailyAggregateReading.findMany({
             where: {
