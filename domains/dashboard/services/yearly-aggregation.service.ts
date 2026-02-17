@@ -20,25 +20,25 @@ export class YearlyAggregationService {
             let totalCount = 0;
 
             // SUMS
-            let sumAqi = 0;
-            let sumPm10 = 0;
-            let sumPm25 = 0;
-            let sumSo2 = 0;
-            let sumNo2 = 0;
-            let sumCo2 = 0;
-            let sumCo = 0;
-            let sumO3 = 0;
-            let sumNoise = 0;
-            let sumPM1 = 0;
-            let sumTvoc = 0;
-            let sumSmoke = 0;
-            let sumMethane = 0;
-            let sumH2 = 0;
-            let sumAmmonia = 0;
-            let sumH2s = 0;
+            let sumAqi: number | null = null;
+            let sumPm10: number | null = null;
+            let sumPm25: number | null = null;
+            let sumSo2: number | null = null;
+            let sumNo2: number | null = null;
+            let sumCo2: number | null = null;
+            let sumCo: number | null = null;
+            let sumO3: number | null = null;
+            let sumNoise: number | null = null;
+            let sumPM1: number | null = null;
+            let sumTvoc: number | null = null;
+            let sumSmoke: number | null = null;
+            let sumMethane: number | null = null;
+            let sumH2: number | null = null;
+            let sumAmmonia: number | null = null;
+            let sumH2s: number | null = null;
 
-            let sumTemperature = 0;
-            let sumHumidity = 0;
+            let sumTemperature: number | null = null;
+            let sumHumidity: number | null = null;
 
             // MIN/MAX
             let minAqi: number | null = null;
