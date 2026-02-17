@@ -36,7 +36,7 @@ export class YearlyAggregationService {
             let sumH2: number | null = null;
             let sumAmmonia: number | null = null;
             let sumH2s: number | null = null;
-
+ 
             let sumTemperature: number | null = null;
             let sumHumidity: number | null = null;
 
