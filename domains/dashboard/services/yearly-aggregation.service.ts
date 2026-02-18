@@ -1,5 +1,5 @@
 import { YearlyAggregateRepo } from "../repositories/yearly-aggregate.repo";
-import { safeAvg, updateMax, updateMin } from "../utils/average.util";
+import { discardNullFieldsDeep, safeAvg, updateMax, updateMin } from "../utils/average.util";
 
 export class YearlyAggregationService {
     static async getYearly(deviceId: string, year: number) {
@@ -36,7 +36,7 @@ export class YearlyAggregationService {
             let sumH2: number | null = null;
             let sumAmmonia: number | null = null;
             let sumH2s: number | null = null;
- 
+
             let sumTemperature: number | null = null;
             let sumHumidity: number | null = null;
 
@@ -197,100 +197,85 @@ export class YearlyAggregationService {
             const safeCount = totalCount || 1;
             const monthStart = new Date(`${monthKey}-01T00:00:00.000Z`);
 
-            return {
+            const result = {
                 monthStart,
                 count: totalCount,
 
-                // AQI
                 avgAqi: safeAvg(sumAqi, safeCount),
                 minAqi,
                 maxAqi,
 
-                // PM10
                 avgPm10: safeAvg(sumPm10, safeCount),
                 minPm10,
                 maxPm10,
 
-                // PM2.5
                 avgPm25: safeAvg(sumPm25, safeCount),
                 minPm25,
                 maxPm25,
 
-                // SO2
                 avgSo2: safeAvg(sumSo2, safeCount),
                 minSo2,
                 maxSo2,
 
-                // NO2
                 avgNo2: safeAvg(sumNo2, safeCount),
                 minNo2,
                 maxNo2,
 
-                // CO2
                 avgCo2: safeAvg(sumCo2, safeCount),
                 minCo2,
                 maxCo2,
 
-                // CO
                 avgCo: safeAvg(sumCo, safeCount),
                 minCo,
                 maxCo,
 
-                // O3
                 avgO3: safeAvg(sumO3, safeCount),
                 minO3,
                 maxO3,
 
-                // Noise
                 avgNoise: safeAvg(sumNoise, safeCount),
                 minNoise,
                 maxNoise,
 
-                // PM1
                 avgPM1: safeAvg(sumPM1, safeCount),
                 minPM1,
                 maxPM1,
 
-                // TVOC
                 avgTvoc: safeAvg(sumTvoc, safeCount),
                 minTvoc,
                 maxTvoc,
 
-                // Smoke
                 avgSmoke: safeAvg(sumSmoke, safeCount),
                 minSmoke,
                 maxSmoke,
 
-                // Methane
                 avgMethane: safeAvg(sumMethane, safeCount),
                 minMethane,
                 maxMethane,
 
-                // H2
                 avgH2: safeAvg(sumH2, safeCount),
                 minH2,
                 maxH2,
 
-                // Ammonia
                 avgAmmonia: safeAvg(sumAmmonia, safeCount),
                 minAmmonia,
                 maxAmmonia,
 
-                // H2S
                 avgH2s: safeAvg(sumH2s, safeCount),
                 minH2s,
                 maxH2s,
 
-                // Weather: Temperature
                 avgTemperature: safeAvg(sumTemperature, safeCount),
                 minTemperature,
                 maxTemperature,
 
-                // Weather: Humidity
                 avgHumidity: safeAvg(sumHumidity, safeCount),
                 minHumidity,
                 maxHumidity,
             };
+
+            return discardNullFieldsDeep(result);
+
         });
     }
 }

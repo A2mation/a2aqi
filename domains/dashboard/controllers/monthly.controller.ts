@@ -9,15 +9,18 @@ export async function MonthlyDashboardController(req: Request) {
         const year = searchParams.get("year");
         const month = searchParams.get("month");
 
-        if (!deviceId || !year || !month) {
+        if (!deviceId) {
             return NextResponse.json(
-                { error: "deviceId, year and month are required" },
+                { error: "deviceId is required" },
                 { status: 400 }
             );
         }
 
-        const yearNum = Number(year);
-        const monthNum = Number(month);
+        const now = new Date();
+
+        // fallback: if no year/month provided, use current year/month
+        const yearNum = year ? Number(year) : now.getFullYear();
+        const monthNum = month ? Number(month) : now.getMonth() + 1;
 
         if (isNaN(yearNum) || isNaN(monthNum)) {
             return NextResponse.json(

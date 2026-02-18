@@ -1,4 +1,5 @@
 import { SensorReadingRepo } from "../repositories/sensor-reading.repo";
+import { discardNullFieldsDeep } from "../utils/average.util";
 
 export class LiveService {
     static async getLive(deviceId: string) {
@@ -6,7 +7,7 @@ export class LiveService {
 
         if (!latest) return null;
 
-        return {
+        const result = {
             measuredAt: latest.measuredAt,
 
             // AQI + Particulates
@@ -35,5 +36,7 @@ export class LiveService {
             temperature: latest.temperature ?? null,
             humidity: latest.humidity ?? null,
         };
+
+        return discardNullFieldsDeep(result);
     }
 }
