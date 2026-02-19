@@ -113,6 +113,8 @@ model Device {
   sensorReadings          SensorReading[]
   hourlyAggregateReadings HourlyAggregateReading[]
   dailyAggregateReadings  DailyAggregateReading[]
+
+  @@index([id])
 }
 
 model AQIReading {
