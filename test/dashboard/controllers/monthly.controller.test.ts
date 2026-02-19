@@ -15,33 +15,15 @@ describe("MonthlyDashboardController", () => {
     });
 
     it("should return 400 if deviceId is missing", async () => {
-        const req = new Request("http://localhost/api/dashboard/monthly?year=2026&month=2");
+        const req = new Request(
+            "http://localhost/api/dashboard/monthly?year=2026&month=2"
+        );
 
         const res = await MonthlyDashboardController(req);
         const json = await res.json();
 
         expect(res.status).toBe(400);
-        expect(json.error).toBe("deviceId, year and month are required");
-    });
-
-    it("should return 400 if year is missing", async () => {
-        const req = new Request("http://localhost/api/dashboard/monthly?deviceId=device123&month=2");
-
-        const res = await MonthlyDashboardController(req);
-        const json = await res.json();
-
-        expect(res.status).toBe(400);
-        expect(json.error).toBe("deviceId, year and month are required");
-    });
-
-    it("should return 400 if month is missing", async () => {
-        const req = new Request("http://localhost/api/dashboard/monthly?deviceId=device123&year=2026");
-
-        const res = await MonthlyDashboardController(req);
-        const json = await res.json();
-
-        expect(res.status).toBe(400);
-        expect(json.error).toBe("deviceId, year and month are required");
+        expect(json.error).toBe("deviceId is required");
     });
 
     it("should return 400 if year and month are invalid numbers", async () => {
@@ -54,6 +36,39 @@ describe("MonthlyDashboardController", () => {
 
         expect(res.status).toBe(400);
         expect(json.error).toBe("year and month must be valid numbers");
+    });
+
+    it("should fallback to current year/month if year and month are missing", async () => {
+        const mockResult = [
+            {
+                dayStart: new Date("2026-02-01T00:00:00.000Z"),
+                avgAqi: 50,
+                minAqi: 20,
+                maxAqi: 80,
+            },
+        ];
+
+        (MonthlyAggregationService.getMonthly as any).mockResolvedValue(mockResult);
+
+        const req = new Request(
+            "http://localhost/api/user/dashboard/monthly?deviceId=device123"
+        );
+
+        const res = await MonthlyDashboardController(req);
+        const json = await res.json();
+
+        expect(res.status).toBe(200);
+        expect(json.success).toBe(true);
+        expect(json.data[0].dayStart).toBe(mockResult[0].dayStart.toISOString());
+
+        expect(MonthlyAggregationService.getMonthly).toHaveBeenCalledTimes(1);
+
+        // just verify it was called with deviceId and numbers
+        const callArgs = (MonthlyAggregationService.getMonthly as any).mock.calls[0];
+
+        expect(callArgs[0]).toBe("device123");
+        expect(typeof callArgs[1]).toBe("number");
+        expect(typeof callArgs[2]).toBe("number");
     });
 
     it("should return monthly data successfully", async () => {
@@ -69,7 +84,7 @@ describe("MonthlyDashboardController", () => {
         (MonthlyAggregationService.getMonthly as any).mockResolvedValue(mockResult);
 
         const req = new Request(
-            "http://localhost/api/dashboard/monthly?deviceId=device123&year=2026&month=2"
+            "http://localhost/api/user/dashboard/monthly?deviceId=device123&year=2026&month=2"
         );
 
         const res = await MonthlyDashboardController(req);
@@ -97,7 +112,7 @@ describe("MonthlyDashboardController", () => {
         );
 
         const req = new Request(
-            "http://localhost/api/dashboard/monthly?deviceId=device123&year=2026&month=2"
+            "http://localhost/api/user/dashboard/monthly?deviceId=device123&year=2026&month=2"
         );
 
         const res = await MonthlyDashboardController(req);

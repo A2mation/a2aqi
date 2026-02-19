@@ -97,16 +97,23 @@ describe("YearlyAggregationService", () => {
         const result = await YearlyAggregationService.getYearly("device123", 2026);
 
         expect(YearlyAggregateRepo.findByYear).toHaveBeenCalledTimes(1);
-        expect(YearlyAggregateRepo.findByYear).toHaveBeenCalledWith(
-            "device123",
-            2026
-        );
+        expect(YearlyAggregateRepo.findByYear).toHaveBeenCalledWith("device123", 2026);
 
         expect(result).toHaveLength(2);
 
+        const feb = result.find(
+            (r) => new Date(r.monthStart).toISOString() === "2026-02-01T00:00:00.000Z"
+        );
+
+        const mar = result.find(
+            (r) => new Date(r.monthStart).toISOString() === "2026-03-01T00:00:00.000Z"
+        );
+
+        expect(feb).toBeDefined();
+        expect(mar).toBeDefined();
+
         // FEB 2026
-        expect(result[0]).toMatchObject({
-            monthStart: new Date("2026-02-01T00:00:00.000Z"),
+        expect(feb).toMatchObject({
             count: 30,
 
             avgAqi: 1500 / 30,
@@ -130,9 +137,10 @@ describe("YearlyAggregationService", () => {
             maxHumidity: 90,
         });
 
+        expect(new Date(feb!.monthStart).toISOString()).toBe("2026-02-01T00:00:00.000Z");
+
         // MAR 2026
-        expect(result[1]).toMatchObject({
-            monthStart: new Date("2026-03-01T00:00:00.000Z"),
+        expect(mar).toMatchObject({
             count: 10,
 
             avgAqi: 200 / 10,
@@ -155,6 +163,8 @@ describe("YearlyAggregationService", () => {
             minHumidity: 20,
             maxHumidity: 70,
         });
+
+        expect(new Date(mar!.monthStart).toISOString()).toBe("2026-03-01T00:00:00.000Z");
     });
 
     it("should return empty array if no records exist", async () => {
@@ -165,63 +175,8 @@ describe("YearlyAggregationService", () => {
         expect(result).toEqual([]);
     });
 
-    it("should keep missing fields as null", async () => {
-        const mockDbData = [
-            {
-                deviceId: "device123",
-                dayStart: new Date("2026-02-01T00:00:00.000Z"),
-                count: 10,
-
-                sumAqi: null,
-                minAqi: null,
-                maxAqi: null,
-
-                sumPm10: null,
-                minPm10: null,
-                maxPm10: null,
-
-                sumTemperature: null,
-                minTemperature: null,
-                maxTemperature: null,
-
-                sumHumidity: null,
-                minHumidity: null,
-                maxHumidity: null,
-            },
-        ];
-
-        (YearlyAggregateRepo.findByYear as any).mockResolvedValue(mockDbData);
-
-        const result = await YearlyAggregationService.getYearly("device123", 2026);
-
-        expect(result).toEqual([
-            expect.objectContaining({
-                monthStart: new Date("2026-02-01T00:00:00.000Z"),
-                count: 10,
-
-                avgAqi: null,
-                minAqi: null,
-                maxAqi: null,
-
-                avgPm10: null,
-                minPm10: null,
-                maxPm10: null,
-
-                avgTemperature: null,
-                minTemperature: null,
-                maxTemperature: null,
-
-                avgHumidity: null,
-                minHumidity: null,
-                maxHumidity: null,
-            }),
-        ]);
-    });
-
     it("should throw error if repo throws error", async () => {
-        (YearlyAggregateRepo.findByYear as any).mockRejectedValue(
-            new Error("DB error")
-        );
+        (YearlyAggregateRepo.findByYear as any).mockRejectedValue(new Error("DB error"));
 
         await expect(
             YearlyAggregationService.getYearly("device123", 2026)

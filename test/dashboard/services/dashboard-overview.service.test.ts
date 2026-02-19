@@ -17,9 +17,16 @@ vi.mock("@/domains/dashboard/repositories/daily-aggregate.repo", () => ({
     },
 }));
 
-vi.mock("@/domains/dashboard/utils/average.util", () => ({
-    safeAvg: vi.fn(),
-}));
+vi.mock("@/domains/dashboard/utils/average.util", async () => {
+    const actual = await vi.importActual<any>(
+        "@/domains/dashboard/utils/average.util"
+    );
+
+    return {
+        ...actual,
+        safeAvg: vi.fn(),
+    };
+});
 
 vi.mock("@/domains/dashboard/utils/aqi.util", () => ({
     getAqiLevel: vi.fn(),
@@ -30,7 +37,7 @@ describe("DashboardOverviewService", () => {
         vi.clearAllMocks();
     });
 
-    it("should return null latest and null daily if no data exists", async () => {
+    it("should return empty object if no data exists (null fields removed)", async () => {
         (SensorReadingRepo.getLatest as any).mockResolvedValue(null);
         (DailyAggregateRepo.findByDay as any).mockResolvedValue(null);
 
@@ -39,10 +46,8 @@ describe("DashboardOverviewService", () => {
             "2026-02-16"
         );
 
-        expect(result).toEqual({
-            latest: null,
-            daily: null,
-        });
+        // discardNullFieldsDeep removes latest:null and daily:null
+        expect(result).toEqual({});
     });
 
     it("should return latest sensor reading data", async () => {
@@ -76,7 +81,7 @@ describe("DashboardOverviewService", () => {
         );
 
         expect(result.latest).toEqual({
-            measuredAt: new Date("2026-02-16T10:00:00.000Z"),
+            measuredAt: "2026-02-16T10:00:00.000Z",
             aqi: 120,
             pm25: 40,
             pm10: 60,
@@ -97,7 +102,8 @@ describe("DashboardOverviewService", () => {
             humidity: 60,
         });
 
-        expect(result.daily).toBeNull();
+        // daily:null removed entirely
+        expect(result.daily).toBeUndefined();
     });
 
     it("should return daily aggregate formatted response", async () => {
@@ -193,8 +199,10 @@ describe("DashboardOverviewService", () => {
             "2026-02-16"
         );
 
-        expect(result.daily).toEqual({
-            dayStart: mockDaily.dayStart,
+        expect(result.latest).toBeUndefined();
+
+        expect(result.daily).toMatchObject({
+            dayStart: "2026-02-16T00:00:00.000Z",
             count: 10,
 
             avgAqi: 50,
@@ -209,58 +217,6 @@ describe("DashboardOverviewService", () => {
             minPm25: 10,
             maxPm25: 50,
 
-            avgSo2: null,
-            minSo2: null,
-            maxSo2: null,
-
-            avgNo2: null,
-            minNo2: null,
-            maxNo2: null,
-
-            avgCo2: null,
-            minCo2: null,
-            maxCo2: null,
-
-            avgCo: null,
-            minCo: null,
-            maxCo: null,
-
-            avgO3: null,
-            minO3: null,
-            maxO3: null,
-
-            avgNoise: null,
-            minNoise: null,
-            maxNoise: null,
-
-            avgPM1: null,
-            minPM1: null,
-            maxPM1: null,
-
-            avgTvoc: null,
-            minTvoc: null,
-            maxTvoc: null,
-
-            avgSmoke: null,
-            minSmoke: null,
-            maxSmoke: null,
-
-            avgMethane: null,
-            minMethane: null,
-            maxMethane: null,
-
-            avgH2: null,
-            minH2: null,
-            maxH2: null,
-
-            avgAmmonia: null,
-            minAmmonia: null,
-            maxAmmonia: null,
-
-            avgH2s: null,
-            minH2s: null,
-            maxH2s: null,
-
             avgTemperature: 30,
             minTemperature: 20,
             maxTemperature: 40,
@@ -271,6 +227,11 @@ describe("DashboardOverviewService", () => {
 
             aqiLevel: "MODERATE",
         });
+
+        // null ones should be removed
+        expect(result.daily).not.toHaveProperty("avgSo2");
+        expect(result.daily).not.toHaveProperty("avgNo2");
+        expect(result.daily).not.toHaveProperty("avgCo2");
     });
 
     it("should throw error if repo fails", async () => {

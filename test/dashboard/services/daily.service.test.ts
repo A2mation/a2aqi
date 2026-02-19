@@ -142,13 +142,13 @@ describe("DailyAggregationService", () => {
             maxHumidity: 60,
         });
 
-        // check null fields are returned correctly
-        expect(result?.avgSo2).toBeNull();
-        expect(result?.minSo2).toBeNull();
-        expect(result?.maxSo2).toBeNull();
+        // discardNullFields removes null fields
+        expect(result).not.toHaveProperty("avgSo2");
+        expect(result).not.toHaveProperty("minSo2");
+        expect(result).not.toHaveProperty("maxSo2");
     });
 
-    it("should return null min/max if values are missing", async () => {
+    it("should remove min/max if values are missing", async () => {
         const mockRecord = {
             dayStart: new Date("2026-02-16T00:00:00.000Z"),
             count: 10,
@@ -165,8 +165,10 @@ describe("DailyAggregationService", () => {
         );
 
         expect(result?.avgAqi).toBe(50);
-        expect(result?.minAqi).toBeNull();
-        expect(result?.maxAqi).toBeNull();
+
+        // null fields removed
+        expect(result).not.toHaveProperty("minAqi");
+        expect(result).not.toHaveProperty("maxAqi");
     });
 
     it("should throw error if repo fails", async () => {
