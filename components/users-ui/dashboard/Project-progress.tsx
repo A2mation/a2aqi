@@ -64,16 +64,16 @@ export function ProjectProgress() {
                 </div>
                 <div className="flex flex-wrap justify-center gap-3 text-xs">
                     <div className="flex items-center gap-1.5">
-                        <div className="w-2.5 h-2.5 rounded-full bg-primary flex-shrink-0" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-primary shrink-0" />
                         <span className="text-muted-foreground whitespace-nowrap">Completed</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                        <div className="w-2.5 h-2.5 rounded-full bg-foreground flex-shrink-0" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-foreground shrink-0" />
                         <span className="text-muted-foreground whitespace-nowrap">In Progress</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                         <div
-                            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                            className="w-2.5 h-2.5 rounded-full shrink-0"
                             style={{
                                 background:
                                     "repeating-linear-gradient(45deg, transparent, transparent 2px, oklch(0.55 0.02 120) 2px, oklch(0.55 0.02 120) 4px)",
