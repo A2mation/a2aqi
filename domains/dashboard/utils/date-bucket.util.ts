@@ -19,3 +19,19 @@ export function getDayRange(dateStr: string) {
 
     return { start, end };
 }
+
+export function getWeekRange(dateStr: string) {
+    const date = new Date(dateStr);
+    date.setUTCHours(0, 0, 0, 0);
+
+    const dayOfWeek = date.getUTCDay(); // Sunday = 0
+
+    const start = new Date(date);
+    start.setUTCDate(start.getUTCDate() - dayOfWeek);
+
+    const end = new Date(start);
+    end.setUTCDate(end.getUTCDate() + 6);
+    end.setUTCHours(23, 59, 59, 999);
+
+    return { start, end };
+}
