@@ -1,20 +1,21 @@
 "use client"
 
+import { useState } from "react"
+
 import { Sidebar } from "@/components/users-ui/dashboard/Sidebar"
 import { Header } from "@/components/users-ui/dashboard/Header"
 import { StatsCards } from "@/components/users-ui/dashboard/Stats-cards"
-import { AqiAnalytics } from "@/components/users-ui/dashboard/Aqi-analytics"
+import { WeeklyAqiAnalytics } from "@/components/users-ui/dashboard/Weekly-aqi-analytics"
 import { MonthlyInsights } from "@/components/users-ui/dashboard/Monthly-Insights"
 import { ProjectList } from "@/components/users-ui/dashboard/Project-list"
 import { DeviceManagement } from "@/components/users-ui/dashboard/Device-Mangement"
-// import { ProjectProgress } from "@/components/users-ui/dashboard/Project-progress"
 import { MobileAppCard } from "@/components/users-ui/dashboard/Mobile-app-card"
-import { TimeTracker } from "@/components/users-ui/dashboard/Time-tracker"
+import { ChartRadar } from "@/components/users-ui/dashboard/ChartRadar"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
-import { cn } from "@/lib/utils"
 import { useDeviceModal } from "@/hooks/use-device-store"
 import { DeviceModal } from "@/components/modals/device-modal"
+import { cn } from "@/lib/utils"
+import { HourlyAnalysis } from "@/components/users-ui/dashboard/hourly-analysis"
 
 
 export default function DashboardPage() {
@@ -60,20 +61,20 @@ export default function DashboardPage() {
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                         <div className="lg:col-span-2 space-y-4">
-                            <AqiAnalytics />
+                            <HourlyAnalysis />
+                            <WeeklyAqiAnalytics />
                             <DeviceManagement />
                         </div>
 
-                        <div className="space-y-4">
+                        <div className="lg:col-span-1 space-y-4">
                             <MonthlyInsights />
-                            {/* <ProjectProgress /> */}
+                            <ChartRadar />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <ProjectList />
                         <MobileAppCard />
-                        <TimeTracker />
                     </div>
                 </div>
             </main>

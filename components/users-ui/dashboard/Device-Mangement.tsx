@@ -24,22 +24,22 @@ const members = [
         avatar: "EA",
         avatarImage: "/avatars/avatar-2.jpg",
     },
-    {
-        name: "Device C",
-        location: "Bandel",
-        status: "Pending",
-        statusColor: "bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400",
-        avatar: "IO",
-        avatarImage: "/avatars/avatar-3.jpg",
-    },
-    {
-        name: "Device D",
-        location: "Agarpara",
-        status: "In Progress",
-        statusColor: "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400",
-        avatar: "DO",
-        avatarImage: "/avatars/avatar-4.jpg",
-    },
+    // {
+    //     name: "Device C",
+    //     location: "Bandel",
+    //     status: "Pending",
+    //     statusColor: "bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400",
+    //     avatar: "IO",
+    //     avatarImage: "/avatars/avatar-3.jpg",
+    // },
+    // {
+    //     name: "Device D",
+    //     location: "Agarpara",
+    //     status: "In Progress",
+    //     statusColor: "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400",
+    //     avatar: "DO",
+    //     avatarImage: "/avatars/avatar-4.jpg",
+    // },
 ]
 
 export function DeviceManagement() {
@@ -47,7 +47,7 @@ export function DeviceManagement() {
 
     return (
         <Card
-            className="p-6 transition-all duration-500 hover:shadow-xl animate-slide-in-up"
+            className="p-6 h-80 transition-all duration-500 hover:shadow-xl animate-slide-in-up "
             style={{ animationDelay: "600ms" }}
         >
             <div className="flex items-center justify-between mb-6">
@@ -62,7 +62,7 @@ export function DeviceManagement() {
                     Add New Device
                 </Button>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-4 overflow-y-scroll">
                 {members.map((member, index) => (
                     <div
                         key={member.name}
