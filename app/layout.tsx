@@ -4,6 +4,7 @@ import { Toaster } from "react-hot-toast";
 
 import NextTopLoader from "nextjs-toploader";
 import VisitCounter from "@/components/VisitCounter";
+import TanStackProvider from "@/providers/tanstack-provider";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -122,16 +123,18 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.png" sizes="32x32" type="image/png" />
       </head>
       <body className="font-poppins">
-        <NextTopLoader
-          color="#3b82f6"
-          height={3}
-          showSpinner={false}
-          speed={200}
-        />
+        <TanStackProvider>
+          <NextTopLoader
+            color="#3b82f6"
+            height={3}
+            showSpinner={false}
+            speed={200}
+          />
 
-        {children}
-        <VisitCounter />
-        <Toaster position="top-center" reverseOrder={false} />
+          {children}
+          <VisitCounter />
+          <Toaster position="top-center" reverseOrder={false} />
+        </TanStackProvider>
       </body>
     </html>
   );
