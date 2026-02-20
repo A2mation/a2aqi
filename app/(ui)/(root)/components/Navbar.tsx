@@ -52,7 +52,7 @@ export function NavbarMain() {
                 Sign In
               </Button>
             </>}
-            
+
             <Button variant="default">Book a call</Button>
           </div>
         </NavBody>
@@ -83,7 +83,15 @@ export function NavbarMain() {
               {pathname.startsWith('/blog') ? <>
                 <Button variant="secondary" className="text-base w-full cursor-pointer" onClick={() => router.push('/blogs/write')}> <PencilLine /> Write </Button>
               </> : <>
-                <Button variant="secondary" className="w-full" onClick={() => setIsMobileMenuOpen(false)}>Login</Button>
+                <Button
+                  variant="secondary"
+                  className="w-full cursor-pointer"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false)
+                    router.push('/user/sign-in')
+                  }}>
+                  Sign In
+                </Button>
               </>}
 
               <Button
