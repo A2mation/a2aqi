@@ -38,12 +38,21 @@ export function NavbarMain() {
           </div>
 
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-start gap-4">
             {pathname.startsWith('/blog') ? <>
               <Button variant="secondary" className="text-base cursor-pointer" onClick={() => router.push('/blogs/write')}> <PencilLine /> Write </Button>
             </> : <>
-              <Button variant="secondary">Login</Button>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  router.push('/user/sign-in')
+                }}
+                className=" cursor-pointer"
+              >
+                Sign In
+              </Button>
             </>}
+            
             <Button variant="default">Book a call</Button>
           </div>
         </NavBody>

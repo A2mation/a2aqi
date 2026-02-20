@@ -25,8 +25,8 @@ export default function LogoutPage() {
             })
 
             toast.success("Logged out successfully 👋")
+            router.refresh();
 
-            router.push("/user/sign-in")
         } catch (error) {
             toast.error("Logout failed")
         } finally {
