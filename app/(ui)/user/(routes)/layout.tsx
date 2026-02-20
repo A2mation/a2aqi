@@ -2,12 +2,21 @@ import React from 'react'
 
 import AuthSessionProviders from '@/providers/auth-session-provider';
 import { Footer } from '@/components/aqi-ui/footer';
+import { getAuthSession } from '@/auth';
+import { ROLE } from '@/types/type';
+import { redirect } from 'next/navigation';
 
 const layout = async ({
     children
 }: {
     children: React.ReactNode
 }) => {
+
+    const session = await getAuthSession();
+
+    if (!session?.user && !(session?.user.role === ROLE.USER)) {
+        redirect("/user/sign-in");
+    }
 
     return (
         <>

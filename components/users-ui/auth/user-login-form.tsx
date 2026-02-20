@@ -5,6 +5,10 @@ import Link from "next/link"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { signIn } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import toast from "react-hot-toast"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -25,6 +29,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { GoogleIcon } from "@/components/icons/GoogleIcon"
 import { MetaIcon } from "@/components/icons/MetaIcon"
+import { Loader2 } from "lucide-react"
 
 const formSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -37,6 +42,10 @@ export function UserLoginForm({
     className,
     ...props
 }: React.ComponentProps<"div">) {
+
+    const router = useRouter()
+    const [loading, setLoading] = useState(false)
+
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -45,8 +54,30 @@ export function UserLoginForm({
         },
     })
 
-    function onSubmit(values: FormValues) {
-        console.log(values)
+    async function onSubmit(values: FormValues) {
+        try {
+            setLoading(true)
+
+            const res = await signIn("user", {
+                email: values.email,
+                password: values.password,
+                redirect: false,
+            })
+            console.log(res)
+
+            if (res?.error) {
+                toast.error(res.error)
+                return
+            }
+
+            toast.success("Login successful 🎉")
+            router.push("/user/dashboard")
+
+        } catch (error) {
+            toast.error("Something went wrong")
+        } finally {
+            setLoading(false)
+        }
     }
 
     return (
@@ -59,6 +90,7 @@ export function UserLoginForm({
                             className="p-6 md:p-8"
                         >
                             <FieldGroup>
+
                                 <div className="flex flex-col items-center gap-2 text-center">
                                     <h1 className="text-2xl font-bold">
                                         Welcome back
@@ -79,6 +111,7 @@ export function UserLoginForm({
                                                 <Input
                                                     type="email"
                                                     placeholder="m@example.com"
+                                                    disabled={loading}
                                                     {...field}
                                                 />
                                             </FormControl>
@@ -104,7 +137,11 @@ export function UserLoginForm({
                                             </div>
 
                                             <FormControl>
-                                                <Input type="password" {...field} />
+                                                <Input
+                                                    type="password"
+                                                    disabled={loading}
+                                                    {...field}
+                                                />
                                             </FormControl>
 
                                             <FormMessage />
@@ -113,21 +150,47 @@ export function UserLoginForm({
                                 />
 
                                 <Field>
-                                    <Button type="submit" className="cursor-pointer">Login</Button>
+                                    <Button
+                                        type="submit"
+                                        disabled={loading}
+                                        className="cursor-pointer w-full flex items-center justify-center gap-2"
+                                    >
+                                        {loading && (
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                        )}
+                                        Login
+                                    </Button>
                                 </Field>
 
                                 <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                                     Or continue with
                                 </FieldSeparator>
 
+                                {/* Google */}
                                 <Field className="grid grid-cols-2 gap-4">
-                                    <Button variant="outline" type="button" className="cursor-pointer">
+                                    <Button
+                                        variant="outline"
+                                        type="button"
+                                        disabled={loading}
+                                        className="cursor-pointer"
+                                        onClick={async () => {
+                                            setLoading(true)
+                                            await signIn("google", { callbackUrl: "/user" })
+                                        }}
+                                    >
                                         <GoogleIcon />
                                         <span className="sr-only">
                                             Login with Google
                                         </span>
                                     </Button>
-                                    <Button variant="outline" type="button" className="cursor-pointer">
+
+                                    {/* Meta disabled unless configured */}
+                                    <Button
+                                        variant="outline"
+                                        type="button"
+                                        disabled
+                                        className="cursor-pointer"
+                                    >
                                         <MetaIcon />
                                         <span className="sr-only">
                                             Login with Meta
@@ -141,6 +204,7 @@ export function UserLoginForm({
                                         Sign up
                                     </Link>
                                 </FieldDescription>
+
                             </FieldGroup>
                         </form>
                     </Form>

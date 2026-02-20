@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { Sidebar } from "@/components/users-ui/dashboard/Sidebar"
 import { Header } from "@/components/users-ui/dashboard/Header"
@@ -16,11 +16,25 @@ import { useDeviceModal } from "@/hooks/use-device-store"
 import { DeviceModal } from "@/components/modals/device-modal"
 import { cn } from "@/lib/utils"
 import { HourlyAnalysis } from "@/components/users-ui/dashboard/hourly-analysis"
+import { Skeleton } from "@/components/ui/skeleton"
 
 
 export default function DashboardPage() {
     const deviceModal = useDeviceModal();
+    const [isClient, setisClient] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false)
+
+    useEffect(() => {
+        setisClient(true);
+    }, [])
+
+    if (!isClient) {
+        return <>
+            <div className="flex min-h-screen bg-background">
+                <Skeleton className="h-screen" />
+            </div>
+        </>;
+    }
 
     return (
         <div className="flex min-h-screen bg-background">
