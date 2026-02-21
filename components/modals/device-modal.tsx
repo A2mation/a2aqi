@@ -12,6 +12,11 @@ import {
 } from "@tanstack/react-query"
 
 import {
+    HoverCard,
+    HoverCardTrigger,
+    HoverCardContent,
+} from "@/components/ui/hover-card"
+import {
     Select,
     SelectContent,
     SelectItem,
@@ -65,6 +70,8 @@ export const DeviceModal = () => {
     const { watch, setValue, reset } = form
     const serialNo = watch("serialNo")
     const modelId = watch("modelId")
+    const latValue = watch("lat")
+    const longValue = watch("long")
 
     /* ===============================
        DEVICE LOOKUP HOOK
@@ -77,11 +84,27 @@ export const DeviceModal = () => {
         errorMessage: deviceErrorMessage,
     } = useDeviceLookup(serialNo, setValue)
 
-    // console.log(isDeviceError, deviceErrorMessage)
+    const handleGetLocation = () => {
+        if (!("geolocation" in navigator)) {
+            toast.error("Geolocation is not supported by your browser.")
+            return
+        }
 
-    /* ===============================
-       FETCH MODELS
-    =============================== */
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                const lat = pos.coords.latitude.toString()
+                const lng = pos.coords.longitude.toString()
+
+                setValue("lat", lat)
+                setValue("long", lng)
+
+                toast.success("Location detected successfully 📍")
+            },
+            (err) => {
+                toast.error(err.message || "Failed to get location")
+            }
+        )
+    }
 
     const { data: modelsData } = useQuery<DeviceModel[]>({
         queryKey: ["device-models"],
@@ -273,35 +296,81 @@ export const DeviceModal = () => {
                         )}
                     />
 
-                    {/* LAT */}
-                    <FormField
-                        name="lat"
-                        control={form.control}
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Latitude</FormLabel>
-                                <FormControl>
-                                    <Input {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                    {/* LOCATION SECTION */}
+                    <div className="space-y-2">
+                        <FormLabel>Device Location</FormLabel>
 
-                    {/* LONG */}
-                    <FormField
-                        name="long"
-                        control={form.control}
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Longitude</FormLabel>
-                                <FormControl>
-                                    <Input {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {/* LAT */}
+                            <FormField
+                                name="lat"
+                                control={form.control}
+                                render={({ field }) => (
+                                    <FormItem className="md:col-span-1">
+                                        <FormControl>
+                                            <Input {...field} placeholder="Latitude" disabled />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            {/* LONG */}
+                            <FormField
+                                name="long"
+                                control={form.control}
+                                render={({ field }) => (
+                                    <FormItem className="md:col-span-1">
+                                        <FormControl>
+                                            <Input {...field} placeholder="Longitude" disabled />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            {/* BUTTON */}
+                            <div className="flex items-end md:col-span-1">
+                                <HoverCard openDelay={200}>
+                                    <HoverCardTrigger asChild>
+                                        <Button
+                                            type="button"
+                                            variant="secondary"
+                                            onClick={handleGetLocation}
+                                            className="w-full cursor-pointer"
+                                        >
+                                            📍 Auto Detect
+                                        </Button>
+                                    </HoverCardTrigger>
+
+                                    <HoverCardContent
+                                        align="center"
+                                        className="w-64 text-sm"
+                                    >
+                                        Automatically detect
+                                        <span className="text-red-600 px-2">
+                                            your current GPS location
+                                        </span>
+                                        and fill in the latitude and longitude fields.
+                                    </HoverCardContent>
+                                </HoverCard>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* GOOGLE MAP PREVIEW */}
+                    {latValue && longValue && (
+                        <div className="mt-4 rounded-lg overflow-hidden border">
+                            <iframe
+                                title="Google Map Preview"
+                                width="100%"
+                                height="250"
+                                loading="lazy"
+                                className="w-full"
+                                src={`https://www.google.com/maps?q=${latValue},${longValue}&z=15&output=embed`}
+                            />
+                        </div>
+                    )}
 
                     <div className="flex justify-end pt-6">
                         <Button
@@ -320,3 +389,5 @@ export const DeviceModal = () => {
         </Modal>
     )
 }
+
+
