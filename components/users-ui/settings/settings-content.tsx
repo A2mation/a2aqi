@@ -82,7 +82,7 @@ export function SettingsContent() {
 
                         {/* Favorite Locations */}
                         <Link
-                            href={`/user${deviceId}/settings/locations`}
+                            href={`/user/${deviceId}/settings/locations`}
                             className="flex items-center justify-between py-3 border-b border-border hover:bg-muted/50 px-2 rounded-lg transition"
                         >
                             <div className="flex items-center gap-3">
