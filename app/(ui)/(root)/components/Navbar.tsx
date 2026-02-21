@@ -16,7 +16,9 @@ import {
 } from "@/components/ui/resizable-navbar";
 import Searchbar from "./Searchbar";
 import { NavbarMiddleSection } from "./NavMiddleSection";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 export function NavbarMain() {
   const pathname = usePathname();
@@ -42,15 +44,19 @@ export function NavbarMain() {
             {pathname.startsWith('/blog') ? <>
               <Button variant="secondary" className="text-base cursor-pointer" onClick={() => router.push('/blogs/write')}> <PencilLine /> Write </Button>
             </> : <>
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  router.push('/user/sign-in')
-                }}
-                className=" cursor-pointer"
+              <Link
+                href={"/user/sign-in"}
+                className={
+                  cn(
+                    "cursor-pointer",
+                    buttonVariants({
+                      variant: "secondary"
+                    })
+                  )
+                }
               >
                 Sign In
-              </Button>
+              </Link>
             </>}
 
             <Button variant="default">Book a call</Button>
@@ -83,15 +89,19 @@ export function NavbarMain() {
               {pathname.startsWith('/blog') ? <>
                 <Button variant="secondary" className="text-base w-full cursor-pointer" onClick={() => router.push('/blogs/write')}> <PencilLine /> Write </Button>
               </> : <>
-                <Button
-                  variant="secondary"
-                  className="w-full cursor-pointer"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false)
-                    router.push('/user/sign-in')
-                  }}>
+                <Link
+                  href={"/user/sign-in"}
+                  className={
+                    cn(
+                      "cursor-pointer",
+                      buttonVariants({
+                        variant: "secondary"
+                      })
+                    )
+                  }
+                >
                   Sign In
-                </Button>
+                </Link>
               </>}
 
               <Button

@@ -7,6 +7,7 @@ import {
     type ChartConfig,
 } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
+import { useParams } from "next/navigation";
 
 import {
     Select,
@@ -23,7 +24,7 @@ import { aqiColorPallet, getAQIColor, getAQITheme } from "@/helpers/aqi-color-pa
 import ChartLoader from "@/components/ui/chart-loading";
 
 export function MonthlyInsights() {
-    const deviceId = "698db75ef96c5dfba830ca22";
+    const { deviceId } = useParams();;
 
     const now = new Date();
     const currentYear = now.getFullYear();

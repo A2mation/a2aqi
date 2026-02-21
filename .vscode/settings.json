@@ -1,4 +1,4 @@
 {
-    "prisma.pinToPrisma6": true,
+    "WillLuke.nextjs.addTypesOnSave": true,
     "WillLuke.nextjs.hasPrompted": true
 }

@@ -3,6 +3,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useParams } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+
 import { Card } from '@/components/ui/card';
 import {
     Popover,
@@ -14,8 +17,6 @@ import {
     HoverCardContent,
     HoverCardTrigger,
 } from '@/components/ui/hover-card';
-
-import { useQuery } from '@tanstack/react-query';
 import { http } from '@/lib/http';
 import { TIME_SLOTS } from '@/utils/timeSlots';
 import { cn } from '@/lib/utils';
@@ -34,7 +35,7 @@ const addDays = (date: Date, days: number) => {
 };
 
 export function HourlyAnalysis() {
-    const deviceId = '698db75ef96c5dfba830ca22';
+    const { deviceId } = useParams();
 
     const [isClient, setIsClient] = useState(false);
 

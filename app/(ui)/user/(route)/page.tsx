@@ -1,4 +1,3 @@
-// app/user/page.tsx (SERVER)
 
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"

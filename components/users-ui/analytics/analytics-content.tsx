@@ -19,6 +19,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { useParams } from "next/navigation";
 
 type QuarterlyRecord = {
     dayStart: string;
@@ -47,10 +48,11 @@ const allMetrics = [
 ] as const;
 
 export function AnalyticsContent() {
+    const { deviceId } = useParams();
+
     const [hoveredCard, setHoveredCard] = useState<number | null>(null);
     const [selectedMetric, setSelectedMetric] = useState<string>("avgAqi");
 
-    const deviceId = "698db75ef96c5dfba830ca22";
     // const today = new Date().toISOString().split("T")[0];
 
     const today = new Date();
@@ -129,8 +131,8 @@ export function AnalyticsContent() {
                             onMouseLeave={() => setHoveredCard(null)}
                             style={{ animationDelay: `${index * 100}ms` }}
                             className={`bg-card text-foreground p-4 transition-all duration-500 ease-out animate-slide-in-up cursor-pointer ${hoveredCard === index
-                                    ? "scale-105 shadow-2xl"
-                                    : "shadow-lg"
+                                ? "scale-105 shadow-2xl"
+                                : "shadow-lg"
                                 }`}
                         >
                             <div className="flex items-start justify-between mb-3">

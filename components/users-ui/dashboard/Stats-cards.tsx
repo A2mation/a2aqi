@@ -10,6 +10,7 @@ import {
     Cell,
 } from "recharts";
 import { useQuery } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -46,7 +47,7 @@ const sensorIcons: Record<string, string> = {
 };
 
 export function StatsCards() {
-    const deviceId = "698db75ef96c5dfba830ca22";
+    const { deviceId } = useParams();;
 
     const { data, isPending, error } = useQuery({
         queryKey: ["dashboardOverview", deviceId],

@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useParams } from "next/navigation"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Link from "next/link"
@@ -14,6 +15,7 @@ import Link from "next/link"
 
 export function SettingsContent() {
     // const { theme, setTheme } = useTheme()
+    const { deviceId } = useParams();
 
     return (
         <div className="space-y-6 animate-fade-in ">
@@ -25,7 +27,7 @@ export function SettingsContent() {
 
                         {/* Manage Profile */}
                         <Link
-                            href="/user/settings/profile"
+                            href={`/user/${deviceId}/settings/profile`}
                             className="flex items-center justify-between py-3 border-b border-border hover:bg-muted/50 px-2 rounded-lg transition"
                         >
                             <div className="flex items-center gap-3">
@@ -44,7 +46,7 @@ export function SettingsContent() {
 
                         {/* View Account */}
                         <Link
-                            href="/user/settings/account"
+                            href={`/user/${deviceId}/settings/account`}
                             className="flex items-center justify-between py-3 border-b border-border hover:bg-muted/50 px-2 rounded-lg transition"
                         >
                             <div className="flex items-center gap-3">
@@ -62,7 +64,7 @@ export function SettingsContent() {
 
                         {/* AQI Alerts */}
                         <Link
-                            href="/user/settings/alerts"
+                            href={`/user/${deviceId}/settings/alerts`}
                             className="flex items-center justify-between py-3 border-b border-border hover:bg-muted/50 px-2 rounded-lg transition"
                         >
                             <div className="flex items-center gap-3">
@@ -80,7 +82,7 @@ export function SettingsContent() {
 
                         {/* Favorite Locations */}
                         <Link
-                            href="/user/settings/locations"
+                            href={`/user${deviceId}/settings/locations`}
                             className="flex items-center justify-between py-3 border-b border-border hover:bg-muted/50 px-2 rounded-lg transition"
                         >
                             <div className="flex items-center gap-3">
@@ -98,7 +100,7 @@ export function SettingsContent() {
 
                         {/* Export Data */}
                         <Link
-                            href="/user/settings/export"
+                            href={`/user/${deviceId}/settings/export`}
                             className="flex items-center justify-between py-3 border-b border-border hover:bg-muted/50 px-2 rounded-lg transition"
                         >
                             <div className="flex items-center gap-3">

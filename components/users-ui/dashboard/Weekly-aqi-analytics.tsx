@@ -15,7 +15,7 @@ import {
 } from "recharts";
 
 import { http } from "@/lib/http";
-import { getAQIColor } from "@/helpers/aqi-color-pallet";
+import { useParams } from "next/navigation";
 
 import {
     Select,
@@ -41,13 +41,13 @@ type WeeklyChartData = {
 const weekOrder = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
 export function WeeklyAqiAnalytics() {
+    const { deviceId } = useParams();
     const [hoveredBar, setHoveredBar] = useState<number | null>(null);
 
     const [selectedAvgMetric, setSelectedAvgMetric] = useState<AvgMetricKey>("avgAqi");
     const [selectedMinMetric, setSelectedMinMetric] = useState<MinMetricKey>("minAqi");
     const [selectedMaxMetric, setSelectedMaxMetric] = useState<MaxMetricKey>("maxAqi");
 
-    const deviceId = "698db75ef96c5dfba830ca22";
     const date = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
 
     const { data, isPending, error } = useQuery({

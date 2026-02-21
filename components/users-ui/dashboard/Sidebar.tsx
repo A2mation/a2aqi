@@ -40,10 +40,6 @@ export function Sidebar({ isCollapsed = false, onToggle }: { isCollapsed?: boole
     const pathname = usePathname()
     const { deviceId } = useParams();
 
-    if (!deviceId) {
-        redirect('/user')
-    }
-
     const menuItems = [
         { icon: LayoutDashboard, label: "Dashboard", href: `/user/${deviceId}/dashboard` },
         { icon: MonitorSmartphone, label: "Devices", badge: "6", href: `/user/${deviceId}/devices` },

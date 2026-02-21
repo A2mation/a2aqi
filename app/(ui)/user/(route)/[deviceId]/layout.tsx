@@ -28,10 +28,9 @@ export default async function DashboardLayout({
             name: true
         }
     });
-    // console.log(device)
 
     if (!device) {
-        redirect('/user');
+        redirect('/user/device');
     }
 
     return (
