@@ -16,7 +16,7 @@ import {
     MapPin,
 } from "lucide-react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { redirect, useParams, usePathname } from "next/navigation"
 import { useState, createContext, useContext } from "react"
 
 import { cn } from "@/lib/utils"
@@ -34,29 +34,35 @@ const SidebarContext = createContext<{
 
 export const useSidebar = () => useContext(SidebarContext)
 
-const menuItems = [
-    { icon: LayoutDashboard, label: "Dashboard", href: "/user/dashboard" },
-    { icon: MonitorSmartphone, label: "Devices", badge: "6", href: "/user/devices" },
-    { icon: MapPin, label: "Map", href: "/user/map" },
-    { icon: BarChart3, label: "Analytics", href: "/user/analytics" },
-    { icon: Users, label: "Team", href: "/user/team" },
-]
-
-const aiItems = [
-    { icon: Bot, label: "AI Assistant", badge: "New", href: "/user/ai-assistant" },
-    { icon: Sparkles, label: "Content Generator", href: "/user/content-generator" },
-    { icon: Wand2, label: "Smart Suggestions", href: "/user/suggestions" },
-]
-
-const generalItems = [
-    { icon: Settings, label: "Settings", href: "/user/settings" },
-    { icon: HelpCircle, label: "Help", href: "/user/help" },
-    { icon: LogOut, label: "Logout", href: "/user/logout" },
-]
 
 export function Sidebar({ isCollapsed = false, onToggle }: { isCollapsed?: boolean; onToggle?: () => void } = {}) {
     const [hoveredItem, setHoveredItem] = useState<string | null>(null)
     const pathname = usePathname()
+    const { deviceId } = useParams();
+
+    if (!deviceId) {
+        redirect('/user')
+    }
+
+    const menuItems = [
+        { icon: LayoutDashboard, label: "Dashboard", href: `/user/${deviceId}/dashboard` },
+        { icon: MonitorSmartphone, label: "Devices", badge: "6", href: `/user/${deviceId}/devices` },
+        { icon: MapPin, label: "Map", href: `/user/${deviceId}/map` },
+        { icon: BarChart3, label: "Analytics", href: `/user/${deviceId}/analytics` },
+        { icon: Users, label: "Team", href: `/user/${deviceId}/team` },
+    ]
+
+    const aiItems = [
+        { icon: Bot, label: "AI Assistant", badge: "New", href: `/user/${deviceId}/ai-assistant` },
+        { icon: Sparkles, label: "Content Generator", href: `/user/${deviceId}/content-generator` },
+        { icon: Wand2, label: "Smart Suggestions", href: `/user/${deviceId}/suggestions` },
+    ]
+
+    const generalItems = [
+        { icon: Settings, label: "Settings", href: `/user/${deviceId}/settings` },
+        { icon: HelpCircle, label: "Help", href: `/user/${deviceId}/help` },
+        { icon: LogOut, label: "Logout", href: `/user/${deviceId}/logout` },
+    ]
 
     return (
         <aside

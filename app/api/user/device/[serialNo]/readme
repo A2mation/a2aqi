@@ -1,0 +1,3 @@
+GET → Get single device data
+
+PATCH → Register device as user

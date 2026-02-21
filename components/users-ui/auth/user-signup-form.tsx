@@ -82,7 +82,7 @@ export function UserSignupForm({
                 redirect: false,
             })
 
-            router.push("/user/dashboard")
+            router.push("/user")
 
         } catch (error: any) {
             const message =

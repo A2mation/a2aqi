@@ -71,7 +71,7 @@ export function UserLoginForm({
             }
 
             toast.success("Login successful 🎉")
-            router.push("/user/dashboard")
+            router.push("/user")
 
         } catch (error) {
             toast.error("Something went wrong")

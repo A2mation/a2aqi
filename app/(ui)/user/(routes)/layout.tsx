@@ -3,8 +3,9 @@ import React from 'react'
 import AuthSessionProviders from '@/providers/auth-session-provider';
 import { Footer } from '@/components/aqi-ui/footer';
 import { getAuthSession } from '@/auth';
-import { ROLE } from '@/types/type';
-import { redirect } from 'next/navigation';
+
+import { ModalProvider } from '@/providers/device-store-provider';
+import { redirect } from "next/navigation";
 
 const layout = async ({
     children
@@ -12,16 +13,16 @@ const layout = async ({
     children: React.ReactNode
 }) => {
 
-    const session = await getAuthSession();
+    const session = await getAuthSession()
 
-    if (!session?.user && !(session?.user.role === ROLE.USER)) {
-        redirect("/user/sign-in");
+    if (!session?.user) {
+        redirect("/user/sign-in")
     }
 
     return (
         <>
             <AuthSessionProviders>
-                {/* TODO :: Device Modal Provide Need to SetUp here */}
+                <ModalProvider />
                 <main
                     style={{
                         ["--background" as any]: "oklch(0.98 0.005 264)",
@@ -32,7 +33,7 @@ const layout = async ({
                         {children}
                     </section>
                 </main>
-                <footer className="w-full md:w-[calc(100%_-_200px)] relative md:left-[200px]">
+                <footer className="w-full md:w-[calc(100%-200px)] relative md:left-50">
                     <Footer />
                 </footer>
 

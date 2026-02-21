@@ -11,7 +11,7 @@ export default async function AuthLayout({
     const session = await getAuthSession();
 
     if (session?.user && (session?.user.role === ROLE.USER)) {
-        redirect("/user/dashboard");
+        redirect("/user");
     }
     return (
         <>

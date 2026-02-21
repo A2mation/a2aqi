@@ -1,0 +1,2 @@
+If deviceId provided → return single
+No deviceId → return all devices
