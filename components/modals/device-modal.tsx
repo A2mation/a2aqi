@@ -360,7 +360,7 @@ export const DeviceModal = () => {
 
                     {/* GOOGLE MAP PREVIEW */}
                     {latValue && longValue && (
-                        <div className="mt-4 rounded-lg overflow-hidden border">
+                        <div className="mt-4 rounded-lg overflow-hidden border hidden md:block">
                             <iframe
                                 title="Google Map Preview"
                                 width="100%"

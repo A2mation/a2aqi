@@ -85,7 +85,7 @@ export const Modal: React.FC<ModalProps> = ({
                                 </>
                             )}
                         </DialogTitle>
-                        <DialogDescription>
+                        <DialogDescription className="flex justify-start">
                             {description}
                         </DialogDescription>
                     </DialogHeader>
