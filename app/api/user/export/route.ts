@@ -7,6 +7,7 @@ import type {
 import { prisma } from "@/lib/prisma"
 import { SENSORUNIT } from "@/constant/sensor-units"
 import { MAX_DAILY_DAYS, MAX_HOURLY_DAYS } from "@/constant/Export-Metrices"
+import { userGuard } from "@/lib/userAuth"
 
 
 function escapeCSV(value: unknown): string {
@@ -22,6 +23,8 @@ function escapeCSV(value: unknown): string {
 
 
 export async function GET(req: NextRequest) {
+    let exportLogId: string | null = null;
+
     try {
         const { searchParams } = new URL(req.url)
 
@@ -29,6 +32,12 @@ export async function GET(req: NextRequest) {
         const startDate = searchParams.get("startDate")
         const endDate = searchParams.get("endDate")
         const type = searchParams.get("type") ?? "hourly"
+
+        const user = await userGuard();
+
+        if (!user) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+        }
 
         if (!deviceId || !startDate || !endDate) {
             return NextResponse.json(
@@ -46,6 +55,22 @@ export async function GET(req: NextRequest) {
 
         const start = new Date(startDate)
         const end = new Date(endDate)
+
+        const exportLog = await prisma.exportLog.create({
+            data: {
+                userId: user.user.id,
+                deviceId,
+                format: "CSV",
+                status: "PROCESSING",
+                fromDate: start,
+                toDate: end,
+                metadata: {
+                    type,
+                },
+            },
+        })
+
+        exportLogId = exportLog.id
 
         if (isNaN(start.getTime()) || isNaN(end.getTime())) {
             return NextResponse.json(
@@ -213,13 +238,35 @@ export async function GET(req: NextRequest) {
 
         const csv = "\uFEFF" + csvLines.join("\n")
 
+        const fileSizeMB = Buffer.byteLength(csv, "utf8") / (1024 * 1024)
+
+        await prisma.exportLog.update({
+            where: { id: exportLogId },
+            data: {
+                status: "COMPLETED",
+                completedAt: new Date(),
+                fileSize: fileSizeMB,
+            },
+        })
+
         return new NextResponse(csv, {
             headers: {
                 "Content-Type": "text/csv",
                 "Content-Disposition": `attachment; filename=${FILE_NAME}.csv`,
             },
         })
-    } catch (error) {
+    } catch (error: any) {
+
+        if (exportLogId) {
+            await prisma.exportLog.update({
+                where: { id: exportLogId },
+                data: {
+                    status: "FAILED",
+                    errorMessage: error.message,
+                    completedAt: new Date(),
+                },
+            })
+        }
         console.error("Export API Error:", error)
 
         return NextResponse.json(
