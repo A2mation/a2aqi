@@ -17,16 +17,33 @@ import { DeviceModal } from "@/components/modals/device-modal"
 import { cn } from "@/lib/utils"
 import { HourlyAnalysis } from "@/components/users-ui/dashboard/hourly-analysis"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useExportDrawerStore } from "@/store/use-export-drawer-store"
+import { useQuery } from "@tanstack/react-query"
+import { http } from "@/lib/http"
+import { Device } from "@prisma/client"
+import { ExportDrawer } from "@/components/Export-Drawer"
 
 
 export default function DashboardPage() {
     const deviceModal = useDeviceModal();
     const [isClient, setisClient] = useState(false);
-    const [isCollapsed, setIsCollapsed] = useState(false)
+    const [isCollapsed, setIsCollapsed] = useState(false);
+    const openDrawer = useExportDrawerStore((s) => s.openDrawer);
 
     useEffect(() => {
         setisClient(true);
     }, [])
+
+    const {
+        data: devices = [],
+        isLoading,
+    } = useQuery<Device[]>({
+        queryKey: ["user-devices"],
+        queryFn: async () => {
+            const res = await http.get<Device[]>("/api/user/device")
+            return res.data
+        },
+    })
 
     if (!isClient) {
         return <>
@@ -63,12 +80,22 @@ export default function DashboardPage() {
                             <Button
                                 variant="outline"
                                 className="w-full hover:cursor-pointer sm:w-auto h-9 px-4 text-sm font-medium rounded-lg bg-transparent"
+                                onClick={() =>
+                                    openDrawer({
+                                        deviceId: "abc123",
+                                        type: "hourly",
+                                    })
+                                }
                             >
                                 Export Report
                             </Button>
                         </>
                     }
                 />
+
+                {!isLoading && devices?.length > 0 && (
+                    <ExportDrawer devices={devices} />
+                )}
 
                 <div className="mt-4 md:mt-5 space-y-4 px-2">
                     <StatsCards />

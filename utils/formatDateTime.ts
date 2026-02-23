@@ -12,3 +12,16 @@ export const formatDateTime = (isoString: string) => {
         hour12: true,
     });
 };
+
+
+export const formatDateOnly = (isoString: string) => {
+    if (!isoString) return "N/A"
+
+    const date = new Date(isoString)
+
+    return date.toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+    })
+}

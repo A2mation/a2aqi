@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { MobileNav } from "./mobile-nav"
 import type { ReactNode } from "react"
+import { useSession } from "next-auth/react"
 
 interface HeaderProps {
     title: string
@@ -14,6 +15,8 @@ interface HeaderProps {
 }
 
 export function Header({ title, description, actions }: HeaderProps) {
+    const session = useSession();
+
     return (
         <header className="space-y-3 px-2">
             <div className="flex items-center justify-between gap-3 mb-8">
@@ -47,16 +50,27 @@ export function Header({ title, description, actions }: HeaderProps) {
                     </Button>
 
                     <div className="flex items-center gap-2 pl-2 ml-1 border-l border-border">
-                        <Avatar className="w-8 h-8">
-                            {/* <AvatarImage src="/profile.jpg" alt="Marketing Manager" /> */}
-                            <AvatarFallback className="text-xs bg-primary text-primary-foreground font-medium">
-                                MM
-                            </AvatarFallback>
-                        </Avatar>
-                        <div className="text-xs hidden lg:block">
-                            <p className="font-medium text-foreground">Saikat Das</p>
-                            <p className="text-muted-foreground text-[10px]">a2mationsolution@gmail.com</p>
-                        </div>
+                        {
+                            session.data && (
+                                <>
+                                    <Avatar className="w-10 h-10 mr-2 cursor-pointer">
+                                        <AvatarFallback className="text-xs bg-blue-700 text-primary-foreground font-medium">
+                                            {session.data.user.name
+                                                ?.split(" ")
+                                                .map((n: any) => n[0])
+                                                .join("")
+                                                .toUpperCase()
+                                            }
+                                        </AvatarFallback>
+
+                                    </Avatar>
+                                    <div className="text-base hidden lg:block">
+                                        <p className="font-medium text-foreground">{session.data.user.name}</p>
+                                        <p className="text-muted-foreground text-[12px]">{session.data.user.email}</p>
+                                    </div>
+                                </>
+                            )
+                        }
                     </div>
                 </div>
             </div>
