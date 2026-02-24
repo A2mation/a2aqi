@@ -32,7 +32,7 @@ vi.mock("@/domains/sensors/sensor.ratelimit", () => ({
 }));
 
 import { sensorQueue } from "@/lib/queue";
-import { POST } from "@/app/api/ingest/route";
+import { POST } from "@/app/api/v1/ingest/route";
 import { SensorError } from "@/domains/sensors/sensor.error";
 
 describe("POST /api/ingest", () => {
