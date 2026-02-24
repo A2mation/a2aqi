@@ -33,6 +33,7 @@ export async function GET(req: Request) {
                     name: true,
                     lat: true,
                     lng: true,
+                    assignedAt: true
                 },
             })
 
@@ -55,6 +56,7 @@ export async function GET(req: Request) {
                 name: true,
                 lat: true,
                 lng: true,
+                assignedAt: true
             },
         })
 

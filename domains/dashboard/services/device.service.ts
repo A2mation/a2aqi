@@ -18,7 +18,6 @@ export class DeviceService {
             serialNo: device.serialNo,
             isActive: device.isActive,
             status: device.status,
-            apiKey: device.apiKey,
             lat: device.lat ?? null,
             lng: device.lng ?? null,
             assignedAt: device.assignedAt ?? null,

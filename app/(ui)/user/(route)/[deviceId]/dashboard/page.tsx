@@ -1,6 +1,9 @@
 "use client"
 
+import { Device } from "@prisma/client"
 import { useEffect, useState } from "react"
+import { useParams } from "next/navigation"
+import { useQuery } from "@tanstack/react-query"
 
 import { Sidebar } from "@/components/users-ui/dashboard/Sidebar"
 import { Header } from "@/components/users-ui/dashboard/Header"
@@ -15,19 +18,19 @@ import { Button } from "@/components/ui/button"
 import { useDeviceModal } from "@/hooks/use-device-store"
 import { DeviceModal } from "@/components/modals/device-modal"
 import { cn } from "@/lib/utils"
+import { http } from "@/lib/http"
 import { HourlyAnalysis } from "@/components/users-ui/dashboard/hourly-analysis"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useExportDrawerStore } from "@/store/use-export-drawer-store"
-import { useQuery } from "@tanstack/react-query"
-import { http } from "@/lib/http"
-import { Device } from "@prisma/client"
 import { ExportDrawer } from "@/components/Export-Drawer"
 
 
 export default function DashboardPage() {
     const deviceModal = useDeviceModal();
+    const { deviceId } = useParams();
     const [isClient, setisClient] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const[currentDeviceAssignDate, setCurrentDeviceAssignDate] = useState<Date | null>(null);
     const openDrawer = useExportDrawerStore((s) => s.openDrawer);
 
     useEffect(() => {
@@ -44,6 +47,22 @@ export default function DashboardPage() {
             return res.data
         },
     })
+
+
+    useEffect(() => {
+        if (!deviceId) return;
+
+        const device = devices.find(d => d.id === deviceId);
+        // console.log(device)
+        if (!device) return;
+
+        setCurrentDeviceAssignDate(device.assignedAt);
+
+        // safe Date here
+    }, [deviceId, devices]);
+
+    console.log(currentDeviceAssignDate)
+
 
     if (!isClient) {
         return <>
@@ -102,7 +121,7 @@ export default function DashboardPage() {
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                         <div className="lg:col-span-2 space-y-4">
-                            <HourlyAnalysis />
+                            <HourlyAnalysis currentDeviceAssignDate={currentDeviceAssignDate} />
                             <WeeklyAqiAnalytics />
                             <DeviceManagement />
                         </div>
