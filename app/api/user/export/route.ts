@@ -22,22 +22,23 @@ function escapeCSV(value: unknown): string {
 }
 
 
-export async function GET(req: NextRequest) {
+export async function POST(req: NextRequest) {
     let exportLogId: string | null = null;
 
     try {
-        const { searchParams } = new URL(req.url)
-
-        const deviceId = searchParams.get("deviceId")
-        const startDate = searchParams.get("startDate")
-        const endDate = searchParams.get("endDate")
-        const type = searchParams.get("type") ?? "hourly"
 
         const user = await userGuard();
 
         if (!user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         }
+
+        const {
+            deviceId,
+            startDate,
+            endDate,
+            type
+        } = await req.json();
 
         if (!deviceId || !startDate || !endDate) {
             return NextResponse.json(
@@ -269,6 +270,67 @@ export async function GET(req: NextRequest) {
         }
         console.error("Export API Error:", error)
 
+        return NextResponse.json(
+            { error: "Internal server error" },
+            { status: 500 }
+        )
+    }
+}
+
+
+export async function GET(req: NextRequest) {
+    try {
+
+        const user = await userGuard();
+
+        if (!user) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+        }
+
+        const { searchParams } = new URL(req.url);
+        const cursor = searchParams.get("cursor");
+        const limit = 10;
+
+        const logs = await prisma.exportLog.findMany({
+            where: { userId: user.user.id },
+            take: limit,
+            // If cursor exists, start after that timestamp
+            ...(cursor && {
+                skip: 1, // Skip the actual cursor record
+                cursor: { id: cursor },
+            }),
+            select: {
+                id: true,
+                deviceId: true,
+                status: true,
+                completedAt: true,
+                requestedAt: true,
+                format: true,
+                fileSize: true,
+                fileUrl: true,
+                fromDate: true,
+                toDate: true,
+                metadata: true,
+                errorMessage: true,
+                device: {
+                    select: {
+                        name: true
+                    }
+                }
+            },
+            orderBy: {
+                completedAt: "desc"
+            }
+        });
+
+        const nextCursor = logs.length === limit ? logs[logs.length - 1].id : null;
+
+        return NextResponse.json({
+            items: logs,
+            nextCursor
+        }, { status: 200 });
+
+    } catch (error) {
         return NextResponse.json(
             { error: "Internal server error" },
             { status: 500 }

@@ -176,16 +176,16 @@ export function ExportDrawer({
 
 
     async function onSubmit(data: ExportFormValues) {
-        const params = new URLSearchParams({
+        const payload = {
             deviceId: data.deviceId,
             startDate: data.dateRange.from.toISOString(),
             endDate: data.dateRange.to.toISOString(),
             type: data.type,
-        })
+        };
 
-        const res = await http.get(`/api/user/export?${params}`, {
+        const res = await http.post(`/api/user/export`, payload, {
             responseType: "blob",
-        })
+        });
 
         const contentDisposition = res.headers["content-disposition"]
         let fileName = `a2aqi-${data.type}-report.csv`

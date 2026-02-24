@@ -25,3 +25,21 @@ export interface BlogContentProps {
     likedIds: []
     author: Author
 }
+
+export interface ExportLog {
+    id: string
+    deviceId: string
+    status: "COMPLETED" | "PROCESSING" | "FAILED"
+    requestedAt: string
+    completedAt: string | null
+    format: "CSV" | "PDF" | "EXCEL"
+    fileSize: number | null
+    fileUrl: string | null
+    fromDate: string | null
+    toDate: string | null
+    metadata: any | null
+    errorMessage: string | null
+    device: {
+        name: string
+    } | null
+}
