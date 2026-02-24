@@ -192,7 +192,7 @@ const ExportHistory = () => {
                         ) : (
                             <div className="grid gap-4">
                                 {filteredLogs.map((log) => (
-                                    <Card key={log.id} className="group overflow-hidden border-slate-200 hover:shadow-md hover:border-slate-300 transition-all">
+                                    <Card key={log.id} className="group border-slate-200 hover:shadow-md hover:border-slate-300 transition-all">
                                         <CardContent className="p-0">
                                             <div className="flex flex-col md:flex-row md:items-center p-5 gap-5">
                                                 <div className="flex items-start gap-4 flex-1">
