@@ -23,7 +23,9 @@ export default function Home() {
       <AirQualityDashboard />
       {/* <AQIGraph /> */}
       <AirQualityIndexTable />
-      <AirPollutionTable />
+      <section className="hidden md:block">
+        <AirPollutionTable />
+      </section>
       <PopularCityCards />
       <ClientLogosBanner logos={logos} />
     </>
