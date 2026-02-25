@@ -4,7 +4,7 @@ import * as z from "zod";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { Trash } from "lucide-react"
+import { Settings2, Trash } from "lucide-react"
 import { DeviceModel, DeviceStatus } from "@prisma/client"
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,7 +20,7 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import Heading from "@/components/ui/Heading"
 import { Separator } from "@/components/ui/separator"
 import AlertModal from "@/components/modals/alert-modal";
@@ -34,6 +34,8 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from '@/components/ui/label'
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 
 interface DeviceInterface {
@@ -222,6 +224,18 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
                             checked={isUserMode}
                             onCheckedChange={setIsUserMode}
                         />
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <Button asChild variant="outline">
+                            <Link href={`/admin/device/${params.deviceId}/calibration`} className={cn(
+                                buttonVariants({
+                                    variant: "link"
+                                })
+                            )}>
+                                <Settings2 className="mr-2 h-4 w-4" />
+                                Calibration
+                            </Link>
+                        </Button>
                     </div>
                     <Button
                         disabled={loading}

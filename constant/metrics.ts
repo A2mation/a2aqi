@@ -19,6 +19,12 @@ export type MetricKey =
     | "Temperature"
     | "Humidity";
 
+export const SENSOR_OPTIONS = [
+    "aqi", "pm10", "pm25", "so2", "no2", "co2", "co", "o3",
+    "noise", "pm1", "tvoc", "smoke", "methane", "h2", "ammonia",
+    "h2s", "temperature", "humidity"
+];
+
 export const BASE_METRICS: { key: MetricKey; label: string }[] = [
     { key: "Aqi", label: "AQI" },
     { key: "Pm25", label: "PM2.5" },

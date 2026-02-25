@@ -26,7 +26,7 @@ const MainNav = ({
         {
             href: `/admin/device`,
             label: 'Devices',
-            active: pathName === `/admin/device` || pathName === `/admin/device/new` || pathName === `/admin/device/${params.deviceId}`
+            active: pathName === `/admin/device` || pathName === `/admin/device/new` || pathName === `/admin/device/${params.deviceId}` || pathName === `/admin/device/${params.deviceId}/calibration`
         },
         {
             href: `/admin/sensors`,
