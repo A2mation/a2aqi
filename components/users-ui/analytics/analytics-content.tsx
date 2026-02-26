@@ -74,11 +74,13 @@ export function AnalyticsContent() {
         },
     });
 
+
     const availableMetrics = allMetrics.filter((metric) =>
         data?.some((row) => row[metric.key] !== undefined)
     );
 
     const latest = data?.[data.length - 1];
+    console.log(latest)
 
     // ✅ Fix infinite re-render by using useEffect
     useEffect(() => {
@@ -154,7 +156,7 @@ export function AnalyticsContent() {
                             </div>
 
                             <p className="text-3xl font-bold mb-2">
-                                {latest?.[metric.key] ?? "--"}
+                                {latest?.[metric.key].toFixed(2) ?? "--"}
                             </p>
 
                             <div className="flex items-center gap-1.5 text-xs opacity-80">
