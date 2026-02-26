@@ -2,11 +2,11 @@ import { prisma } from "@/lib/prisma";
 import { SensorError } from "./sensor.error";
 
 export async function authenticateSensor(serialNo: string, apiKey: string) {
-    console.time("db");
+    // console.time("db");
     const device = await prisma.device.findUnique({
         where: { serialNo: serialNo },
     });
-    console.timeEnd("db");
+    // console.timeEnd("db");
     // console.log(device)
 
     if (!device) throw new SensorError("Device not found", 404);

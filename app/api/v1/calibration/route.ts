@@ -1,9 +1,9 @@
 import { authenticateSensor } from "@/domains/sensors/sensor.auth";
 import { SensorError } from "@/domains/sensors/sensor.error";
 import { prisma } from "@/lib/prisma";
-import { CalibrationValues } from "@/types/type";
 import { NextResponse } from "next/server";
 import { redis } from "@/lib/redis";
+import { calibrationKey } from "@/constant/Calibration.key";
 
 export async function POST(req: Request) {
     try {
@@ -55,7 +55,7 @@ export async function POST(req: Request) {
                 },
             });
             
-            await redis.del(`calibration:${device.id}`);
+            await redis.del(calibrationKey(device.id));
             
             return new NextResponse(null, { status: 204 });
         }
@@ -75,7 +75,7 @@ export async function POST(req: Request) {
             
             // Only first valid ACK deletes Redis
             if (result.count === 1) {
-                await redis.del(`calibration:${device.id}`);
+                await redis.del(calibrationKey(device.id));
             }
             
             return NextResponse.json(
@@ -86,7 +86,7 @@ export async function POST(req: Request) {
         
         // Fetch calibration from Redis
         const cachedCalibration: any = await redis.get(
-            `calibration:${device.id}`
+            calibrationKey(device.id)
         );
         
         if (!cachedCalibration) {
@@ -107,12 +107,11 @@ export async function POST(req: Request) {
         }
         
         
-        console.log(cachedCalibration)
 
         return NextResponse.json(
             {
                 success: true,
-                calibration: cachedCalibration,
+                calibration: JSON.parse(cachedCalibration),
             },
             {
                 status: 200

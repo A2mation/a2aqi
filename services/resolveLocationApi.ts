@@ -14,7 +14,7 @@ export async function resolveLocationAqi(location: any, source: string) {
 
     const cached = await redis.get(cacheKey)
     if (cached) {
-        return NextResponse.json({ ...cached, cached: true })
+        return NextResponse.json({ ...JSON.parse(cached), cached: true })
     }
 
     const airQualityResponse = await fetchAqiByCoordinates(location.lat, location.lng)
@@ -43,7 +43,7 @@ export async function resolveLocationAqi(location: any, source: string) {
         source,
     }
 
-    await redis.set(cacheKey, payload, { ex: LOCATION_CACHE_TTL })
+    await redis.set(cacheKey, JSON.stringify(payload), "EX", LOCATION_CACHE_TTL)
 
     return NextResponse.json(payload)
 }

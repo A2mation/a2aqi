@@ -1,3 +1,4 @@
+import { calibrationKey } from "@/constant/Calibration.key";
 import { adminGuard } from "@/lib/adminAuth";
 import { handleAdminError } from "@/lib/handleRoleError";
 import { prisma } from "@/lib/prisma"
@@ -105,11 +106,10 @@ export async function POST(req: Request,
 
         // Store in Redis
         await redis.set(
-            `calibration:${deviceId}`,
+            calibrationKey(deviceId),
             JSON.stringify(newValues),
-            {
-                ex: 60 * 60, // 1 hour
-            }
+            "EX",
+            60 * 60 // 1 hour
         );
 
         return NextResponse.json(

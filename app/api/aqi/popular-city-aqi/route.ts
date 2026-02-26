@@ -20,11 +20,11 @@ const CACHE_TTL = 60 * 60 * 12; // 12 hours
 
 export async function GET() {
     try {
-        
+
         const cached = await redis.get(CACHE_KEY);
 
         if (cached) {
-            return NextResponse.json(cached, {
+            return NextResponse.json(JSON.parse(cached), {
                 headers: {
                     "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
                     "X-Cache": "HIT",
@@ -32,7 +32,7 @@ export async function GET() {
             });
         }
 
-        
+
         const readings = await prisma.aQIReading.findMany({
             where: {
                 location: { in: popularCitiesName },
@@ -51,10 +51,8 @@ export async function GET() {
             },
         });
 
-       
-        await redis.set(CACHE_KEY, readings, {
-            ex: CACHE_TTL,
-        });
+
+        await redis.set(CACHE_KEY, JSON.stringify(readings), "EX", CACHE_TTL);
 
         return NextResponse.json(readings, {
             headers: {
@@ -62,7 +60,7 @@ export async function GET() {
                 "X-Cache": "MISS",
             },
         });
-        
+
     } catch (error) {
         console.error("Popular cities AQI error:", error);
         return new NextResponse("Internal Server Error", { status: 500 });
