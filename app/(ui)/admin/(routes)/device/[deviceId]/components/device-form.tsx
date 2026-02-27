@@ -121,7 +121,7 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
 
     const { data: deviceModel, isLoading: loadingModels } = useQuery<DeviceModel[]>({
         queryKey: ["device-models"],
-        queryFn: async () => (await http.get('/api/admin/device-model')).data
+        queryFn: async () => (await http.get('/api/admin/device-model/active-device-model')).data
     });
 
     const { data: users, isLoading: loadingUsers } = useQuery<User[]>({
