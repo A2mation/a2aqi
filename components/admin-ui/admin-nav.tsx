@@ -20,12 +20,6 @@ const AdminNavbar = () => {
 
     const session = useSession();
 
-    // if (!userId) {
-    //     redirect('/sign-in');
-    // }
-    console.log(session);
-
-
     return (
         <div className='border-b'>
             <div className='flex h-16 items-center px-4 py-2 gap-4'>

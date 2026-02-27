@@ -42,83 +42,75 @@ export async function GET(
 
 export async function PATCH(
     req: Request,
-    params: {
-        params: Promise<{ deviceId: string }>
-    }
+    { params }: { params: Promise<{ deviceId: string }> }
 ) {
     try {
-
         await adminGuard();
-
-        const { deviceId } = await params.params;
+        const { deviceId } = await params;
 
         if (!deviceId) {
-            return new NextResponse("Device ID not Found", {
-                status: 400
-            })
+            return new NextResponse("Device ID not Found", { status: 400 });
         }
-
 
         const body = await req.json();
+        const { name, user, isUserMode, serialNo, modelId, lat, lng, status } = body;
 
-        const { name, serialNo, modelId, lat, lng, status } = body as {
-            name?: string;
-            serialNo: string;
-            modelId: string;
-            lat?: string | null;
-            lng?: string | null;
-            status?: DeviceStatus;
+        
+        if (!serialNo) return new NextResponse("Serial No is required", { status: 400 });
+        if (!modelId) return new NextResponse("Model ID is required", { status: 400 });
+
+        
+        const model = await prisma.deviceModel.findUnique({ where: { id: modelId } });
+        if (!model) return new NextResponse("Invalid Model", { status: 400 });
+
+       
+        let payload: any = {
+            name,
+            serialNo,
+            modelId,
         };
-        // TODO: ADD user Details add from ADMIN side
 
-        if (!serialNo) {
-            return new NextResponse("Serial No is required", { status: 400 });
-        }
+        if (isUserMode && user) {
+        
+            const vefUser = await prisma.user.findUnique({
+                where: { id: user },
+                select: { id: true }
+            });
 
-        if (!modelId) {
-            return new NextResponse("Model ID is required", { status: 400 });
-        }
+            if (!vefUser) return new NextResponse("User not found", { status: 404 });
 
-        const model = await prisma.deviceModel.findUnique({
-            where: {
-                id: modelId
-            }
-        })
+            const parsedLat = lat ? parseFloat(lat) : null;
+            const parsedLng = lng ? parseFloat(lng) : null;
 
-        if (!model) {
-            return new NextResponse("Invalid Model", { status: 400 })
-        }
-
-        const parsedLat = lat ? parseFloat(lat) : null;
-        const parsedLng = lng ? parseFloat(lng) : null;
-
-        if (lat && isNaN(parsedLat!)) {
-            return new NextResponse("Invalid latitude value", { status: 400 });
-        }
-
-        if (lng && isNaN(parsedLng!)) {
-            return new NextResponse("Invalid longitude value", { status: 400 });
+            payload = {
+                ...payload,
+                userId: vefUser.id,
+                lat: isNaN(parsedLat!) ? null : parsedLat,
+                lng: isNaN(parsedLng!) ? null : parsedLng,
+                status: status || DeviceStatus.UNASSIGNED,
+                assignedAt: status === DeviceStatus.ASSIGNED ? new Date() : null,
+            };
+        } else {
+            
+            payload = {
+                ...payload,
+                userId: null,
+                lat: null,
+                lng: null,
+                status: DeviceStatus.UNASSIGNED,
+                assignedAt: null,
+            };
         }
 
         const updatedDevice = await prisma.device.update({
             where: { id: deviceId },
-            data: {
-                name,
-                serialNo,
-                modelId,
-                lat: parsedLat,
-                lng: parsedLng,
-                status: status ?? DeviceStatus.UNASSIGNED,
-
-                assignedAt:
-                    status === DeviceStatus.ASSIGNED ? new Date() : null,
-            },
+            data: payload,
         });
 
         return NextResponse.json(updatedDevice);
 
-
     } catch (error) {
+        console.error("[DEVICE_PATCH_ERROR]", error);
         return handleAdminError(error);
     }
 }

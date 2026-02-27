@@ -33,7 +33,9 @@ const SingleDeviceModelPage = async ({
             },
             user: {
                 select: {
-                    name: true
+                    id: true,
+                    name: true,
+                    email: true
                 }
             },
             createdAt: true,
@@ -49,7 +51,9 @@ const SingleDeviceModelPage = async ({
             apiKey: device.apiKey,
             modelId: device.model.id,
             modelName: device.model.name,
-            user: device.user?.name ?? "",
+            userId: device.user?.id ?? "",
+            username: device.user?.name ?? "",
+            email: device.user?.email ?? "",
             lat: device.lat?.toString() ?? "",
             lng: device.lng?.toString() ?? "",
             createdAt: device.createdAt,
