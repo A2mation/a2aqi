@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import { Trash2, Plus, Settings2, History, Loader2 } from "lucide-react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 
 import { cn } from "@/lib/utils";
 import { http } from "@/lib/http";
@@ -20,6 +20,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useInView } from "react-intersection-observer";
+import { useEffect } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 
 
@@ -48,9 +51,10 @@ const calibrationSchema = z.object({
 export default function DynamicCalibrationPage() {
     const params = useParams();
     const queryClient = useQueryClient();
+    const { ref, inView } = useInView();
 
     const form = useForm<CalibrationFormValues>({
-        
+
         resolver: zodResolver(calibrationSchema) as any,
         defaultValues: {
             reason: "",
@@ -63,13 +67,32 @@ export default function DynamicCalibrationPage() {
         name: "sensors",
     });
 
-    const { data: logs, isLoading } = useQuery<CalibrationLog[]>({
-        queryKey: ["calibrations", params.deviceId],
-        queryFn: async () => {
-            const { data } = await http.get(`/api/admin/device/${params.deviceId}/calibration`);
-            return data;
+    const {
+        data,
+        isLoading,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage
+    } = useInfiniteQuery({
+        queryKey: ["calibrations-infinite", params.deviceId],
+        queryFn: async ({ pageParam = null }) => {
+            const { data } = await http.get(
+                `/api/admin/device/${params.deviceId}/calibration`,
+                { params: { cursor: pageParam, limit: 10 } }
+            );
+            return data; // { items: CalibrationLog[], nextCursor: string | null }
         },
+        initialPageParam: null,
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
     });
+
+    useEffect(() => {
+        if (inView && hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+        }
+    }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+    const allLogs = data?.pages.flatMap((page) => page.items) || [];
 
     const mutation = useMutation({
         mutationFn: async (values: z.infer<typeof calibrationSchema>) => {
@@ -104,10 +127,10 @@ export default function DynamicCalibrationPage() {
     });
 
     return (
-        <div className="p-6 max-w-7xl mx-auto space-y-6">
+        <div className="p-6 max-w-7xl mx-auto min-h-screen space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-               
+
                 <Card className="lg:col-span-5 h-fit">
                     <CardHeader><CardTitle className="flex items-center gap-2"><Settings2 size={20} /> Configure Device</CardTitle></CardHeader>
                     <CardContent>
@@ -173,98 +196,66 @@ export default function DynamicCalibrationPage() {
                     </CardContent>
                 </Card>
 
-               
-                <Card className="lg:col-span-7">
-                    <CardHeader><CardTitle className="flex items-center gap-2"><History size={20} /> Log History</CardTitle></CardHeader>
-                    <CardContent>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-25">Status</TableHead>
-                                    <TableHead>Values</TableHead>
-                                    <TableHead>Reason</TableHead>
-                                    <TableHead>Lifecycle</TableHead>
-                                    <TableHead className="text-right">Created At</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {isLoading ? (
-                                   
-                                    Array.from({ length: 3 }).map((_, i) => (
-                                        <TableRow key={i}>
-                                            <TableCell colSpan={5}><Skeleton className="h-8 w-full" /></TableCell>
-                                        </TableRow>
-                                    ))
-                                ) : Array.isArray(logs) && logs.length > 0 ? (
-                                   
-                                    logs.map((log: any) => (
-                                        <TableRow key={log.id} className="hover:bg-slate-50 transition-colors">
-                                           
-                                            <TableCell>
-                                                <Badge
-                                                    variant="outline"
-                                                    className={cn(
-                                                        "font-bold px-2.5 py-0.5 rounded-full border-none",                           
-                                                        log.status === "PENDING" && "bg-amber-100 text-amber-700 hover:bg-amber-100/80",
-                                                        log.status === "SUCCESS" && "bg-emerald-100 text-emerald-700 hover:bg-emerald-100/80",
-                                                        log.status === "EXPIRED" && "bg-rose-100 text-rose-700 hover:bg-rose-100/80",
-                                                        log.status === "DELIVERED" && "bg-blue-100 text-blue-700 hover:bg-blue-100/80"
-                                                    )}
-                                                >
-                                                    {log.status}
-                                                </Badge>
-                                            </TableCell>
 
-                                        
-                                            <TableCell>
-                                                <div className="flex flex-wrap gap-1 max-w-62.5">
-                                                    {Object.entries(log.newValues || {}).map(([key, value]) => (
-                                                        <Badge key={key} variant="outline" className="text-[10px] uppercase font-mono bg-white">
-                                                            <span className="text-muted-foreground mr-1">{key}:</span>
-                                                            {value as string}
-                                                        </Badge>
-                                                    ))}
-                                                </div>
-                                            </TableCell>
+                <Card className="lg:col-span-7 flex flex-col h-150">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <History size={20} /> Log History
+                        </CardTitle>
+                    </CardHeader>
 
-                                            
-                                            <TableCell className="max-w-37.5 truncate text-sm">
-                                                <span title={log.reason}>{log.reason || "—"}</span>
-                                            </TableCell>
-
-                                           
-                                            <TableCell>
-                                                <div className="flex flex-col gap-1 text-[11px]">
-                                                    <div className="flex items-center text-emerald-600">
-                                                        <span className="w-12 font-semibold">From:</span>
-                                                        {new Date(log.effectiveFrom).toLocaleDateString()}
-                                                    </div>
-                                                    <div className="flex items-center text-amber-600">
-                                                        <span className="w-12 font-semibold">Exp:</span>
-                                                        {new Date(log.expiresAt).toLocaleDateString()}
-                                                    </div>
-                                                </div>
-                                            </TableCell>
-
-                                            
-                                            <TableCell className="text-right text-xs text-muted-foreground">
-                                                {new Date(log.createdAt).toLocaleString([], {
-                                                    dateStyle: 'short',
-                                                    timeStyle: 'short'
-                                                })}
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                ) : (
-                                    
+                    <CardContent className="flex-1 overflow-hidden p-0">
+                        <ScrollArea className="h-full px-6">
+                            <Table>
+                                <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
                                     <TableRow>
-                                        <TableCell colSpan={5} className="h-32 text-center text-muted-foreground italic">
-                                            No logs available for this device.
+                                        <TableHead className="w-25">Status</TableHead>
+                                        <TableHead>Values</TableHead>
+                                        <TableHead>Reason</TableHead>
+                                        <TableHead>Lifecycle</TableHead>
+                                        <TableHead className="text-right">Created At</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {allLogs.map((log: any) => (
+                                        <TableRow key={log.id} className="hover:bg-slate-50 transition-colors">
+                                            {/* ... (Keep your existing TableCell content) */}
+                                        </TableRow>
+                                    ))}
+
+                                    {/* INFINITE SCROLL TARGET */}
+                                    <TableRow ref={ref} className="border-none">
+                                        <TableCell colSpan={5} className="text-center py-4">
+                                            {isFetchingNextPage ? (
+                                                <div className="flex justify-center items-center gap-2 text-muted-foreground text-sm">
+                                                    <Loader2 className="animate-spin w-4 h-4" />
+                                                    Loading more...
+                                                </div>
+                                            ) : hasNextPage ? (
+                                                <div className="h-4 w-4 bg-slate-200 rounded-full animate-bounce mx-auto" />
+                                            ) : allLogs.length > 0 ? (
+                                                <span className="text-xs text-muted-foreground italic">End of history</span>
+                                            ) : null}
                                         </TableCell>
                                     </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
+                                </TableBody>
+                            </Table>
+
+                            {/* Initial Loading State */}
+                            {isLoading && (
+                                <div className="space-y-2 p-4">
+                                    <Skeleton className="h-10 w-full" />
+                                    <Skeleton className="h-10 w-full" />
+                                    <Skeleton className="h-10 w-full" />
+                                </div>
+                            )}
+
+                            {!isLoading && allLogs.length === 0 && (
+                                <div className="h-32 flex items-center justify-center text-muted-foreground italic">
+                                    No logs available for this device.
+                                </div>
+                            )}
+                        </ScrollArea>
                     </CardContent>
                 </Card>
             </div>

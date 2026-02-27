@@ -10,23 +10,16 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { http } from '@/lib/http';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useInView } from 'react-intersection-observer';
+import { useDebounce } from '@/hooks/use-debounce';
 
 export const AssignmentPanel = () => {
     const [selectedUser, setSelectedUser] = useState<any>(null);
     const [selectedDevice, setSelectedDevice] = useState<any>(null);
-    const [userSearch, setUserSearch] = useState("");
-    const [debouncedSearch, setDebouncedSearch] = useState("");
+    const [searchQuery, setSearchQuery] = useState("");
+    const debouncedSearch = useDebounce(searchQuery, 400);
+
 
     const { ref: loadMoreRef, inView } = useInView();
-
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            setDebouncedSearch(userSearch);
-        }, 500);
-
-        return () => clearTimeout(handler);
-    }, [userSearch]);
-
 
     const {
         data,
@@ -49,7 +42,6 @@ export const AssignmentPanel = () => {
         initialPageParam: null,
     });
 
-    // 2. Fetch Devices for Selected User
     const { data: devices = [], isLoading: devicesLoading } = useQuery({
         queryKey: ["admin-devices", selectedUser?.id],
         queryFn: async () => {
@@ -95,8 +87,8 @@ export const AssignmentPanel = () => {
                             <Input
                                 placeholder="Search name or email..."
                                 className="pl-9"
-                                value={userSearch}
-                                onChange={(e) => setUserSearch(e.target.value)}
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
                             />
                         </div>
                     </CardHeader>

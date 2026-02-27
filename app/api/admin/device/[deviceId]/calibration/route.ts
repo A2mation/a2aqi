@@ -21,21 +21,21 @@ export async function GET(req: Request,
 
         await adminGuard();
 
+        const { searchParams } = new URL(req.url);
+        const cursor = searchParams.get("cursor");
+        const limit = Number(searchParams.get("limit")) || 10;
+
         const logs = await prisma.calibration.findMany({
-            where: {
-                deviceId: deviceId,
-            }
-        })
+            take: limit,
+            skip: cursor ? 1 : 0,
+            cursor: cursor ? { id: cursor } : undefined,
+            where: { deviceId: deviceId },
+            orderBy: { createdAt: 'desc' }
+        });
 
-        if (!logs || logs.length === 0) {
-            return new NextResponse("No Logs found", {
-                status: 404
-            })
-        };
+        const nextCursor = logs.length === limit ? logs[logs.length - 1].id : null;
 
-        return NextResponse.json(logs, {
-            status: 200
-        })
+        return NextResponse.json({ items: logs, nextCursor });
 
     } catch (error: any) {
         return handleAdminError(error);

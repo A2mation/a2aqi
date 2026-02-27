@@ -1,14 +1,14 @@
 "use client"
 
 import * as z from "zod";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
-import { Settings2, Trash } from "lucide-react"
+import { Check, ChevronsUpDown, Loader2, Settings2, Trash } from "lucide-react"
 import { DeviceStatus, DeviceModel, User } from "@prisma/client"
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useParams, useRouter } from "next/navigation";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import Link from "next/link";
 
 import {
@@ -35,6 +35,10 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from '@/components/ui/label'
+import { useDebounce } from "@/hooks/use-debounce";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 
 // Define the Schema First
 const formSchema = z.object({
@@ -82,6 +86,8 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
     const params = useParams();
     const router = useRouter();
     const queryClient = useQueryClient();
+    const [searchQuery, setSearchQuery] = useState("");
+    const debouncedSearch = useDebounce(searchQuery, 400);
 
     const [open, setOpen] = useState(false);
 
@@ -124,10 +130,35 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
         queryFn: async () => (await http.get('/api/admin/device-model/active-device-model')).data
     });
 
-    const { data: users, isLoading: loadingUsers } = useQuery<User[]>({
-        queryKey: ["users"],
-        queryFn: async () => (await http.get('/api/admin/user')).data
+    const {
+        data: userPages,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading: loadingUsers
+    } = useInfiniteQuery({
+        queryKey: ["users-infinite", debouncedSearch],
+        // 1. Explicitly type the context parameter
+        queryFn: async ({ pageParam }: { pageParam: string | null }) => {
+            const response = await http.get<{
+                users: { id: string; name: string; email: string }[];
+                nextCursor: string | null;
+            }>('/api/admin/user', {
+                params: {
+                    search: debouncedSearch,
+                    cursor: pageParam,
+                    limit: 10,
+                },
+            });
+            return response.data;
+        },
+
+        initialPageParam: null as string | null,
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
     });
+
+
+    const allUsers = userPages?.pages.flatMap((page) => page.users || []).filter(Boolean) ?? [];
 
     const { mutate: saveDevice, isPending: isSaving } = useMutation({
         mutationFn: async (values: DeviceFormValues) => {
@@ -283,7 +314,7 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
                                         value={field.value}
                                     >
                                         <FormControl>
-                                            <SelectTrigger>
+                                            <SelectTrigger className="w-full">
                                                 <SelectValue placeholder="Select model" />
                                             </SelectTrigger>
                                         </FormControl>
@@ -309,34 +340,82 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
                                 <FormField
                                     control={form.control}
                                     name="user"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Device User</FormLabel>
-                                            <Select
-                                                disabled={loading}
-                                                onValueChange={field.onChange}
-                                                value={field.value ?? ""}
-                                            >
-                                                <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select User" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    {users?.map((item) => (
-                                                        <SelectItem key={item.id} value={item.id}>
-                                                            {item.email}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
+                                    render={({ field }) => {
 
-                                            <FormDescription>
-                                                {`Name: ` + users?.find((m) => m.id === field.value)?.name || "No description available"}
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
+                                        const sortedUsers = useMemo(() => {
+
+                                            if (!field.value) return allUsers;
+
+                                            const selected = allUsers.find((u) => u?.id === field.value);
+                                            const others = allUsers.filter((u) => u?.id !== field.value);
+
+                                            // Pin selected to top, then add the rest
+                                            return selected ? [selected, ...others] : allUsers;
+                                        }, [userPages, field.value]);
+                                        return (
+                                            <FormItem className="flex flex-col">
+                                                <FormLabel>Device User</FormLabel>
+                                                <Popover>
+                                                    <PopoverTrigger asChild>
+                                                        <FormControl>
+                                                            <Button variant="outline" role="combobox" className="w-full justify-between">
+                                                                {field.value ? sortedUsers.find(u => u.id === field.value)?.email : "Select User..."}
+                                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                            </Button>
+                                                        </FormControl>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-100 p-0">
+                                                        <Command shouldFilter={false}> {/* Disable local filtering */}
+                                                            <CommandInput
+                                                                placeholder="Search by email..."
+                                                                value={searchQuery}
+                                                                onValueChange={setSearchQuery}
+                                                            />
+                                                            <CommandList className="max-h-75 overflow-y-auto">
+                                                                <CommandEmpty>{loading ? "Searching..." : "No user found."}</CommandEmpty>
+
+                                                                <CommandGroup>
+                                                                    {sortedUsers.map((user) => (
+                                                                        <CommandItem
+                                                                            key={user.id}
+                                                                            value={user.id}
+                                                                            onSelect={() => {
+                                                                                form.setValue("user", user.id);
+                                                                            }}
+                                                                        >
+                                                                            <Check className={cn("mr-2 h-4 w-4", user.id === field.value ? "opacity-100 text-green-500" : "opacity-0")} />
+                                                                            <div className="flex flex-col">
+                                                                                <span>{user.email}</span>
+                                                                                <span className="text-xs text-muted-foreground">{user.name}</span>
+                                                                            </div>
+                                                                        </CommandItem>
+                                                                    ))}
+                                                                </CommandGroup>
+
+                                                                {/* Infinite Scroll Trigger */}
+                                                                {hasNextPage && (
+                                                                    <div className="p-2 flex justify-center">
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="sm"
+                                                                            disabled={isFetchingNextPage}
+                                                                            onClick={() => fetchNextPage()}
+                                                                        >
+                                                                            {isFetchingNextPage ? <Loader2 className="animate-spin h-4 w-4" /> : "Load More"}
+                                                                        </Button>
+                                                                    </div>
+                                                                )}
+                                                            </CommandList>
+                                                        </Command>
+                                                    </PopoverContent>
+                                                </Popover>
+                                                <FormDescription>
+                                                    {field.value ? `Name : ${sortedUsers.find(u => u.id === field.value)?.name}` : "Please select user"}
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )
+                                    }}
                                 />
 
                                 <FormField
@@ -351,7 +430,7 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
                                                 value={field.value}
                                             >
                                                 <FormControl>
-                                                    <SelectTrigger>
+                                                    <SelectTrigger className="w-full">
                                                         <SelectValue placeholder="Select status" />
                                                     </SelectTrigger>
                                                 </FormControl>
@@ -360,6 +439,13 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
                                                     <SelectItem value={DeviceStatus.UNASSIGNED}>UNASSIGNED</SelectItem>
                                                 </SelectContent>
                                             </Select>
+                                            <FormDescription>
+                                                {field.value === DeviceStatus.ASSIGNED
+                                                    ? "The device is active and linked to a specific user."
+                                                    : field.value === DeviceStatus.UNASSIGNED
+                                                        ? "The device will be moved to the inventory pool and removed from the current user."
+                                                        : "Choose the current operational state of this hardware."}
+                                            </FormDescription>
                                             <FormMessage />
                                         </FormItem>
                                     )}
