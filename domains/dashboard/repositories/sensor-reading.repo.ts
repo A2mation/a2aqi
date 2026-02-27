@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 
 export class SensorReadingRepo {
     static async getLatest(deviceId: string) {
-        return prisma.sensorReading.findFirst({
+        return prisma.latestSensorReading.findFirst({
             where: { deviceId },
             orderBy: { measuredAt: "desc" },
         });

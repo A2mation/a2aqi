@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getMonthRange } from "../utils/date-bucket.util";
+import { DeviceStatus } from "@prisma/client";
 
 export class MonthlyAggregateRepo {
     static async findByMonth(deviceId: string, year: number, month: number) {
@@ -16,6 +17,10 @@ export class MonthlyAggregateRepo {
                     gte: start,
                     lt: end,
                 },
+                device: {
+                    isActive: true,
+                    status: DeviceStatus.ASSIGNED
+                }
             },
             orderBy: { dayStart: "asc" },
         });

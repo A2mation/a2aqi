@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { DeviceStatus } from "@prisma/client";
 
 export class QuarterlyAggregateRepo {
     static async findLast90Days(deviceId: string, dateStr: string) {
@@ -13,6 +14,10 @@ export class QuarterlyAggregateRepo {
                     gte: start,
                     lt: end,
                 },
+                device: {
+                    isActive: true,
+                    status: DeviceStatus.ASSIGNED
+                }
             },
             orderBy: {
                 dayStart: "asc",

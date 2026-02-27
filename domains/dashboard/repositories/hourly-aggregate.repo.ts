@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { DeviceStatus } from "@prisma/client";
 
 export class HourlyAggregateRepo {
     static async findByDate(deviceId: string, date: string) {
@@ -13,6 +14,10 @@ export class HourlyAggregateRepo {
                     gte: start,
                     lt: end,
                 },
+                device: {
+                    isActive: true,
+                    status: DeviceStatus.ASSIGNED
+                }
             },
             orderBy: { hourStart: "asc" },
         });

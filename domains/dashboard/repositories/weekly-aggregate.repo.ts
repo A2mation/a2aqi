@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getWeekRange } from "../utils/date-bucket.util";
+import { DeviceStatus } from "@prisma/client";
 
 export class WeeklyAggregateRepo {
     static async findByWeek(deviceId: string, dateStr: string) {
@@ -12,6 +13,10 @@ export class WeeklyAggregateRepo {
                     gte: start,
                     lt: end,
                 },
+                device: {
+                    isActive: true,
+                    status: DeviceStatus.ASSIGNED
+                }
             },
             orderBy: { dayStart: "asc" },
         });

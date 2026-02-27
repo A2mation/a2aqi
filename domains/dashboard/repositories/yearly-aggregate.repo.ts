@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 
 import { getYearRange } from "../utils/date-bucket.util";
+import { DeviceStatus } from "@prisma/client";
 
 export class YearlyAggregateRepo {
     static async findByYear(deviceId: string, year: number) {
@@ -17,6 +18,10 @@ export class YearlyAggregateRepo {
                     gte: start,
                     lt: end,
                 },
+                device: {
+                    isActive: true,
+                    status: DeviceStatus.ASSIGNED
+                }
             },
             orderBy: { dayStart: "asc" },
         });
