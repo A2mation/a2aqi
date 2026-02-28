@@ -40,6 +40,7 @@ import { Modal } from "../ui/modal"
 import { DeviceModel } from "@/types/devices"
 import { http } from "@/lib/http"
 import { useRouter } from "next/navigation"
+import { handleGetLocation } from "@/helpers/handleGetLocation"
 
 const formSchema = z.object({
     serialNo: z.string().min(2, "Device ID is required").max(32),
@@ -84,27 +85,6 @@ export const DeviceModal = () => {
         errorMessage: deviceErrorMessage,
     } = useDeviceLookup(serialNo, setValue)
 
-    const handleGetLocation = () => {
-        if (!("geolocation" in navigator)) {
-            toast.error("Geolocation is not supported by your browser.")
-            return
-        }
-
-        navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                const lat = pos.coords.latitude.toString()
-                const lng = pos.coords.longitude.toString()
-
-                setValue("lat", lat)
-                setValue("long", lng)
-
-                toast.success("Location detected successfully 📍")
-            },
-            (err) => {
-                toast.error(err.message || "Failed to get location")
-            }
-        )
-    }
 
     const { data: modelsData } = useQuery<DeviceModel[]>({
         queryKey: ["device-models"],
@@ -336,7 +316,7 @@ export const DeviceModal = () => {
                                         <Button
                                             type="button"
                                             variant="secondary"
-                                            onClick={handleGetLocation}
+                                            onClick={() => handleGetLocation(form.setValue, "lat", "long")}
                                             className="w-full cursor-pointer"
                                         >
                                             📍 Auto Detect
