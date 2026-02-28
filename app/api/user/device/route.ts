@@ -2,7 +2,8 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { userGuard } from "@/lib/userAuth"
 import { handleUserError } from "@/lib/handleRoleError"
-import { DeviceType } from "@prisma/client"
+import { deviceSchema } from "@/components/users-ui/edit/schema/schema"
+import { DeviceStatus } from "@prisma/client"
 
 export async function GET(req: Request) {
     try {
@@ -12,17 +13,6 @@ export async function GET(req: Request) {
         const deviceId = searchParams.get("deviceId")
         const search = searchParams.get("search");
         const type = searchParams.get("type");
-
-        const user = await prisma.user.findUnique({
-            where: { id: sessionUser.id },
-            select: { id: true },
-        })
-
-        if (!user) {
-            return new NextResponse("Unauthorized User", {
-                status: 401,
-            })
-        }
 
 
         if (deviceId) {
@@ -36,7 +26,10 @@ export async function GET(req: Request) {
                     name: true,
                     lat: true,
                     lng: true,
-                    assignedAt: true
+                    assignedAt: true,
+                    isActive: true,
+                    loaction: true,
+                    serialNo: true
                 },
             })
 
@@ -89,6 +82,63 @@ export async function GET(req: Request) {
 
         return NextResponse.json(devices)
     } catch (error) {
+        return handleUserError(error)
+    }
+}
+
+export async function PATCH(
+    req: Request,
+) {
+    try {
+        const { user: sessionUser } = await userGuard()
+        const body = await req.json();
+
+        const { searchParams } = new URL(req.url);
+        const deviceId = searchParams.get("deviceId");
+
+        if (!deviceId) {
+            return new NextResponse("Device ID is required", { status: 400 });
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { id: sessionUser.id },
+            select: { id: true },
+        })
+
+        if (!user) {
+            throw new Error("Unauthorized");
+        }
+
+        const validatedData = deviceSchema.parse(body);
+
+        const device = await prisma.device.update({
+            where: {
+                id: deviceId,
+                userId: sessionUser.id,
+                serialNo: validatedData.serialNo,
+                status: DeviceStatus.ASSIGNED
+            },
+            data: {
+                name: validatedData.name,
+                type: validatedData.type as any,
+                loaction: validatedData.loaction,
+                lat: parseFloat(validatedData.lat),
+                lng: parseFloat(validatedData.lng),
+            },
+        });
+
+        if (!device) {
+            throw new Error("Unauthorized");
+        }
+
+        return NextResponse.json(device);
+    } catch (error: any) {
+        console.error("[DEVICE_PATCH]", error);
+
+        if (error.name === "ZodError") {
+            return new NextResponse(JSON.stringify(error.errors), { status: 400 });
+        }
+
         return handleUserError(error)
     }
 }

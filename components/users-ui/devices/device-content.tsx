@@ -129,8 +129,8 @@ export function DeviceContent() {
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                                        onClick={() => router.push(`/admin/device/${device.id}`)}
+                                        className="h-8 w-8 transition-opacity group-hover:cursor-pointer"
+                                        onClick={() => router.push(`/user/${device.id}/edit`)}
                                     >
                                         <Edit2 className="w-4 h-4 text-primary" />
                                     </Button>

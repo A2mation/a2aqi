@@ -41,11 +41,17 @@ export function Sidebar({ isCollapsed = false, onToggle }: { isCollapsed?: boole
     const { deviceId } = useParams();
 
     const menuItems = [
-        { icon: LayoutDashboard, label: "Dashboard", href: `/user/${deviceId}/dashboard` },
-        { icon: MonitorSmartphone, label: "Devices", badge: "6", href: `/user/${deviceId}/devices` },
-        { icon: MapPin, label: "Map", href: `/user/${deviceId}/map` },
-        { icon: BarChart3, label: "Analytics", href: `/user/${deviceId}/analytics` },
-        { icon: Users, label: "Team", href: `/user/${deviceId}/team` },
+        { icon: LayoutDashboard, label: "Dashboard", href: `/user/${deviceId}/dashboard`, isActive: pathname === `/user/${deviceId}/dashboard` },
+        {
+            icon: MonitorSmartphone,
+            label: "Devices",
+            badge: "6",
+            href: `/user/${deviceId}/devices`,
+            isActive: pathname === `/user/${deviceId}/devices` || pathname === `/user/${deviceId}/edit`
+        },
+        { icon: MapPin, label: "Map", href: `/user/${deviceId}/map`, isActive: pathname === `/user/${deviceId}/map` },
+        { icon: BarChart3, label: "Analytics", href: `/user/${deviceId}/analytics`, isActive: pathname === `/user/${deviceId}/analytics` },
+        { icon: Users, label: "Team", href: `/user/${deviceId}/team`, isActive: pathname === `/user/${deviceId}/team` },
     ]
 
     const aiItems = [
@@ -96,7 +102,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: { isCollapsed?: boole
                         )}
                         <nav className="space-y-0.5">
                             {menuItems.map((item) => {
-                                const isActive = pathname === item.href
+
                                 return (
                                     <Link
                                         key={item.label}
@@ -104,7 +110,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: { isCollapsed?: boole
                                         title={isCollapsed ? item.label : undefined}
                                         className={cn(
                                             "w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm font-normal transition-colors",
-                                            isActive
+                                            item.isActive
                                                 ? "bg-primary/10 text-primary font-medium"
                                                 : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground",
                                             isCollapsed && "justify-center",
