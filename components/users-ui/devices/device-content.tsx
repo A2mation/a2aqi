@@ -12,22 +12,21 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import { http } from "@/lib/http"
 
 export function DeviceContent() {
     const router = useRouter();
     const [filter, setFilter] = useState("all")
     const [searchQuery, setSearchQuery] = useState("")
 
-    // 1. Fetch ALL devices for the user (No params sent to backend)
     const { data: allDevices = [], isLoading } = useQuery({
         queryKey: ["user-devices-list"],
         queryFn: async () => {
-            const res = await axios.get("/api/user/device");
+            const res = await http.get("/api/user/device");
             return res.data;
         },
     });
 
-    // 2. Perform Filtering in the Frontend using useMemo for performance
     const filteredDevices = useMemo(() => {
         return allDevices.filter((device: any) => {
             // Check Search Match (Name or Serial)
