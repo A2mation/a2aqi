@@ -10,6 +10,9 @@ import { useEffect, useRef, useState } from "react";
 import { getAQIBgColor } from "@/helpers/aqi-color-pallet";
 import { AirQualityCard } from "./air-quality-card";
 import { AQIMarker } from "../page";
+import { useQuery } from "@tanstack/react-query";
+import { Loader2, RefreshCcw } from "lucide-react";
+import { useDebounce } from "@/hooks/use-debounce";
 
 const MapContainer = dynamic(
   () => import("react-leaflet").then((m) => m.MapContainer),
@@ -51,122 +54,118 @@ const aqiIcon = (value: number) =>
   });
 
 export default function Map({
-  markers,
-  loading,
   lat,
   lng,
-  setMarkers
 }: {
-  markers: AQIMarker[];
-  loading: boolean;
   lat: number | null;
   lng: number | null;
-  setMarkers: React.Dispatch<React.SetStateAction<AQIMarker[]>>;
 }) {
   const [mounted, setMounted] = useState(false);
   const [selectedStation, setSelectedStation] = useState<AQIMarker | null>(null);
-  const requestRef = useRef<AbortController | null>(null);
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const [bounds, setBounds] = useState<any>(null);
 
+  const debouncedBounds = useDebounce(bounds, 400);
 
-  const handleBoundsChange = (bounds: {
-    north: number;
-    south: number;
-    east: number;
-    west: number;
-  }) => {
-    
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current);
-    }
+  const { data: markers = [],
+    isPending,
+    isFetching,
+    isError
+  } = useQuery({
+    queryKey: ["map-aqi-bounds", debouncedBounds],
+    queryFn: async () => {
+      const res = await axios.get("/api/maps/aqi", { params: debouncedBounds });
+      return res.data;
+    },
+    enabled: !!debouncedBounds,
 
-    debounceRef.current = setTimeout(async () => {
-      
-      if (requestRef.current) {
-        requestRef.current.abort();
-      }
+    placeholderData: (previousData) => previousData,
+  });
 
-      const controller = new AbortController();
-      requestRef.current = controller;
+  const showFullLoader = isPending && !!debouncedBounds;
+  const showBackgroundLoader = isFetching && !isPending;
 
-      try {
-        const res = await axios.get("/api/maps/aqi", {
-          params: bounds,
-          signal: controller.signal,
-        });
+  useEffect(() => { setMounted(true); }, []);
 
-        setMarkers(res.data);
-      } catch (err: any) {
-        if (err.name !== "CanceledError") {
-          console.error("Failed to fetch map AQI data", err);
-        }
-      }
-    }, 300); 
-  };
+  if (isError) {
+    return (
+      <div className="flex h-full w-full items-center justify-center bg-red-50 p-4">
+        <p className="text-red-600">Failed to load air quality data. Please try zooming in.</p>
+      </div>
+    );
+  }
 
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted || loading || lat == null || lng == null) return null;
+  if (!mounted || lat == null || lng == null) return null;
 
   return (
-    <div className=" w-full h-screen rounded-2xl overflow-hidden bg-white shadow">
+    <div className="relative min-h-screen w-full h-screen rounded-2xl overflow-hidden bg-white shadow">
       <MapContainer
         center={[lat, lng]}
-        zoom={10}
-        scrollWheelZoom={true}
+        zoom={8}
         className="h-full w-full z-0"
       >
-        <MapEvents onBoundsChange={handleBoundsChange} />
-        <TileLayer
-          attribution="&copy; OpenStreetMap contributors"
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+        <MapEvents onBoundsChange={setBounds} />
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-        {markers.map((station) => (
+        {markers.map((station: AQIMarker) => (
           <Marker
             key={station.id}
             position={[station.lat, station.lng]}
             icon={aqiIcon(station.aqi)}
-            eventHandlers={{
-              click: () => setSelectedStation(station),
-            }}
-          >
-            <Popup offset={[0, -10]}>
-              <strong>{station.name}</strong>
-              <br />
-              AQI: <b>{station.aqi}</b>
-            </Popup>
-          </Marker>
+            eventHandlers={{ click: () => setSelectedStation(station) }}
+          />
         ))}
       </MapContainer>
 
-      {/* CARD OVERLAY */}
-      <div className="absolute top-3/4 md:top-1/4 left-3 sm:-8 md:left-15 z-80">
+      <div className="absolute top-3/4 md:top-1/4 left-3 z-">
         <AirQualityCard station={selectedStation} />
       </div>
+
+      {showFullLoader && (
+        <div className="absolute inset-0 z- flex items-center justify-center bg-white/50 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-2">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-sm font-medium">Loading AQI Data...</p>
+          </div>
+        </div>
+      )}
+
+      {showBackgroundLoader && (
+        <div className="absolute top-4 right-4 z- flex items-center gap-2 rounded-full bg-white px-3 py-1.5 shadow-md border animate-in fade-in zoom-in">
+          <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+          <span className="text-xs font-medium text-gray-600">Updating area...</span>
+        </div>
+      )}
     </div>
   );
 }
 
 
-
-
 function MapEvents({ onBoundsChange }: { onBoundsChange: (b: any) => void }) {
-  useMapEvents({
-    moveend: (e) => {
-      const bounds = e.target.getBounds();
+  const map = useMapEvents({
 
+    moveend: () => {
+      const b = map.getBounds();
       onBoundsChange({
-        north: bounds.getNorth(),
-        south: bounds.getSouth(),
-        east: bounds.getEast(),
-        west: bounds.getWest(),
+        north: parseFloat(b.getNorth().toFixed(3)),
+        south: parseFloat(b.getSouth().toFixed(3)),
+        east: parseFloat(b.getEast().toFixed(3)),
+        west: parseFloat(b.getWest().toFixed(3)),
       });
     },
   });
+
+
+  useEffect(() => {
+    if (map) {
+      const b = map.getBounds();
+      onBoundsChange({
+        north: parseFloat(b.getNorth().toFixed(3)),
+        south: parseFloat(b.getSouth().toFixed(3)),
+        east: parseFloat(b.getEast().toFixed(3)),
+        west: parseFloat(b.getWest().toFixed(3)),
+      });
+    }
+  }, [map, onBoundsChange]);
 
   return null;
 }
