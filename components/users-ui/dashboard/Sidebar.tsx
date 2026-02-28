@@ -14,6 +14,7 @@ import {
     ChevronLeft,
     ChevronRight,
     MapPin,
+    Lock,
 } from "lucide-react"
 import Link from "next/link"
 import { redirect, useParams, usePathname } from "next/navigation"
@@ -36,7 +37,7 @@ export const useSidebar = () => useContext(SidebarContext)
 
 
 export function Sidebar({ isCollapsed = false, onToggle }: { isCollapsed?: boolean; onToggle?: () => void } = {}) {
-    const [hoveredItem, setHoveredItem] = useState<string | null>(null)
+    // const [hoveredItem, setHoveredItem] = useState<string | null>(null)
     const pathname = usePathname()
     const { deviceId } = useParams();
 
@@ -60,10 +61,22 @@ export function Sidebar({ isCollapsed = false, onToggle }: { isCollapsed?: boole
         { icon: Wand2, label: "Smart Suggestions", href: `/user/${deviceId}/suggestions` },
     ]
 
+    console.log(/^\/user\/[^/]+\/settings(\/.*)?$/.test(pathname))
+
     const generalItems = [
-        { icon: Settings, label: "Settings", href: `/user/${deviceId}/settings` },
-        { icon: HelpCircle, label: "Help", href: `/user/${deviceId}/help` },
-        { icon: LogOut, label: "Logout", href: `/user/${deviceId}/logout` },
+        {
+            icon: Settings,
+            label: "Settings",
+            href: `/user/${deviceId}/settings`,
+            isActive: /^\/user\/[^/]+\/settings(\/.*)?$/.test(pathname)
+        },
+        {
+            icon: HelpCircle,
+            label: "Help",
+            href: `/user/${deviceId}/help`,
+            isActive: pathname === `/user/${deviceId}/help`
+        },
+        { icon: LogOut, label: "Logout", href: `/user/${deviceId}/logout`, isActive: pathname === `/user/${deviceId}/logout` },
     ]
 
     return (
@@ -133,43 +146,49 @@ export function Sidebar({ isCollapsed = false, onToggle }: { isCollapsed?: boole
                         </nav>
                     </div>
 
-                    <div>
+                    <div className="relative group/ai opacity-80">
                         {!isCollapsed && (
-                            <p className="text-[10px] font-semibold text-muted-foreground mb-2 uppercase tracking-wide px-2">
+                            <p className="text-[10px] font-bold text-muted-foreground/70 mb-2 uppercase flex items-center justify-between tracking-widest px-3">
                                 AI TOOLS
+                                <span className="flex items-center gap-1 text-[9px] bg-amber-500/10 text-amber-600 dark:text-amber-400 px-1.5 py-0.5 rounded-full border border-amber-500/20">
+                                    <Lock className="w-3 h-3" strokeWidth={2.5} />
+                                    PRO
+                                </span>
                             </p>
                         )}
-                        <nav className="space-y-0.5">
-                            {aiItems.map((item) => {
-                                const isActive = pathname === item.href
-                                return (
-                                    <Link
+
+                        {/* The Lock Overlay Effect for the whole section */}
+                        <div className="space-y-0.5 opacity-60 grayscale-[0.5] cursor-not-allowed pointer-events-none select-none">
+                            <nav className="space-y-0.5">
+                                {aiItems.map((item) => (
+                                    <div
                                         key={item.label}
-                                        href={item.href}
-                                        title={isCollapsed ? item.label : undefined}
                                         className={cn(
-                                            "w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm font-normal transition-colors",
-                                            isActive
-                                                ? "bg-primary/10 text-primary font-medium"
-                                                : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground",
-                                            isCollapsed && "justify-center",
+                                            "w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-colors",
+                                            isCollapsed && "justify-center"
                                         )}
                                     >
-                                        <item.icon className={cn("w-4 h-4", isCollapsed && "w-4.5 h-4.5")} />
+                                        <item.icon className={cn("w-4 h-4 text-muted-foreground")} />
                                         {!isCollapsed && (
                                             <>
-                                                <span className="text-base">{item.label}</span>
-                                                {item.badge && (
-                                                    <span className="ml-auto bg-muted text-foreground text-sm font-medium px-1.5 py-0.5 rounded">
-                                                        {item.badge}
-                                                    </span>
-                                                )}
+                                                <span className="text-muted-foreground font-medium">{item.label}</span>
+                                                <span className="ml-auto bg-muted/50 text-[10px] text-muted-foreground px-1.5 py-0.5 rounded uppercase tracking-tighter">
+                                                    Locked
+                                                </span>
                                             </>
                                         )}
-                                    </Link>
-                                )
-                            })}
-                        </nav>
+                                    </div>
+                                ))}
+                            </nav>
+                        </div>
+
+                        {!isCollapsed && (
+                            <div className="absolute inset-x-0 bottom-0 top-8 bg-linear-to-t from-background/20 to-transparent flex items-end justify-center pb-2 opacity-0 group-hover/ai:opacity-100 transition-opacity">
+                                <Button className="text-[10px] bg-blue-700 hover:bg-blue-800 text-primary-foreground px-2 py-1 rounded shadow-lg font-medium">
+                                    Upgrade to Unlock
+                                </Button>
+                            </div>
+                        )}
                     </div>
 
                     <div>
@@ -180,7 +199,6 @@ export function Sidebar({ isCollapsed = false, onToggle }: { isCollapsed?: boole
                         )}
                         <nav className="space-y-0.5">
                             {generalItems.map((item) => {
-                                const isActive = pathname === item.href
                                 return (
                                     <Link
                                         key={item.label}
@@ -188,7 +206,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: { isCollapsed?: boole
                                         title={isCollapsed ? item.label : undefined}
                                         className={cn(
                                             "w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm font-normal transition-colors",
-                                            isActive
+                                            item.isActive
                                                 ? "bg-primary/10 text-primary font-medium"
                                                 : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground",
                                             isCollapsed && "justify-center",
