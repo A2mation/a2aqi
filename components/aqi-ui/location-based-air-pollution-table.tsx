@@ -7,6 +7,7 @@ import { getAQIColor, getAQIStatus } from "@/helpers/aqi-color-pallet";
 import { http } from "@/lib/http";
 import { useLocationStore } from "@/store/location.store";
 import { Skeleton } from "../ui/skeleton";
+import { AQIReading } from "@prisma/client";
 
 
 type Location = {
@@ -17,6 +18,7 @@ type Location = {
     pm10: number;
     temp: number;
     humidity: number;
+    source: string
 };
 
 type SortKey = keyof Location | null;
@@ -46,14 +48,17 @@ export function AirPollutionTable() {
                     `/api/location/nearby-cities?lat=${lat}&lon=${lng}`
                 );
 
-                const normalized: Location[] = res.data.map((city: any) => ({
-                    name: city.name,
-                    aqi: city.aqi?.data?.aqi ?? 0,
-                    status: getAQIStatus(city.aqi?.data?.aqi ?? 0),
-                    pm25: city.aqi?.data?.iaqi?.pm25?.v ?? 0,
-                    pm10: city.aqi?.data?.iaqi?.pm10?.v ?? 0,
-                    temp: city.aqi?.data?.iaqi?.t?.v ?? 0,
-                    humidity: city.aqi?.data?.iaqi?.h?.v ?? 0,
+                console.log(res)
+
+                const normalized: Location[] = res.data.map((city: AQIReading) => ({
+                    name: city.location,
+                    aqi: city.aqi ?? 0,
+                    status: getAQIStatus(city.aqi ?? 0),
+                    pm25: city.pm25 ?? 0,
+                    pm10: city.pm10 ?? 0,
+                    temp: city.temperature ?? 0,
+                    humidity: city.humidity ?? 0,
+                    source: city.source ?? "WAQI"
                 }));
 
                 setLocations(normalized);
@@ -130,7 +135,7 @@ export function AirPollutionTable() {
 
     return (
         <section className="min-h-xl bg-background p-5 md:p-8">
-            <div className="mx-auto max-w-[90rem] px-6">
+            <div className="mx-auto max-w-360 px-6">
                 <div className="space-y-6">
                     <div className="space-y-1 border-b-2 pb-4">
                         <h1 className="text-4xl font-bold text-balance">
@@ -168,6 +173,9 @@ export function AirPollutionTable() {
                                             <th onClick={() => handleSort("humidity")} className="px-6 py-4 text-center text-xl font-medium cursor-pointer">
                                                 Humidity.
                                             </th>
+                                            <th className="px-6 py-4 text-center text-xl font-medium cursor-pointer">
+                                                Source
+                                            </th>
                                         </tr>
                                     </thead>
 
@@ -178,16 +186,17 @@ export function AirPollutionTable() {
                                                 <td className="px-6 py-4">
                                                     <Badge
                                                         style={{ backgroundColor: getAQIColor(location.aqi) }}
-                                                        className="text-white text-lg"
+                                                        className="text-white text-base"
                                                     >
                                                         {location.status}
                                                     </Badge>
                                                 </td>
-                                                <td className="px-6 py-4 text-lg text-center">{location.aqi}</td>
-                                                <td className="px-6 py-4 text-lg text-center">{location.pm25}</td>
-                                                <td className="px-6 py-4 text-lg text-center">{location.pm10}</td>
-                                                <td className="px-6 py-4 text-lg text-center">{location.temp}</td>
-                                                <td className="px-6 py-4 text-lg text-center">{location.humidity.toFixed(1)}</td>
+                                                <td className="px-6 py-4 text-base text-center">{location.aqi}</td>
+                                                <td className="px-6 py-4 text-base text-center">{location.pm25}</td>
+                                                <td className="px-6 py-4 text-base text-center">{location.pm10}</td>
+                                                <td className="px-6 py-4 text-base text-center">{location.temp}</td>
+                                                <td className="px-6 py-4 text-base text-center">{location.humidity.toFixed(1)}</td>
+                                                <td className="px-6 py-4 text-base text-center">{location.source}</td>
                                             </tr>
                                         ))}
                                     </tbody>

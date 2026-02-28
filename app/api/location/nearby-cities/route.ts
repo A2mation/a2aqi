@@ -10,16 +10,6 @@ import { normalizeCachedCities } from "@/helpers/normalizeCachedCities"
 import { haversine } from "@/helpers/haversine"
 
 
-type GeoNamesCity = {
-    name: string
-    lat: string
-    lng: string
-    population: number
-    countryName: string
-    fcode: string
-}
-
-
 const CACHE_TTL = 60 * 60 // 1 hour
 
 
@@ -32,18 +22,6 @@ function getClientIp(req: NextRequest): string {
     )
 }
 
-
-
-
-function cityScore(city: GeoNamesCity): number {
-    let score = 0
-
-    if (city.population > 1_000_000) score += 5
-    if (city.population > 5_000_000) score += 5
-    if (city.fcode === "PPLC") score += 10 // capital
-
-    return score
-}
 
 
 export async function GET(req: NextRequest) {
@@ -80,9 +58,22 @@ export async function GET(req: NextRequest) {
                 lat: { gte: latNum - latDelta, lte: latNum + latDelta },
                 lng: { gte: lonNum - lngDelta, lte: lonNum + lngDelta },
             },
+            select: {
+                id: true,
+                location: true,
+                aqi: true,
+                pm25: true,
+                pm10: true,
+                temperature: true,
+                humidity: true,
+                lat: true,
+                lng: true,
+                source: true
+            },
             orderBy: { createdAt: "desc" },
-            take: 500,
+            take: 20,
         });
+
 
         const nearest10 = candidates
             .map((c) => ({
@@ -99,7 +90,6 @@ export async function GET(req: NextRequest) {
                 )
             })
             .slice(0, 10);
-
 
         return NextResponse.json(nearest10);
 
