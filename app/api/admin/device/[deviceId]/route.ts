@@ -55,23 +55,32 @@ export async function PATCH(
         const body = await req.json();
         const { name, user, isUserMode, serialNo, modelId, lat, lng, status } = body;
 
-        
+
         if (!serialNo) return new NextResponse("Serial No is required", { status: 400 });
         if (!modelId) return new NextResponse("Model ID is required", { status: 400 });
 
-        
+
         const model = await prisma.deviceModel.findUnique({ where: { id: modelId } });
         if (!model) return new NextResponse("Invalid Model", { status: 400 });
 
-       
+
         let payload: any = {
             name,
             serialNo,
             modelId,
         };
 
+        const currentDevice = await prisma.device.findUnique({
+            where: { id: deviceId },
+            select: { status: true, assignedAt: true }
+        });
+
+        const isTransitioningToAssigned =
+            status === DeviceStatus.ASSIGNED &&
+            currentDevice?.status !== DeviceStatus.ASSIGNED;
+
         if (isUserMode && user) {
-        
+
             const vefUser = await prisma.user.findUnique({
                 where: { id: user },
                 select: { id: true }
@@ -88,10 +97,14 @@ export async function PATCH(
                 lat: isNaN(parsedLat!) ? null : parsedLat,
                 lng: isNaN(parsedLng!) ? null : parsedLng,
                 status: status || DeviceStatus.UNASSIGNED,
-                assignedAt: status === DeviceStatus.ASSIGNED ? new Date() : null,
+                assignedAt: isTransitioningToAssigned
+                    ? new Date()
+                    : status === DeviceStatus.ASSIGNED
+                        ? currentDevice?.assignedAt
+                        : null,
             };
         } else {
-            
+
             payload = {
                 ...payload,
                 userId: null,
@@ -133,15 +146,20 @@ export async function DELETE(
             })
         }
 
-        const res = await prisma.device.delete({
-            where: {
-                id: deviceId
-            }
-        })
+        await prisma.$transaction(async (tx) => {
+            await tx.sensorReading.deleteMany({ where: { deviceId } });
+            await tx.hourlyAggregateReading.deleteMany({ where: { deviceId } });
+            await tx.dailyAggregateReading.deleteMany({ where: { deviceId } });
+            await tx.payment.deleteMany({ where: { deviceId } });
+            await tx.couponRedemption.deleteMany({ where: { deviceId } });
+            await tx.deviceSubscription.deleteMany({ where: { deviceId } });
+            await tx.exportLog.deleteMany({ where: { deviceId } });
+            await tx.calibration.deleteMany({ where: { deviceId } });
+            await tx.latestSensorReading.deleteMany({ where: { deviceId } });
+            await tx.device.delete({ where: { id: deviceId } });
+        });
 
-        if (!res) {
-            return new NextResponse("Device not found", { status: 404 });
-        }
+
 
         return new NextResponse("Device deleted successfully", { status: 200 });
     } catch (error) {
