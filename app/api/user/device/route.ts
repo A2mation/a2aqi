@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { userGuard } from "@/lib/userAuth"
 import { handleUserError } from "@/lib/handleRoleError"
 import { deviceSchema } from "@/components/users-ui/edit/schema/schema"
-import { DeviceStatus } from "@prisma/client"
+import { DeviceStatus, DeviceType } from "@prisma/client"
 
 export async function GET(req: Request) {
     try {
@@ -26,6 +26,7 @@ export async function GET(req: Request) {
                     name: true,
                     lat: true,
                     lng: true,
+                    type: true,
                     assignedAt: true,
                     isActive: true,
                     loaction: true,
@@ -120,7 +121,7 @@ export async function PATCH(
             },
             data: {
                 name: validatedData.name,
-                type: validatedData.type as any,
+                type: validatedData.type as DeviceType,
                 loaction: validatedData.loaction,
                 lat: parseFloat(validatedData.lat),
                 lng: parseFloat(validatedData.lng),

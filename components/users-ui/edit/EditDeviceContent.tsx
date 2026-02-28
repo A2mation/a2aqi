@@ -33,6 +33,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 import { deviceSchema, type DeviceFormValues } from "./schema/schema";
 import { formatDateTime } from "@/utils/formatDateTime";
+import { handleGetLocation } from "@/helpers/handleGetLocation";
+import { DeviceStatus, DeviceType } from "@prisma/client";
 
 
 
@@ -47,6 +49,7 @@ const EditDeviceContent = () => {
         queryKey: ["device", deviceId],
         queryFn: async () => {
             const res = await axios.get(`/api/user/device?deviceId=${deviceId}`);
+            console.log(res.data)
             return res.data;
         },
     });
@@ -80,27 +83,6 @@ const EditDeviceContent = () => {
         }
     }, [device, form]);
 
-    // --- Geolocation Helper ---
-    const handleDetectLocation = () => {
-        if (!("geolocation" in navigator)) {
-            toast.error("Geolocation is not supported by your browser.");
-            return;
-        }
-
-        const loadingToast = toast.loading("Detecting location...");
-
-        navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                // Setting as strings as requested
-                form.setValue("lat", pos.coords.latitude.toString(), { shouldDirty: true });
-                form.setValue("lng", pos.coords.longitude.toString(), { shouldDirty: true });
-                toast.success("Location detected! 📍", { id: loadingToast });
-            },
-            (err) => {
-                toast.error(err.message || "Failed to get location", { id: loadingToast });
-            }
-        );
-    };
 
     const { mutate: updateDevice, isPending: isUpdating } = useMutation({
         mutationFn: async (values: DeviceFormValues) => {
@@ -166,20 +148,20 @@ const EditDeviceContent = () => {
 
                             {/* Coordinates Grid with Detect Button */}
                             <div className="space-y-4">
-                                <div className="flex items-center justify-between">
+                                <div className="flex items-center justify-between gap-2">
                                     <div>
-                                        <FormLabel className="text-base"> <MapPin className="w-4 h-4" color="red" />
+                                        <FormLabel className="text-sm md:text-base"> <MapPin className="w-4 h-4" color="red" />
                                             Coordinates
 
-                                            <span className="text-sm text-red-500">(Use Phone for Better accuracy)</span>
+                                            <span className="text-sm hidden md:block text-red-500 flex-wrap">(Use Phone for Better accuracy)</span>
                                         </FormLabel>
                                     </div>
                                     <Button
                                         type="button"
                                         variant="outline"
                                         size="sm"
-                                        onClick={handleDetectLocation}
-                                        className="gap-2"
+                                        onClick={() => handleGetLocation(form.setValue, "lat", "lng")}
+                                        className="gap-2 text-sm md:text-base"
                                     >
                                         <MapPin className="w-4 h-4" color="red" />
                                         Detect Location
@@ -228,8 +210,8 @@ const EditDeviceContent = () => {
                                                     <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    <SelectItem value="INDOOR">Indoor</SelectItem>
-                                                    <SelectItem value="OUTDOOR">Outdoor</SelectItem>
+                                                    <SelectItem value={DeviceType.INDOOR}>Indoor</SelectItem>
+                                                    <SelectItem value={DeviceType.OUTDOOR}>Outdoor</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
@@ -282,7 +264,7 @@ const EditDeviceContent = () => {
                                 )}
                             />
 
-                            <Button type="submit" className="w-full h-12" disabled={isUpdating}>
+                            <Button type="submit" className="w-full h-12 cursor-pointer" disabled={isUpdating}>
                                 {isUpdating ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Save className="mr-2 h-5 w-5" />}
                                 Save Changes
                             </Button>
