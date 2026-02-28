@@ -241,25 +241,30 @@ export function StatsCards() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     {pollutants.map((item) => (
                         <div key={item.key} className="flex flex-col items-center text-center bg-background py-4 rounded-2xl">
-                            {item.icon && (
-                                <Image
-                                    src={item.icon}
-                                    width={28}
-                                    height={28}
-                                    alt={item.label}
-                                />
-                            )}
+                            <div className="flex flex-col md:flex-row gap-2 px-10 mb-2 items-center justify-between w-full">
+                                {item.icon && (
+                                    <Image
+                                        src={item.icon}
+                                        width={80}
+                                        height={80}
+                                        alt={item.label}
+                                    />
+                                )}
 
-                            <p className="text-sm font-medium text-gray-700 mt-2">
-                                {item.label}
-                            </p>
+                                <div className="">
+                                    <p className="text-base md:text-lg font-medium text-gray-700 mt-2">
+                                        {item.label}
+                                    </p>
 
-                            <p className="text-lg font-bold text-gray-900">
-                                {item.value}
-                                <span className="text-xs text-gray-500 ml-1">
-                                    {item.unit}
-                                </span>
-                            </p>
+                                    <p className="text-lg md:text-2xl font-bold text-gray-900">
+                                        {item.value}
+                                        <span className="text-xs md:text-base text-gray-500 ml-1">
+                                            {item.unit}
+                                        </span>
+                                    </p>
+
+                                </div>
+                            </div>
 
                             <div className="w-[90%] h-1 bg-gray-200 rounded-full mt-2">
                                 <div className={cn(
