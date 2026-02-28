@@ -2,14 +2,22 @@ import { Mail, MapPin } from "lucide-react"
 import Link from "next/link"
 import ViewStats from "../ViewStats"
 
+
+const ROLES = [
+    { label: "Administrator", href: "/admin/sign-in" },
+    { label: "Moderator", href: "#" },
+    { label: "Local Authority", href: "#" },
+    { label: "Writer", href: "/blogs/sign-in" },
+];
+
 export function Footer() {
     return (
         <footer className=" px-6 py-12 md:px-12 lg:px-16">
             <div className="mx-auto w-full">
-                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 bg-gray-50 p-10 rounded-xl">
+                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-5 bg-gray-50 p-10 rounded-xl">
                     {/* Logo and Tagline Section */}
                     <div className="lg:col-span-1 max-h-screen flex items-center ">
-                        <div className="rounded-2xl bg-gradient-to-br from-blue-50 to-purple-50 p-8">
+                        <div className="rounded-2xl bg-linear-to-br from-blue-50 to-purple-50 p-8">
                             <div className="flex items-center justify-center">
                                 <img
                                     src={"/favicon.png"}
@@ -17,7 +25,7 @@ export function Footer() {
                                     alt={"LOGO"}
                                     width={200}
                                     height={100}
-                                    // className="aspect-2/1"
+                                // className="aspect-2/1"
                                 />
                             </div>
                             <p className="text-center text-lg leading-relaxed text-blue-600">
@@ -28,20 +36,20 @@ export function Footer() {
 
                     {/* About AQI Column */}
                     <div>
-                        <h3 className="mb-4 text-xl font-medium text-gray-400">About A2AQI</h3>
+                        <h3 className="mb-4 text-base font-bold uppercase tracking-widest text-muted-foreground">About A2AQI</h3>
                         <ul className="space-y-3">
                             <li>
-                                <Link href="/about-us" className="text-lg text-gray-900 hover:text-blue-600">
+                                <Link href="/about-us" className="block rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600">
                                     About Us
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/contact-us" className="text-lg text-gray-900 hover:text-blue-600">
+                                <Link href="/contact-us" className="block rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600">
                                     Contact Us
                                 </Link>
                             </li>
                             <li>
-                                <Link href="#" className="text-lg text-gray-900 hover:text-blue-600">
+                                <Link href="#" className="block rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600">
                                     AQI Monitor
                                 </Link>
                             </li>
@@ -51,11 +59,11 @@ export function Footer() {
 
                     {/* Air Quality Column */}
                     <div>
-                        <h3 className="mb-4 text-xl font-medium text-gray-400">Air Quality</h3>
+                        <h3 className="mb-4 text-base font-bold uppercase tracking-widest text-muted-foreground">Air Quality</h3>
                         <ul className="space-y-3">
 
                             <li>
-                                <Link href="/air-quality-map" className="text-lg text-gray-900 hover:text-blue-600">
+                                <Link href="/air-quality-map" className="block rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600">
                                     AQI Map
                                 </Link>
                             </li>
@@ -63,36 +71,28 @@ export function Footer() {
                         </ul>
                     </div>
 
-                    {/* Rankings Column */}
-                    {/* <div>
-                        <h3 className="mb-4 text-lg font-medium text-gray-400">Rankings</h3>
-                        <ul className="space-y-3">
-                            <li>
-                                <Link href="#" className="text-lg text-gray-900 hover:text-blue-600">
-                                    Live AQI City Ranking
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="#" className="text-lg text-gray-900 hover:text-blue-600">
-                                    Historic AQI City Ranking
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="#" className="text-lg text-gray-900 hover:text-blue-600">
-                                    Historic AQI Country Ranking
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="#" className="text-lg text-gray-900 hover:text-blue-600">
-                                    Weather Ranking
-                                </Link>
-                            </li>
+                    {/* Access Management Column */}
+                    <div>
+                        <h3 className="mb-4 text-base font-bold uppercase tracking-widest text-muted-foreground">
+                            Access Management
+                        </h3>
+                        <ul className="space-y-1">
+                            {ROLES.map((role) => (
+                                <li key={role.label}>
+                                    <Link
+                                        href={role.href}
+                                        className="block rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600"
+                                    >
+                                        {role.label}
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
-                    </div> */}
+                    </div>
 
                     {/* Location Column */}
                     <div className="">
-                        <h3 className="mb-4 text-xl font-medium text-gray-400">Location</h3>
+                        <h3 className="mb-4 text-base font-bold uppercase tracking-widest text-muted-foreground">Location</h3>
                         <div className="space-y-4">
                             <Link
                                 href="#"
@@ -149,7 +149,7 @@ export function Footer() {
                             </svg>
                         </Link>
                     </div>
-                    
+
                 </div>
 
                 {/* Bottom Legal Links */}
