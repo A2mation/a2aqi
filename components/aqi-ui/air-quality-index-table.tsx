@@ -33,7 +33,7 @@ const AirQualityIndexTable = () => {
 
     return (
         <>
-            <div className="max-w-[90rem] mx-auto p-4 mt-5">
+            <div className="max-w-360 mx-auto p-4 mt-5">
                 {/* Tab Navigation */}
                 <div className="bg-white ">
                     <h2 className="text-2xl md:text-4xl font-bold text-slate-900 mb-6">{TAB_CONTENT[activeTab].title}</h2>
@@ -98,21 +98,19 @@ const AirQualityIndexTable = () => {
                     </div>
 
                     {/* Product Showcase */}
-                    <div className="bg-gradient-to-br from-amber-400 to-amber-600 rounded-2xl shadow-xl h-full">
-                        <div className="relative aspect-square bg-gradient-to-br from-amber-300 to-amber-600 flex items-center justify-center">
-                            <svg className="w-32 h-32 text-white opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={1}
-                                    d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2m15-11c0 1.105-1.343 2-3 2s-3-.895-3-2m3-11v2m0 0a3 3 0 00-6 0m6 0a3 3 0 01-6 0"
-                                />
-                            </svg>
+                    <div className=" rounded-2xl shadow-xl h-full">
+                        <div className="w-full h-3/4 relative ">
+                            <Image
+                                src={"/assets/ads/main-banner.jpg"}
+                                alt={" Indoor Air Quality Monitor"}
+                                fill
+                                className="object-cover"
+                                priority
+                            />
                         </div>
-                        <div className="p-6 text-white">
-                            <h3 className="text-xl font-bold mb-2">Cair +</h3>
-                            <p className="text-amber-100">Indoor Air Quality Monitor</p>
-                        </div>
+
+
+                       
                     </div>
                 </div>
             </div>
