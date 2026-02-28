@@ -5,7 +5,7 @@ export async function storeRawSensorReading(data: {
     measuredAt: Date;
 
     // Pollution Data
-    aqi?: number;
+    aqi: number;
     pm10?: number;
     pm25?: number;
     so2?: number;
