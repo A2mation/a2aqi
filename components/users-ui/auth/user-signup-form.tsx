@@ -5,7 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { useState } from "react"
 import toast from "react-hot-toast"
-import { Loader2 } from "lucide-react"
+import { Eye, EyeOff, Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -53,6 +53,7 @@ export function UserSignupForm({
 
     const router = useRouter()
     const [loading, setLoading] = useState(false)
+    const [showPassword, setShowPassword] = useState(false);
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
@@ -183,11 +184,31 @@ export function UserSignupForm({
                                                 <Field>
                                                     <FieldLabel>Confirm Password</FieldLabel>
                                                     <FormControl>
-                                                        <Input
-                                                            type="password"
-                                                            disabled={loading}
-                                                            {...field}
-                                                        />
+                                                        <div className="relative">
+                                                            <Input
+                                                                type={showPassword ? "text" : "password"}
+                                                                disabled={loading}
+                                                                className="pr-10"
+                                                                {...field}
+                                                            />
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent cursor-pointer"
+                                                                onClick={() => setShowPassword((prev) => !prev)}
+                                                                disabled={loading}
+                                                            >
+                                                                {showPassword ? (
+                                                                    <EyeOff className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                                                                ) : (
+                                                                    <Eye className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                                                                )}
+                                                                <span className="sr-only">
+                                                                    {showPassword ? "Hide password" : "Show password"}
+                                                                </span>
+                                                            </Button>
+                                                        </div>
                                                     </FormControl>
                                                     <FormMessage />
                                                 </Field>

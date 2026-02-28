@@ -9,6 +9,7 @@ import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import toast from "react-hot-toast"
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -24,12 +25,13 @@ import {
     Form,
     FormControl,
     FormField,
+    FormItem,
+    FormLabel,
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { GoogleIcon } from "@/components/icons/GoogleIcon"
 import { MetaIcon } from "@/components/icons/MetaIcon"
-import { Loader2 } from "lucide-react"
 
 const formSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -45,6 +47,7 @@ export function UserLoginForm({
 
     const router = useRouter()
     const [loading, setLoading] = useState(false)
+    const [showPassword, setShowPassword] = useState(false);
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
@@ -125,27 +128,46 @@ export function UserLoginForm({
                                     control={form.control}
                                     name="password"
                                     render={({ field }) => (
-                                        <Field>
+                                        <FormItem className="space-y-2">
                                             <div className="flex items-center">
-                                                <FieldLabel>Password</FieldLabel>
-                                                <a
-                                                    href="#"
-                                                    className="ml-auto text-sm underline-offset-2 hover:underline"
+                                                <FormLabel>Password</FormLabel>
+                                                {/* <Link
+                                                        href="#"
+                                                        className="ml-auto text-sm underline-offset-2 hover:underline"
                                                 >
                                                     Forgot your password?
-                                                </a>
+                                                </Link> */}
                                             </div>
 
                                             <FormControl>
-                                                <Input
-                                                    type="password"
-                                                    disabled={loading}
-                                                    {...field}
-                                                />
+                                                <div className="relative">
+                                                    <Input
+                                                        type={showPassword ? "text" : "password"}
+                                                        disabled={loading}
+                                                        className="pr-10"
+                                                        {...field}
+                                                    />
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent cursor-pointer"
+                                                        onClick={() => setShowPassword((prev) => !prev)}
+                                                        disabled={loading}
+                                                    >
+                                                        {showPassword ? (
+                                                            <EyeOff className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                                                        ) : (
+                                                            <Eye className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                                                        )}
+                                                        <span className="sr-only">
+                                                            {showPassword ? "Hide password" : "Show password"}
+                                                        </span>
+                                                    </Button>
+                                                </div>
                                             </FormControl>
-
                                             <FormMessage />
-                                        </Field>
+                                        </FormItem>
                                     )}
                                 />
 
