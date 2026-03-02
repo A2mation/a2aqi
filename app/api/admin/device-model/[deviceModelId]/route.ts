@@ -109,6 +109,14 @@ export async function DELETE(
             }
         })
 
+        // await prisma.deviceModel.update({
+        //     where: { id: deviceModelId },
+        //     data: { 
+        //         deletedAt: new Date(),
+        //         isActive: false // Also set to false so it stops showing in active lists
+        //     }
+        // });
+
         if (!res) {
             return new NextResponse("Device Model not found", { status: 404 });
         }
