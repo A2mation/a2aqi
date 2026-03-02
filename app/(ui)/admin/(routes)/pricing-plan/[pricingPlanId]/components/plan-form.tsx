@@ -61,10 +61,10 @@ export const PricingPlanForm = ({ initialData, deviceModels }: PricingPlanProps)
     const form = useForm<PricingPlanFormValues>({
         resolver: zodResolver(formSchema) as any,
         defaultValues: {
-            modelId: initialData?.modelId  ?? "",
+            modelId: initialData?.modelId ?? "",
             duration: initialData?.duration ?? SubscriptionDuration.THREE_MONTHS,
             price: initialData?.price ?? 0,
-            currency:  initialData?.currency ?? "INR",
+            currency: initialData?.currency ?? "INR",
             isEnabled: initialData?.isEnabled ?? true,
         },
     });
@@ -72,14 +72,19 @@ export const PricingPlanForm = ({ initialData, deviceModels }: PricingPlanProps)
     const onSubmit = async (data: PricingPlanFormValues) => {
         try {
             setLoading(true);
+            let res;
             if (initialData) {
-                await http.patch(`/api/admin/pricing-plan/${params.pricingPlanId}`, data);
+                res = await http.patch(`/api/admin/pricing-plan/${params.pricingPlanId}`, data);
             } else {
-                await http.post(`/api/admin/pricing-plan`, data);
+                res = await http.post(`/api/admin/pricing-plan`, data);
             }
-            router.refresh();
-            router.push('/admin/pricing-plan');
-            toast.success(toastMsg);
+            if (res.status === 200 || res.status === 201) {
+                toast.success(toastMsg);
+                router.push('/admin/pricing-plan');
+                router.refresh();
+                return;
+            }
+            throw new Error(res.data || "Operation failed");
         } catch (error: any) {
             toast.error(error.response?.data?.message || "Check your unique constraint (One price per duration per model)");
         } finally {

@@ -38,7 +38,7 @@ export const columns: ColumnDef<PricingPlanColumn>[] = [
         accessorKey: "isEnabled",
         header: "Status",
         cell: ({ row }) => (
-            <Badge variant={row.original.isEnabled ? "default" : "destructive"}>
+            <Badge variant={row.original.isEnabled ? "success" : "destructive"}>
                 {row.original.isEnabled ? "Active" : "Disabled"}
             </Badge>
         )
