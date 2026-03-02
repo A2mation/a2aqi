@@ -24,6 +24,11 @@ const MainNav = ({
             active: pathName === `/admin/device-model` || pathName === `/admin/device-model/new` || pathName === `/admin/device-model/${params.deviceModelId}`
         },
         {
+            href: `/admin/pricing-plan`,
+            label: 'Plans',
+            active: pathName === `/admin/pricing-plan` || pathName === `/admin/pricing-plan/new` || pathName === `/admin/pricing-plan/${params.deviceModelId}`
+        },
+        {
             href: `/admin/device`,
             label: 'Devices',
             active: pathName === `/admin/device` || pathName === `/admin/device/new` || pathName === `/admin/device/${params.deviceId}` || pathName === `/admin/device/${params.deviceId}/calibration`
