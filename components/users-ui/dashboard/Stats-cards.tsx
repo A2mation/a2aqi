@@ -26,6 +26,7 @@ import {
 import { getAQIBgColor, getAQIColor, getAQIStatus, getAQITextColor } from "@/helpers/aqi-color-pallet";
 import { formatDateTime } from "@/utils/formatDateTime";
 import { DeviceManagement } from "./Device-Mangement";
+import { SubscriptionExpireWheel } from "./SubscriptionExpireWheel";
 
 const AirQualityImages: Record<string, string> = {
     Good: "/assets/aqi-moods/Good.png",
@@ -132,7 +133,7 @@ export function StatsCards() {
             {/* TOP CARDS */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* AQI Card */}
-                <Card className="p-6 rounded-xl border border-border bg-white">
+                <Card className="p-6 shadow hover:shadow-xl rounded-xl border border-border bg-white">
                     <div className="grid grid-cols-2 gap-4 items-center">
 
                         {/* LEFT SIDE */}
@@ -183,7 +184,7 @@ export function StatsCards() {
 
 
                 {/* Avg AQI Trends */}
-                <Card className="p-6 rounded-xl border border-border bg-white">
+                <Card className="p-6 rounded-xl shadow hover:shadow-xl border border-border bg-white">
                     <h2 className="text-lg font-semibold text-gray-800 mb-2">
                         Avg. AQI Trends
                     </h2>
@@ -228,8 +229,8 @@ export function StatsCards() {
                 </Card>
 
 
-                {/* Device Monitor */}
-                <DeviceManagement />
+                {/* Subscription Wheel Monitor */}
+                <SubscriptionExpireWheel />
             </div>
 
             {/* AIR POLLUTANTS STRIP */}
