@@ -26,6 +26,16 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { verifyPaymentOnServer } from "@/lib/razorpay-helpers"
+
+
+import dynamic from 'next/dynamic'
+
+// This tells Next.js: "Only load this component on the client side"
+const CheckOutButton = dynamic(
+    () => import('@/components/CheckOut-Button'),
+    { ssr: false }
+)
 
 // --- DUMMY DATA ---
 const PRICING_PLANS = [
@@ -215,6 +225,13 @@ const BillingAndPlans = () => {
                             </div>
                         </div>
 
+
+                        <CheckOutButton
+                            amount={2999}
+                            // planName="6 Months Subscription"
+                            // description="Model: PA-II"
+                            
+                        />
                     </div>
                 </div>
             </div>
