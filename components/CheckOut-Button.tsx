@@ -25,6 +25,7 @@ const CheckOutButton = ({ amount }: { amount: number }) => {
 
             const { data: order } = await http.post("/api/payments/create-order", { deviceId, pricingPlanId });
 
+
             const options = {
                 key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
                 amount: order.amount,
@@ -49,9 +50,18 @@ const CheckOutButton = ({ amount }: { amount: number }) => {
                 },
             };
 
-            console.log(order)
+
             const rzp = new (window as any).Razorpay(options);
+
+            rzp.on('payment.failed', function (response: any) {
+                console.error("Reason:", response.error.description);
+                toast.error(`Payment Failed: ${response.error.description}`);
+                setIsLoading(false);
+            });
+
             rzp.open();
+
+
 
         } catch (error: any) {
             console.error(error);
