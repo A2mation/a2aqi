@@ -7,9 +7,12 @@ import { toast } from "react-hot-toast";
 import { http } from "@/lib/http";
 import { Button } from "@/components/ui/button";
 import { verifyPaymentOnServer } from "@/lib/razorpay-helpers";
+import { useParams } from "next/navigation";
 
 const CheckOutButton = ({ amount }: { amount: number }) => {
+    const { deviceId } = useParams();
     const [isLoading, setIsLoading] = useState(false);
+    const pricingPlanId = '69a56bd6fd69e7569e82cb05'
 
     const handlePayment = async () => {
         if (!(window as any).Razorpay) {
@@ -20,7 +23,7 @@ const CheckOutButton = ({ amount }: { amount: number }) => {
         try {
             setIsLoading(true);
 
-            const { data: order } = await http.post("/api/payments/create-order", { amount });
+            const { data: order } = await http.post("/api/payments/create-order", { deviceId, pricingPlanId });
 
             const options = {
                 key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
@@ -46,6 +49,7 @@ const CheckOutButton = ({ amount }: { amount: number }) => {
                 },
             };
 
+            console.log(order)
             const rzp = new (window as any).Razorpay(options);
             rzp.open();
 

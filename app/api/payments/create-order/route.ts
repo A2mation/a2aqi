@@ -1,26 +1,35 @@
 import { NextResponse } from 'next/server';
-import { razorpay } from '@/lib/razorpay';
+
 import { getAuthSession } from '@/auth';
+import { withAuditContext } from '@/lib/withAuditContext';
+import { createOrder } from '@/domains/payments/services/payment.service';
 
 export async function POST(req: Request) {
     try {
         const session = await getAuthSession();
+
         if (!session) {
             return new NextResponse('Unauthorized', { status: 401 });
         }
 
-        const body = await req.json();
-        const { amount } = body;
+        const body = await req.json()
+        const { deviceId, pricingPlanId } = body
 
-        const options = {
-            amount: amount * 100,
-            currency: 'INR',
-            receipt: `receipt_${Date.now()}`,
-        };
+        const userId = session.user.id;
 
-        const order = await razorpay.orders.create(options);
+        return withAuditContext(
+            {
+                userId,
+                route: "/api/payments/create-order"
+            },
+            async () => {
 
-        return NextResponse.json(order);
+                const order = await createOrder(userId, deviceId, pricingPlanId)
+
+                return NextResponse.json(order)
+
+            }
+        )
     } catch (error) {
         console.error('[RAZORPAY_ORDER_ERROR]', error);
         return new NextResponse('Internal Error', { status: 500 });

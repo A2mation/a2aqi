@@ -1,11 +1,20 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client"
+import { createAuditExtension } from "./prisma-audit"
 
-declare global {
-    var prisma: PrismaClient | undefined;
+const prismaClientSingleton = () => {
+
+    const client = new PrismaClient()
+
+    return client.$extends(createAuditExtension(client))
 }
 
-export const prisma =  globalThis.prisma || new PrismaClient();
+declare global {
+    var prismaGlobal: undefined | ReturnType<typeof prismaClientSingleton>
+}
 
-if (process.env.NODE_ENV !== 'production') {
-    globalThis.prisma = prisma;
+export const prisma =
+    globalThis.prismaGlobal ?? prismaClientSingleton()
+
+if (process.env.NODE_ENV !== "production") {
+    globalThis.prismaGlobal = prisma
 }
