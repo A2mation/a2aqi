@@ -1,6 +1,7 @@
 import { Prisma, PrismaClient, AuditAction } from "@prisma/client"
 import { getAuditContext } from "./audit-context"
 import { diffObjects } from "@/utils/object-diff"
+import { createAuditLog } from "@/domains/payments/services/audit.service"
 
 const TRACKED_MODELS = [
     "Payment",
@@ -111,20 +112,16 @@ export const createAuditExtension = (prisma: PrismaClient) =>
                     const storedOld = isUpdate ? oldData : null
 
                     try {
-                        await prisma.auditLog.create({
-                            data: {
-                                entityType: model,
-                                entityId: (
-                                    resultRecord?.id ??
-                                    (argsRecord?.where as Record<string, unknown>)?.id ??
-                                    "UNKNOWN"
-                                ) as string,
-                                action,
-                                actorId: ctx?.userId ?? "SYSTEM",
-                                actorType: ctx?.userId ? "USER" : "SYSTEM",
-                                oldData: storedOld as Prisma.InputJsonValue | null,
-                                newData: newData as Prisma.InputJsonValue | null,
-                            }
+                        await createAuditLog({
+                            entityType: model,
+                            entityId: (
+                                resultRecord?.id ??
+                                (argsRecord?.where as Record<string, unknown>)?.id ??
+                                "UNKNOWN"
+                            ) as string,
+                            action,
+                            oldData: storedOld  as Prisma.InputJsonValue | null,
+                            newData: newData as Prisma.InputJsonValue | null
                         })
                     } catch (err) {
                         console.error("[audit] Failed to write audit log:", err)
