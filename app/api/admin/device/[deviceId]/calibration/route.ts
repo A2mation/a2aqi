@@ -3,6 +3,7 @@ import { adminGuard } from "@/lib/adminAuth";
 import { handleAdminError } from "@/lib/handleRoleError";
 import { prisma } from "@/lib/prisma"
 import { redis } from "@/lib/redis";
+import { CalibrationStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request,
@@ -79,14 +80,24 @@ export async function POST(req: Request,
         const existingPending = await prisma.calibration.findFirst({
             where: {
                 deviceId,
-                status: "PENDING",
+                status: CalibrationStatus.PENDING,
             },
+            select: {
+                id: true,
+                status: true
+            }
         });
 
         if (existingPending) {
-            return new NextResponse("Pending calibration already exists", {
-                status: 409,
-            });
+            await prisma.calibration.update({
+                where: {
+                    id: existingPending.id
+                },
+                data: {
+                    expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+                    status: CalibrationStatus.FAILED
+                }
+            })
         }
 
         const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour

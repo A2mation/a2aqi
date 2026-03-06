@@ -68,9 +68,22 @@ export interface CalibrationValues {
 
 
 export interface CalibrationLog {
-  id: string;
-  status: "PENDING" | "APPROVED" | "REJECTED"; 
-  newValues: Record<string, number | string>;
-  reason?: string;
-  createdAt: string;
+    id: string;
+
+    status: "PENDING" | "SUCCESS" | "FAILED" | "APPROVED" | "REJECTED";
+
+    newValues: {
+        [key: string]: number | undefined;
+    };
+
+    reason: string | null;
+    createdAt: string;
+    expiresAt: string;
+    previousValues: Record<string, number> | null;
+    effectiveFrom: string;
+    deliveredAt: string | null;
+    acknowledgedAt: string | null;
+
+    deviceId: string;
+    performedById: string | null;
 }

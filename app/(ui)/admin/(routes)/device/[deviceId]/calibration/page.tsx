@@ -93,6 +93,7 @@ export default function DynamicCalibrationPage() {
     }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
     const allLogs = data?.pages.flatMap((page) => page.items) || [];
+    console.log(allLogs)
 
     const mutation = useMutation({
         mutationFn: async (values: z.infer<typeof calibrationSchema>) => {
@@ -110,7 +111,7 @@ export default function DynamicCalibrationPage() {
         },
         onSuccess: () => {
 
-            queryClient.invalidateQueries({ queryKey: ["calibrations", params.deviceId] });
+            queryClient.invalidateQueries({ queryKey: ["calibrations-infinite", params.deviceId] });
 
             form.reset({
                 reason: "",
@@ -131,7 +132,7 @@ export default function DynamicCalibrationPage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
 
-                <Card className="lg:col-span-5 h-fit">
+                <Card className="lg:col-span-4 h-fit">
                     <CardHeader><CardTitle className="flex items-center gap-2"><Settings2 size={20} /> Configure Device</CardTitle></CardHeader>
                     <CardContent>
                         <Form {...form}>
@@ -197,7 +198,7 @@ export default function DynamicCalibrationPage() {
                 </Card>
 
 
-                <Card className="lg:col-span-7 flex flex-col h-150">
+                <Card className="lg:col-span-8 flex flex-col h-150">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <History size={20} /> Log History
@@ -217,9 +218,68 @@ export default function DynamicCalibrationPage() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {allLogs.map((log: any) => (
+                                    {allLogs.map((log: CalibrationLog) => (
                                         <TableRow key={log.id} className="hover:bg-slate-50 transition-colors">
-                                            {/* ... (Keep your existing TableCell content) */}
+                                            {/* Status */}
+                                            <TableCell className="w-25">
+                                                <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${log.status === 'SUCCESS' ? 'bg-green-100 text-green-700' :
+                                                    log.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
+                                                        'bg-red-100 text-red-700'
+                                                    }`}>
+                                                    {log.status}
+                                                </span>
+                                            </TableCell>
+
+                                            {/* Values */}
+                                            <TableCell>
+                                                <div className="flex flex-wrap gap-1.5 max-w-60">
+                                                    {Object.entries(log.newValues).map(([key, value]) => (
+                                                        <Badge
+                                                            key={key}
+                                                            variant="outline"
+                                                            className="flex items-center gap-1.5 px-2 py-0.5 border-slate-200"
+                                                        >
+                                                            <span className="text-[10px] uppercase text-muted-foreground font-semibold">
+                                                                {key}
+                                                            </span>
+                                                            <span className="text-[11px] font-mono font-bold">
+                                                                {value}
+                                                            </span>
+                                                        </Badge>
+                                                    ))}
+                                                </div>
+                                            </TableCell>
+
+                                            {/* Reason */}
+                                            <TableCell className="max-w-37.5 truncate text-sm italic text-slate-600">
+                                                {log.reason || "—"}
+                                            </TableCell>
+
+                                            {/* Lifecycle - Showing Date and Time */}
+                                            <TableCell className="text-[11px] text-slate-500">
+                                                <div className="flex flex-col gap-1">
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="font-semibold text-slate-700">Start:</span>
+                                                        <span>{new Date(log.effectiveFrom).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1 text-red-600 font-medium">
+                                                        <span>Expires:</span>
+                                                        {/* Bolded time specifically since it's only an hour window */}
+                                                        <span>{new Date(log.expiresAt).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}</span>
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+
+                                            {/* Created At - Detailed Timestamp */}
+                                            <TableCell className="text-right text-xs text-muted-foreground font-mono">
+                                                {new Date(log.createdAt).toLocaleString([], {
+                                                    month: 'numeric',
+                                                    day: 'numeric',
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                    second: '2-digit'
+                                                })}
+                                            </TableCell>
                                         </TableRow>
                                     ))}
 
