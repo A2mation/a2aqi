@@ -3,6 +3,7 @@
 import Script from "next/script";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
+import { useSession } from "next-auth/react";
 
 import { http } from "@/lib/http";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,8 @@ import { verifyPaymentOnServer } from "@/lib/razorpay-helpers";
 import { useParams } from "next/navigation";
 
 const CheckOutButton = ({ amount }: { amount: number }) => {
+    const session = useSession();
+
     const { deviceId } = useParams();
     const [isLoading, setIsLoading] = useState(false);
     const pricingPlanId = '69a56bd6fd69e7569e82cb05'
@@ -34,13 +37,14 @@ const CheckOutButton = ({ amount }: { amount: number }) => {
                 description: "Device Subscription",
                 order_id: order.id,
                 handler: async (response: any) => {
+                    console.log(response)
                     await verifyPaymentOnServer(response);
                     console.log("Payment Success:", response);
                     toast.success("Payment Successful!");
                 },
                 prefill: {
-                    name: "User",
-                    email: "user@example.com",
+                    name: session.data?.user.name,
+                    email: session.data?.user.email,
                 },
                 theme: {
                     color: "#0096FF",
@@ -70,6 +74,10 @@ const CheckOutButton = ({ amount }: { amount: number }) => {
             setIsLoading(false);
         }
     };
+
+    if (!session) {
+        return null;
+    }
 
     return (
         <>
