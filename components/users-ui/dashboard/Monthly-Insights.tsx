@@ -142,7 +142,7 @@ export function MonthlyInsights() {
                             <p className="text-2xl font-semibold text-slate-500">No Data</p>
                         ) : (
                             <p className="text-4xl md:text-5xl font-bold text-red-600">
-                                {avgMonthAqi}
+                                {Math.round(avgMonthAqi)}
                             </p>
                         )}
                     </div>
@@ -210,11 +210,11 @@ export function MonthlyInsights() {
 
                         <div className="flex items-center justify-between">
                             <p className="text-sm text-slate-500">
-                                {minEntry ? `On ${minEntry.day} ${selectedMonth}` : "No Data"}
+                                {minEntry ? `On ${Math.round(Number(minEntry.day))} ${selectedMonth}` : "No Data"}
                             </p>
 
                             <div className="bg-red-600 text-white font-bold rounded px-4 py-2">
-                                {minEntry ? minEntry.aqi : "--"}
+                                {minEntry ? Math.round(minEntry.aqi) : "--"}
                             </div>
                         </div>
                     </div>
@@ -252,7 +252,7 @@ const CustomTooltip = ({ active, payload }: any) => {
         <div className={`rounded-lg border p-3 shadow-md bg-white dark:bg-black ${theme.borderClass}`}>
             <p className="text-xs text-slate-500">{fullDate}</p>
             <p className={`text-sm font-semibold ${theme.text}`}>
-                AQI: {aqi} ({theme.label})
+                AQI: {aqi.toFixed(1)} ({theme.label})
             </p>
         </div>
     );

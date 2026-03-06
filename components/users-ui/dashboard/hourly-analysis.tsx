@@ -252,7 +252,7 @@ export function HourlyAnalysis({ currentDeviceAssignDate }: {
                                                 <HoverCardContent className="w-40">
                                                     <div className="text-xs space-y-1">
                                                         <p className="font-bold">{date} • {slot.label}</p>
-                                                        <p>AQI: <span className={cn("font-bold", getAQITextColor(value ?? 0))}>{value ?? 'N/A'}</span></p>
+                                                        <p>AQI: <span className={cn("font-bold", getAQITextColor(value ?? 0))}>{value?.toFixed(2) ?? 'N/A'}</span></p>
                                                     </div>
                                                 </HoverCardContent>
                                             </HoverCard>
@@ -267,13 +267,13 @@ export function HourlyAnalysis({ currentDeviceAssignDate }: {
                         <Card className="p-4 bg-slate-50 border-none shadow-none">
                             <div className="text-xs text-gray-500 uppercase tracking-wider">Min AQI</div>
                             <div className="text-2xl font-black text-slate-700">
-                                {allValues.length > 0 ? Math.min(...allValues) : '--'}
+                                {allValues.length > 0 ? Math.min(...allValues).toFixed(2) : '--'}
                             </div>
                         </Card>
                         <Card className="p-4 bg-slate-50 border-none shadow-none">
                             <div className="text-xs text-gray-500 uppercase tracking-wider">Max AQI</div>
                             <div className="text-2xl font-black text-slate-700">
-                                {maxValue || '--'}
+                                {maxValue.toFixed(2) || '--'}
                             </div>
                         </Card>
                     </div>

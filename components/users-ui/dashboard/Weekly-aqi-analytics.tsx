@@ -145,7 +145,7 @@ export function WeeklyAqiAnalytics() {
 
                 <div className="mt-2">
                     <p className="font-bold">
-                        {title}: {hovered.value} {metricLabel}
+                        {title}: {hovered.value.toFixed(2)} {metricLabel}
                     </p>
                 </div>
             </div>
