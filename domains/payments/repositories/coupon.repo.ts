@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma"
+import { DB, prisma } from "@/lib/prisma"
 
 export async function findCouponByCode(code: string) {
     return prisma.coupon.findUnique({
@@ -15,14 +15,16 @@ export async function getUserCouponUsage(couponId: string, userId: string) {
     })
 }
 
-export async function getCouponRedemptionByPayment(paymentId: string) {
-    return prisma.couponRedemption.findUnique({
+export async function getCouponRedemptionByPayment(paymentId: string, tx?: DB) {
+    const db = tx || prisma;
+    return db.couponRedemption.findUnique({
         where: { paymentId }
     })
 }
 
-export async function incrementCouponUsage(couponId: string) {
-    return prisma.coupon.update({
+export async function incrementCouponUsage(couponId: string, tx?: DB) {
+    const db = tx || prisma;
+    return db.coupon.update({
         where: { id: couponId },
         data: {
             usedCount: { increment: 1 }
@@ -36,8 +38,9 @@ export async function createCouponRedemption(data: {
     deviceId: string
     paymentId: string
     discountApplied: number
-}) {
-    return prisma.couponRedemption.create({
+}, tx?: DB) {
+    const db = tx || prisma;
+    return db.couponRedemption.create({
         data
     })
 }

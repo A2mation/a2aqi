@@ -1,27 +1,38 @@
-import { prisma } from "@/lib/prisma"
-import { Prisma } from "@prisma/client"
+import { DB, prisma } from "@/lib/prisma"
+import { PaymentStatus } from "@prisma/client"
+import { CreatePaymentDTO } from "../types/payment.dto";
 
-// domains/payments/repositories/payment.repo.ts
+export async function createPayment(data: CreatePaymentDTO) {
 
-export async function createPayment(data: Prisma.PaymentCreateInput) {
-    try {
-        return await prisma.payment.upsert({
-            where: { razorpayOrderId: data.razorpayOrderId },
-            update: {
-                amount: data.amount,
-                finalAmount: data.finalAmount,
-            },
-            create: data,
-        });
-    } catch (error: any) {
-        // If P2002 happens despite upsert, someone else just created it.
-        if (error.code === 'P2002') {
-            return await prisma.payment.findUnique({
-                where: { razorpayOrderId: data.razorpayOrderId }
-            });
+    await prisma.payment.updateMany({
+        where: {
+            deviceId: data.deviceId,
+            userId: data.userId,
+            pricingPlanId: data.pricingPlanId,
+            status: "PENDING",
+            NOT: { razorpayOrderId: data.razorpayOrderId }
+        },
+        data: {
+            status: "FAILED"
         }
-        throw error;
-    }
+    })
+
+    return await prisma.payment.create({
+        data: {
+            userId: data.userId,
+            deviceId: data.deviceId,
+            pricingPlanId: data.pricingPlanId,
+            couponId: data.couponId,
+            amount: data.amount,
+            discountAmount: data.discountAmount,
+            finalAmount: data.finalAmount,
+            currency: data.currency || "INR",
+            razorpayOrderId: data.razorpayOrderId,
+            status: "PENDING",
+            metadata: data.metadata || {},
+        },
+    });
+
 }
 
 export async function updatePayment(id: string, data: any) {
@@ -33,14 +44,87 @@ export async function updatePayment(id: string, data: any) {
 
 export async function updatePaymentSuccess(
     razorpayOrderId: string,
-    razorpayPaymentId: string
+    razorpayPaymentId: string,
+    razorpay_signature: string,
+    tx?: DB
 ) {
-    return prisma.payment.update({
-        where: { razorpayOrderId },
+    const db = tx || prisma;
+    
+    return db.payment.update({
+        where: {
+            razorpayOrderId,
+            status: PaymentStatus.PROCESSING
+        },
         data: {
             status: "SUCCESS",
             razorpayPaymentId,
+            razorpaySignature: razorpay_signature,
             paidAt: new Date()
         }
     })
+}
+
+export async function updatePaymentFailed(
+    razorpayOrderId: string,
+    errorCode: string,
+    errorDesc: string,
+    tx?: DB
+) {
+    const db = tx || prisma;
+    return await db.payment.update({
+        where: { razorpayOrderId },
+        data: {
+            status: "FAILED",
+            metadata: {
+                errorCode: errorCode || "UNKNOWN",
+                errorDesc: errorDesc || "No description provided",
+                failedAt: new Date().toISOString(),
+            },
+        },
+    });
+}
+
+export async function updatePaymentPending(
+    razorpayOrderId: string,
+    tx?: DB
+) {
+    const db = tx || prisma;
+    return await db.payment.update({
+        where: { razorpayOrderId },
+        data: {
+            status: "PENDING",
+        },
+    });
+}
+
+export async function updateLockPaymentTable(razorpayOrderId: string, STALE_LOCK_TIME: Date, tx?: DB) {
+    const db = tx || prisma;
+    try {
+        return await db.payment.update({
+            where: {
+                razorpayOrderId: razorpayOrderId,
+                OR: [
+                    {
+                        status: "PENDING"
+                    }, {
+                        status: "PROCESSING",
+                        updatedAt: {
+                            lt: STALE_LOCK_TIME
+                        }
+                    }
+                ]
+            },
+            data: {
+                status: "PROCESSING",
+                updatedAt: new Date(),
+            },
+            select: {
+                id: true,
+                status: true
+            }
+        });
+    } catch (error: any) {
+        // If P2025, it means status is already PROCESSING or SUCCESS
+        return null;
+    }
 }

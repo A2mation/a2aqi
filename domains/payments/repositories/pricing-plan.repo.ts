@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma"
+import { DB, prisma } from "@/lib/prisma"
 import { SubscriptionDuration } from "@prisma/client"
 
 /**
@@ -35,8 +35,9 @@ export async function getPricingPlansByModel(modelId: string) {
 /**
  * Get pricing plan by id
  */
-export async function getPricingPlanById(planId: string) {
-    return prisma.pricingPlan.findUnique({
+export async function getPricingPlanById(planId: string, tx?: DB) {
+    const db = tx || prisma;
+    return db.pricingPlan.findUnique({
         where: { id: planId }
     })
 }
