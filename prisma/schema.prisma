@@ -50,6 +50,7 @@ enum DiscountType {
 
 enum PaymentStatus {
   PENDING
+  PROCESSING
   SUCCESS
   FAILED
   REFUNDED
@@ -780,7 +781,7 @@ model Payment {
   status PaymentStatus @default(PENDING)
 
   razorpayOrderId   String  @unique
-  razorpayPaymentId String? @unique
+  razorpayPaymentId String? 
   razorpaySignature String?
 
   metadata Json?
