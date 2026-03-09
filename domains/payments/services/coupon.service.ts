@@ -1,6 +1,7 @@
 import { calculateDiscount } from "@/utils/discount"
 import { createCouponRedemption, findCouponByCode, getCouponRedemptionByPayment, getUserCouponUsage, incrementCouponUsage } from "../repositories/coupon.repo"
-import { Payment } from "@prisma/client"
+import { Payment, Prisma } from "@prisma/client"
+import { DB } from "@/lib/prisma"
 
 export async function validateCoupon(
     code: string,
@@ -47,11 +48,11 @@ export async function validateCoupon(
     }
 }
 
-export async function redeemCoupon(payment: Payment) {
+export async function redeemCoupon(payment: Payment, tx?: DB) {
 
     if (!payment.couponId) return
 
-    const existing = await getCouponRedemptionByPayment(payment.id)
+    const existing = await getCouponRedemptionByPayment(payment.id, tx)
 
     if (existing) return
 
@@ -60,8 +61,8 @@ export async function redeemCoupon(payment: Payment) {
         userId: payment.userId,
         deviceId: payment.deviceId,
         paymentId: payment.id,
-        discountApplied: payment.discountAmount ?? 0
-    })
+        discountApplied: payment.discountAmount ?? 0,
+    }, tx)
 
-    await incrementCouponUsage(payment.couponId)
+    await incrementCouponUsage(payment.couponId, tx)
 }

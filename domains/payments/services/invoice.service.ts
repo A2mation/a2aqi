@@ -1,8 +1,9 @@
-import { prisma } from "@/lib/prisma"
+import { DB, prisma } from "@/lib/prisma"
 
-export async function generateInvoice(payment: any, subscription: any) {
+export async function generateInvoice(payment: any, subscription: any, tx: DB) {
+    const db = tx || prisma
 
-    return prisma.invoice.create({
+    return db.invoice.create({
         data: {
             invoiceNumber: `INV-${Date.now()}`,
             userId: payment.userId,

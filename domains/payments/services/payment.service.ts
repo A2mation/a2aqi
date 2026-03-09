@@ -1,4 +1,5 @@
-import { createPayment } from "../repositories/payment.repo"
+import { DB } from "@/lib/prisma"
+import { createPayment, updateLockPaymentTable, updatePaymentFailed, updatePaymentPending, updatePaymentSuccess } from "../repositories/payment.repo"
 import { getPricingPlanById } from "../repositories/pricing-plan.repo"
 import { validateCoupon } from "./coupon.service"
 import { razorpay } from "@/lib/razorpay"
@@ -39,14 +40,15 @@ export async function createOrder(
     }
 
     const order = await razorpay.orders.create({
-        amount: finalAmount * 100,
-        currency: "INR"
+        amount: Math.round(finalAmount * 100),
+        currency: "INR",
+        receipt: `receipt_${Date.now()}`
     })
 
-    const payment = await createPayment({
-        user: { connect: { id: userId } },
-        device: { connect: { id: deviceId } },
-        pricingPlan: { connect: { id: pricingPlanId } },
+    await createPayment({
+        userId:  userId ,
+        deviceId: deviceId,
+        pricingPlanId,
 
         amount: plan.price,
         discountAmount: discount,
@@ -55,9 +57,7 @@ export async function createOrder(
         razorpayOrderId: order.id,
         status: "PENDING",
 
-        coupon: couponId
-            ? { connect: { id: couponId } }
-            : undefined
+        couponId: couponId || undefined,
     })
 
     return {
@@ -67,4 +67,59 @@ export async function createOrder(
         // paymentId: payment.id,
         discount
     }
+
+
+}
+
+
+export async function completePayment(
+    razorpayOrderId: string,
+    razorpayPaymentId: string,
+    razorpay_signature: string,
+    tx?: DB
+) {
+    return await updatePaymentSuccess(
+        razorpayOrderId,
+        razorpayPaymentId,
+        razorpay_signature,
+        tx
+    );
+}
+
+export async function changePaymentStatusToPending(
+    razorpayOrderId: string,
+    tx?: DB
+) {
+    return await updatePaymentPending(
+        razorpayOrderId,
+        tx
+    );
+}
+
+/**
+ * Orchestrates the failure flow.
+ * Records the failure state in the database.
+ */
+export async function recordFailure(
+    razorpayOrderId: string,
+    code?: string,
+    desc?: string,
+    tx?: DB
+) {
+    return await updatePaymentFailed(
+        razorpayOrderId,
+        code || "UNKNOWN",
+        desc || "Transaction declined",
+        tx
+    );
+}
+
+/**
+ * Atomic State Locking. 
+ * This is a "Check-and-Set" strategy where the first process to
+ * hit the database "claims" the right to process the payment.
+ */
+export async function lockPaymentForProcessing(razorpayOrderId: string, tx?: DB) {
+    const STALE_LOCK_TIME = new Date(Date.now() - 5 * 60 * 1000);
+    return await updateLockPaymentTable(razorpayOrderId, STALE_LOCK_TIME, tx)
 }

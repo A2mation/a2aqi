@@ -1,7 +1,8 @@
 import { Payment, SubscriptionDuration } from "@prisma/client"
 
-import { createDeviceSubscription } from "../repositories/subscription.repo"
+import { DB } from "@/lib/prisma"
 import { getPricingPlanById } from "../repositories/pricing-plan.repo"
+import { createDeviceSubscription } from "../repositories/subscription.repo"
 
 const durationToMonths: Record<SubscriptionDuration, number> = {
     THREE_MONTHS: 3,
@@ -10,10 +11,11 @@ const durationToMonths: Record<SubscriptionDuration, number> = {
 }
 
 export async function activateSubscription(
-    data: Payment
+    data: Payment,
+    tx?: DB
 ) {
 
-    const plan = await getPricingPlanById(data.pricingPlanId)
+    const plan = await getPricingPlanById(data.pricingPlanId, tx)
 
     if (!plan) {
         throw new Error("Pricing plan not found")
@@ -32,6 +34,7 @@ export async function activateSubscription(
         startDate: start,
         endDate: end,
         paidAmount: plan.price,
-        planType: plan.duration
-    })
+        planType: plan.duration,
+        
+    }, tx)
 }
