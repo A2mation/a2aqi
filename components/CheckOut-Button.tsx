@@ -8,11 +8,12 @@ import { useSession } from "next-auth/react";
 import { http } from "@/lib/http";
 import { Button } from "@/components/ui/button";
 import { verifyPaymentOnServer } from "@/lib/razorpay-helpers";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 const CheckOutButton = ({ amount }: { amount: number }) => {
     const session = useSession();
 
+    const router = useRouter();
     const { deviceId } = useParams();
     const [isLoading, setIsLoading] = useState(false);
     const pricingPlanId = '69a56bd6fd69e7569e82cb05'
@@ -28,6 +29,9 @@ const CheckOutButton = ({ amount }: { amount: number }) => {
 
             const { data: order } = await http.post("/api/payments/create-order", { deviceId, pricingPlanId });
 
+            if (!order || !order.orderId) {
+                throw new Error("Invalid order data received from server");
+            }
 
             const options = {
                 key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
@@ -35,12 +39,19 @@ const CheckOutButton = ({ amount }: { amount: number }) => {
                 currency: order.currency,
                 name: "A2AQI",
                 description: "Device Subscription",
-                order_id: order.id,
+                order_id: order.orderId,
                 handler: async (response: any) => {
-                    console.log(response)
-                    await verifyPaymentOnServer(response);
-                    console.log("Payment Success:", response);
-                    toast.success("Payment Successful!");
+                    const success = await verifyPaymentOnServer({
+                        response,
+                        router,
+                        redirectPath: "/user"
+                    });
+
+                    if (success) {
+                        toast.success("Payment Successful!");
+                    } else {
+                        setIsLoading(false);
+                    }
                 },
                 prefill: {
                     name: session.data?.user.name,
@@ -57,10 +68,17 @@ const CheckOutButton = ({ amount }: { amount: number }) => {
 
             const rzp = new (window as any).Razorpay(options);
 
-            rzp.on('payment.failed', function (response: any) {
-                console.error("Reason:", response.error.description);
-                toast.error(`Payment Failed: ${response.error.description}`);
-                setIsLoading(false);
+            rzp.on('payment.failed', async function (response: any) {
+                await verifyPaymentOnServer({
+                    response: {
+                        razorpay_order_id: response.error.metadata.order_id,
+                        razorpay_payment_id: response.error.metadata.payment_id,
+                        razorpay_signature: "",
+                        error_code: response.error.code,
+                        error_description: response.error.description
+                    },
+                    router
+                });
             });
 
             rzp.open();
@@ -68,8 +86,8 @@ const CheckOutButton = ({ amount }: { amount: number }) => {
 
 
         } catch (error: any) {
-            console.error(error);
-            toast.error("Failed to initiate payment.");
+            console.error("Payment Initiation Error:", error);
+            toast.error(error.response?.data?.message || "Failed to initiate payment.");
         } finally {
             setIsLoading(false);
         }
