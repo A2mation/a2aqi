@@ -18,35 +18,37 @@ export const ApiList = ({
 
     return (
         <>
-            <ApiAlert
-                title={"GET"}
-                description={`${baseUrl}/${entityName}`}
-                variant={"public"}
-            />
+            <section className="flex flex-col gap-4">
+                <ApiAlert
+                    title={"GET"}
+                    description={`${baseUrl}/${entityName}`}
+                    variant={"admin"}
+                />
 
-            <ApiAlert
-                title={"GET"}
-                description={`${baseUrl}/${entityName}/{${entityIdName}}`}
-                variant={"public"}
-            />
+                <ApiAlert
+                    title={"GET"}
+                    description={`${baseUrl}/${entityName}/{${entityIdName}}`}
+                    variant={"admin"}
+                />
 
-            <ApiAlert
-                title={"POST"}
-                description={`${baseUrl}/${entityName}`}
-                variant={"admin"}
-            />
+                <ApiAlert
+                    title={"POST"}
+                    description={`${baseUrl}/${entityName}`}
+                    variant={"admin"}
+                />
 
-            <ApiAlert
-                title={"PATCH"}
-                description={`${baseUrl}/${entityName}/{${entityIdName}}`}
-                variant={"admin"}
-            />
+                <ApiAlert
+                    title={"PATCH"}
+                    description={`${baseUrl}/${entityName}/{${entityIdName}}`}
+                    variant={"admin"}
+                />
 
-            <ApiAlert
-                title={"DELETE"}
-                description={`${baseUrl}/${entityName}/{${entityIdName}}`}
-                variant={"admin"}
-            />
+                <ApiAlert
+                    title={"DELETE"}
+                    description={`${baseUrl}/${entityName}/{${entityIdName}}`}
+                    variant={"admin"}
+                />
+            </section>
         </>
     )
 }

@@ -7,7 +7,7 @@ import { signAdminToken } from "@/lib/jwt";
 export async function POST(req: Request) {
     try {
         const { email, password } = await req.json();
-        console.log(email, password)
+        // console.log(email, password)
 
         // const hashedPassword = await bcrypt.hash(password, 10);
         // return NextResponse.json(hashedPassword)
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
         }
 
         const token = signAdminToken(admin.id, admin.email);
-        console.log(token)
+        // console.log(token)
 
         return NextResponse.json({
             id: admin.id,

@@ -26,7 +26,12 @@ const MainNav = ({
         {
             href: `/admin/pricing-plan`,
             label: 'Plans',
-            active: pathName === `/admin/pricing-plan` || pathName === `/admin/pricing-plan/new` || pathName === `/admin/pricing-plan/${params.deviceModelId}`
+            active: pathName === `/admin/pricing-plan` || pathName === `/admin/pricing-plan/new` || pathName === `/admin/pricing-plan/${params.pricingPlanId}`
+        },
+        {
+            href: `/admin/coupons`,
+            label: 'Coupons',
+            active: pathName === `/admin/coupons` || pathName === `/admin/coupons/new` || pathName === `/admin/coupons/${params.couponId}`
         },
         {
             href: `/admin/device`,
