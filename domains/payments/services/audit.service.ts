@@ -1,4 +1,4 @@
-import { AuditAction } from "@prisma/client"
+import { AuditAction, AuditActorType } from "@prisma/client"
 import { getAuditContext } from "@/lib/audit-context"
 
 import {
@@ -17,21 +17,51 @@ interface AuditLogInput {
 }
 
 /**
- * Generic audit logger
+ * Utility to determine current actor identity and role from context
  */
-export async function createAuditLog(data: AuditLogInput) {
+export function getActorDetails(fallbackType: AuditActorType = AuditActorType.SYSTEM) {
+    const ctx = getAuditContext();
 
-    const ctx = getAuditContext()
+    // fallback (SYSTEM or WEBHOOK)
+    let actorType: AuditActorType = fallbackType;
+    let actorId = ctx?.userId ?? "SYSTEM";
+
+    // Check if context contains a user (Admin or standard User)
+    if (ctx?.userId) {
+        actorType = ctx.isAdmin ? AuditActorType.ADMIN : AuditActorType.USER;
+    }
+    // If no user, but the route indicates a webhook path
+    else if (ctx?.route === "razorpay-webhook") {
+        actorType = AuditActorType.WEBHOOK;
+        actorId = "WEBHOOK_HANDLER";
+    }
+
+    return {
+        actorId,
+        actorType,
+        ip: ctx?.ip,
+        route: ctx?.route
+    };
+}
+
+
+/**
+ * Generic audit logger
+*/
+export async function createAuditLog(data: AuditLogInput) {
+    const { actorId, actorType, ip, route } = getActorDetails();
 
     return createAuditLogRecord({
         entityType: data.entityType,
         entityId: data.entityId,
         action: data.action,
-        actorId: ctx?.userId ?? "SYSTEM",
-        actorType: ctx?.userId ? "USER" : "SYSTEM",
+        actorId,
+        actorType,
+        ip,
+        route,
         oldData: data.oldData ?? null,
         newData: data.newData ?? null
-    })
+    });
 }
 
 /**
