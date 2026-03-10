@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { adminGuard } from "@/lib/adminAuth";
 import { handleAdminError } from "@/lib/handleRoleError";
+import { withAuditContext } from "@/lib/withAuditContext";
+import { getAuditContext } from "@/lib/audit-context";
 
 /**
  * GET: Fetch a single coupon by ID
@@ -36,18 +38,19 @@ export async function GET(
  * PATCH: Update coupon details
  */
 export async function PATCH(
-    req: Request,
+    request: Request,
     { params }: { params: Promise<{ couponId: string }> }
 ) {
     try {
-        await adminGuard();
+        const { admin } = await adminGuard();
+
         const { couponId } = await params;
 
         if (!couponId) {
             return new NextResponse("Coupon ID is required", { status: 400 });
         }
 
-        const body = await req.json();
+        const body = await request.json();
         const {
             code,
             description,
@@ -58,10 +61,10 @@ export async function PATCH(
             isActive
         } = body;
 
-        // 1. Basic validation for required update fields
+
         if (!code) return new NextResponse("Code is required", { status: 400 });
 
-        // 2. Check if the updated code conflicts with another coupon
+
         const duplicate = await prisma.coupon.findFirst({
             where: {
                 code: code.toUpperCase(),
@@ -73,21 +76,29 @@ export async function PATCH(
             return new NextResponse("Coupon code already in use", { status: 400 });
         }
 
-        // 3. Update the coupon
-        const updatedCoupon = await prisma.coupon.update({
-            where: { id: couponId },
-            data: {
-                code: code.toUpperCase(),
-                description,
-                discountType,
-                discountValue: Number(discountValue),
-                maxUsage: usage ? Number(usage) : null,
-                validUntil: new Date(validUntil),
-                isActive: isActive ?? true,
-            },
-        });
+        return await withAuditContext({
+            userId: admin.id,
+            isAdmin: true,
+            role: "ADMIN",
+            ip: request.headers.get("x-forwarded-for") || "unknown",
+            route: "Update-Coupons-Details"
+        }, async () => {
 
-        return NextResponse.json(updatedCoupon);
+            const updatedCoupon = await prisma.coupon.update({
+                where: { id: couponId },
+                data: {
+                    code: code.toUpperCase(),
+                    description,
+                    discountType,
+                    discountValue: Number(discountValue),
+                    maxUsage: usage ? Number(usage) : null,
+                    validUntil: new Date(validUntil),
+                    isActive: isActive ?? true,
+                },
+            });
+            return NextResponse.json(updatedCoupon);
+        })
+
     } catch (error) {
         return handleAdminError(error);
     }
@@ -101,23 +112,32 @@ export async function DELETE(
     { params }: { params: Promise<{ couponId: string }> }
 ) {
     try {
-        await adminGuard();
+        const { admin } = await adminGuard();
         const { couponId } = await params;
 
         if (!couponId) {
             return new NextResponse("Coupon ID is required", { status: 400 });
         }
 
-        await prisma.$transaction(async (tx) => {
-           
-            await tx.couponRedemption.deleteMany({ where: { couponId } });
+        return await withAuditContext({
+            userId: admin.id,
+            isAdmin: true,
+            role: "ADMIN",
+            ip: req.headers.get("x-forwarded-for") || "unknown",
+            route: "Delete-Coupons-with-Coupon-Redemption"
+        }, async () => {
 
-            await tx.coupon.delete({
-                where: { id: couponId }
+            await prisma.$transaction(async (tx) => {
+
+                await tx.couponRedemption.deleteMany({ where: { couponId } });
+
+                await tx.coupon.delete({
+                    where: { id: couponId }
+                });
             });
-        });
 
-        return new NextResponse("Coupon deleted successfully", { status: 200 });
+            return new NextResponse("Coupon deleted successfully", { status: 200 });
+        })
     } catch (error) {
         return handleAdminError(error);
     }

@@ -8,7 +8,7 @@ import { redeemCoupon } from "@/domains/payments/services/coupon.service";
 import {
     changePaymentStatusToPending,
     completePayment,
-    lockPaymentForProcessing, // Updated: Logic moved outside tx
+    lockPaymentForProcessing, 
     recordFailure
 } from "@/domains/payments/services/payment.service";
 
@@ -18,7 +18,7 @@ export async function POST(req: Request) {
         const signature = req.headers.get("x-razorpay-signature");
 
 
-        const expected = crypto  
+        const expected = crypto
             .createHmac("sha256", process.env.RAZORPAY_WEBHOOK_SECRET!)
             .update(body)
             .digest("hex");
@@ -33,7 +33,10 @@ export async function POST(req: Request) {
         if (event.event === "payment.captured" || event.event === "order.paid") {
             const paymentData = event.payload.payment.entity;
 
-            return await withAuditContext({ route: "razorpay-webhook" }, async () => {
+            return await withAuditContext({
+                ip: req.headers.get("x-forwarded-for") || "unknown",
+                route: "razorpay-webhook"
+            }, async () => {
 
                 const lock = await lockPaymentForProcessing(paymentData.order_id);
                 console.log("Webhook Route Log: ", lock)

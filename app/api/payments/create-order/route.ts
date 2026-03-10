@@ -20,6 +20,7 @@ export async function POST(req: Request) {
         return withAuditContext(
             {
                 userId,
+                ip: req.headers.get("x-forwarded-for") || "unknown",
                 route: "/api/payments/create-order"
             },
             async () => {

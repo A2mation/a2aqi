@@ -781,7 +781,7 @@ model Payment {
   status PaymentStatus @default(PENDING)
 
   razorpayOrderId   String  @unique
-  razorpayPaymentId String? 
+  razorpayPaymentId String?
   razorpaySignature String?
 
   metadata Json?
@@ -849,6 +849,9 @@ model AuditLog {
 
   oldData Json?
   newData Json?
+
+  ip    String?
+  route String?
 
   createdAt DateTime @default(now())
 
