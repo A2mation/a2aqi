@@ -4,9 +4,15 @@ export interface AuditContext {
     userId?: string
     ip?: string
     route?: string
+    role?: string
+    isAdmin?: boolean
 }
 
-export const auditStorage = new AsyncLocalStorage<AuditContext>()
+const globalForAudit = global as unknown as { auditStorage: AsyncLocalStorage<AuditContext> };
+
+export const auditStorage = globalForAudit.auditStorage || new AsyncLocalStorage<AuditContext>();
+
+if (process.env.NODE_ENV !== "production") globalForAudit.auditStorage = auditStorage;
 
 export function getAuditContext() {
     return auditStorage.getStore()

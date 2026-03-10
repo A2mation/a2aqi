@@ -1,7 +1,7 @@
 import { Prisma, PrismaClient, AuditAction } from "@prisma/client"
-import { getAuditContext } from "./audit-context"
 import { diffObjects } from "@/utils/object-diff"
-import { createAuditLog } from "@/domains/payments/services/audit.service"
+import { createAuditLog, getActorDetails } from "@/domains/payments/services/audit.service"
+import { getAuditContext } from "./audit-context"
 
 const TRACKED_MODELS = [
     "Payment",
@@ -95,11 +95,13 @@ export const createAuditExtension = (prisma: PrismaClient) =>
                     const result = await query(args)
                     const resultRecord = result as Record<string, unknown> | null
 
-                    const ctx = getAuditContext()
-                    if (!ctx?.userId) {
-                        console.warn("[audit] No user context — logging as SYSTEM")
-                    }
+                    const { actorId, actorType } = getActorDetails();
 
+                    if (actorType === "SYSTEM") {
+                        console.warn(`[audit] No user context for ${operation} on ${model} — logging as SYSTEM`);
+                    } else {
+                        console.log(`[audit] ${actorType} (${actorId}) is performing ${operation} on ${model}`);
+                    }
 
                     let action: AuditAction = mapAction(mutationOp)
                     if (mutationOp === "upsert") {
@@ -120,7 +122,7 @@ export const createAuditExtension = (prisma: PrismaClient) =>
                                 "UNKNOWN"
                             ) as string,
                             action,
-                            oldData: storedOld  as Prisma.InputJsonValue | null,
+                            oldData: storedOld as Prisma.InputJsonValue | null,
                             newData: newData as Prisma.InputJsonValue | null
                         })
                     } catch (err) {
