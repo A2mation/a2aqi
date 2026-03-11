@@ -16,7 +16,9 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -49,9 +51,10 @@ interface UserData {
 interface AddressFormProps {
   user: UserData | null;
   isLoading: boolean;
+  showAddressSection?: boolean
 }
 
-export const AddressForm = ({ user, isLoading: profileLoading }: AddressFormProps) => {
+export const AddressForm = ({ user, isLoading: profileLoading, showAddressSection=true }: AddressFormProps) => {
   const queryClient = useQueryClient()
   const [isAddingAddress, setIsAddingAddress] = useState(false)
 
@@ -69,7 +72,7 @@ export const AddressForm = ({ user, isLoading: profileLoading }: AddressFormProp
   });
 
   const addAddressMutation = useMutation({
-    mutationFn: async (address: any) => {
+    mutationFn: async (address: Partial<Address>) => {
       const { data } = await http.post("/api/user/address", address)
       return data
     },
@@ -181,9 +184,14 @@ export const AddressForm = ({ user, isLoading: profileLoading }: AddressFormProp
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {Object.values(AddressType).map((type) => (
-                            <SelectItem key={type} value={type}>{type.charAt(0) + type.slice(1).toLowerCase()}</SelectItem>
-                          ))}
+                          <SelectGroup>
+                            <SelectLabel>
+                              Address Types
+                            </SelectLabel>
+                            {Object.values(AddressType).map((type) => (
+                              <SelectItem key={type} value={type}>{type.charAt(0) + type.slice(1).toLowerCase()}</SelectItem>
+                            ))}
+                          </SelectGroup>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -242,66 +250,67 @@ export const AddressForm = ({ user, isLoading: profileLoading }: AddressFormProp
         </div>
       )}
 
-      {/* Saved Addresses List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {user?.addresses?.map((addr) => {
-          const isDefault = user.billingAddressId === addr.id;
-          return (
-            <div
-              key={addr.id}
-              className={cn(
-                "group relative p-5 rounded-xl border-2 transition-all duration-200 flex justify-between items-start hover:shadow-md",
-                isDefault ? "border-primary bg-primary/5 shadow-sm" : "border-gray-100 bg-white hover:border-gray-200"
-              )}
-            >
-              <div className="flex gap-4">
-                <div className={cn(
-                  "p-2 rounded-full h-fit",
-                  isDefault ? "bg-primary/10 text-primary" : "bg-gray-100 text-gray-400"
-                )}>
-                  <MapPin className="w-4 h-4" />
-                </div>
-
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <p className="font-bold text-sm tracking-tight capitalize">
-                      {addr.type.toLowerCase()}
-                    </p>
-                    {isDefault && (
-                      <span className="text-[10px] bg-primary text-white px-2 py-0.5 rounded-md font-bold uppercase">
-                        Default
-                      </span>
-                    )}
+      {showAddressSection && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {user?.addresses?.map((addr) => {
+            const isDefault = user.billingAddressId === addr.id;
+            return (
+              <div
+                key={addr.id}
+                className={cn(
+                  "group relative p-5 rounded-xl border-2 transition-all duration-200 flex justify-between items-start hover:shadow-md",
+                  isDefault ? "border-primary bg-primary/5 shadow-sm" : "border-gray-100 bg-white hover:border-gray-200"
+                )}
+              >
+                <div className="flex gap-4">
+                  <div className={cn(
+                    "p-2 rounded-full h-fit",
+                    isDefault ? "bg-primary/10 text-primary" : "bg-gray-100 text-gray-400"
+                  )}>
+                    <MapPin className="w-4 h-4" />
                   </div>
 
-                  <p className="text-sm text-gray-700 leading-snug max-w-50">
-                    {addr.street}
-                  </p>
-                  <p className="text-xs text-gray-500 font-medium">
-                    {addr.city}, {addr.state} — {addr.zipCode}
-                  </p>
-
-                  <div className="pt-2 space-y-1 border-t border-gray-100 mt-2">
-                    <div className="flex items-center gap-2 text-[11px] text-gray-400">
-                      <Mail className="w-3 h-3" /> {addr.email}
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <p className="font-bold text-sm tracking-tight capitalize">
+                        {addr.type.toLowerCase()}
+                      </p>
+                      {isDefault && (
+                        <span className="text-[10px] bg-primary text-white px-2 py-0.5 rounded-md font-bold uppercase">
+                          Default
+                        </span>
+                      )}
                     </div>
-                    <div className="flex items-center gap-2 text-[11px] text-gray-400">
-                      <Phone className="w-3 h-3" /> {addr.phoneNumber}
+
+                    <p className="text-sm text-gray-700 leading-snug max-w-50">
+                      {addr.street}
+                    </p>
+                    <p className="text-xs text-gray-500 font-medium">
+                      {addr.city}, {addr.state} — {addr.zipCode}
+                    </p>
+
+                    <div className="pt-2 space-y-1 border-t border-gray-100 mt-2">
+                      <div className="flex items-center gap-2 text-[11px] text-gray-400">
+                        <Mail className="w-3 h-3" /> {addr.email}
+                      </div>
+                      <div className="flex items-center gap-2 text-[11px] text-gray-400">
+                        <Phone className="w-3 h-3" /> {addr.phoneNumber}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
 
-        {user?.addresses?.length === 0 && !isAddingAddress && (
-          <div className="col-span-full py-12 flex flex-col items-center justify-center border-2 border-dashed rounded-xl border-gray-200 bg-gray-50">
-            <MapPin className="w-8 h-8 text-gray-300 mb-2" />
-            <p className="text-sm text-gray-500 font-medium">No saved addresses found</p>
-          </div>
-        )}
-      </div>
+          {user?.addresses?.length === 0 && !isAddingAddress && (
+            <div className="col-span-full py-12 flex flex-col items-center justify-center border-2 border-dashed rounded-xl border-gray-200 bg-gray-50">
+              <MapPin className="w-8 h-8 text-gray-300 mb-2" />
+              <p className="text-sm text-gray-500 font-medium">No saved addresses found</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

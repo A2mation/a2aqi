@@ -1,6 +1,6 @@
 "use client"
 
-import { ChevronRight, User, Bell, MapPin, Shield, Download } from "lucide-react"
+import { ChevronRight, User, Bell, MapPin, Shield, Download, MapPinned } from "lucide-react"
 
 import { Switch } from "@/components/ui/switch"
 import { Card } from "@/components/ui/card"
@@ -31,7 +31,9 @@ export function SettingsContent() {
                             className="flex items-center justify-between py-3 border-b border-border hover:bg-muted/50 px-2 rounded-lg transition"
                         >
                             <div className="flex items-center gap-3">
-                                <User className="w-5 h-5 text-muted-foreground" />
+                                <div className="p-2 bg-primary/10 rounded-full text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                                    <User className="w-5 h-5" />
+                                </div>
                                 <div>
                                     <p className="font-medium">Manage Profile</p>
                                     <p className="text-sm text-muted-foreground">
@@ -43,6 +45,27 @@ export function SettingsContent() {
                             <ChevronRight className="w-4 h-4 text-muted-foreground" />
                         </Link>
 
+                        <Link
+                            href={`/user/${deviceId}/settings/manage-address`}
+                            className="flex items-center justify-between py-3 border-b border-border hover:bg-muted/50 px-2 rounded-lg transition"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-primary/10 rounded-full text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                                    <MapPinned className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-sm tracking-tight">Manage Addresses</p>
+                                    <p className="text-xs text-muted-foreground">
+                                        Add, edit, or set your primary billing address
+                                    </p>
+                                </div>
+                            </div>
+
+                            <Button variant="ghost" size="icon">
+                                <ChevronRight className="w-4 h-4" />
+                            </Button>
+                        </Link>
+
 
                         {/* View Account */}
                         <Link
@@ -50,7 +73,9 @@ export function SettingsContent() {
                             className="flex items-center justify-between py-3 border-b border-border hover:bg-muted/50 px-2 rounded-lg transition"
                         >
                             <div className="flex items-center gap-3">
-                                <Shield className="w-5 h-5 text-muted-foreground" />
+                                <div className="p-2 bg-primary/10 rounded-full text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                                    <Shield className="w-5 h-5 " />
+                                </div>
                                 <div>
                                     <p className="font-medium">View Account</p>
                                     <p className="text-sm text-muted-foreground">Check your plan and account details</p>
@@ -68,7 +93,9 @@ export function SettingsContent() {
                             className="flex items-center justify-between py-3 border-b border-border hover:bg-muted/50 px-2 rounded-lg transition"
                         >
                             <div className="flex items-center gap-3">
-                                <Bell className="w-5 h-5 text-muted-foreground" />
+                                <div className="p-2 bg-primary/10 rounded-full text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                                    <Bell className="w-5 h-5 " />
+                                </div>
                                 <div>
                                     <p className="font-medium">AQI Alerts</p>
                                     <p className="text-sm text-muted-foreground">Set notifications for high pollution</p>
@@ -86,7 +113,9 @@ export function SettingsContent() {
                             className="flex items-center justify-between py-3 border-b border-border hover:bg-muted/50 px-2 rounded-lg transition"
                         >
                             <div className="flex items-center gap-3">
-                                <MapPin className="w-5 h-5 text-muted-foreground" />
+                                <div className="p-2 bg-primary/10 rounded-full text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                                    <MapPin className="w-5 h-5" />
+                                </div>
                                 <div>
                                     <p className="font-medium">Saved Locations</p>
                                     <p className="text-sm text-muted-foreground">Manage your favorite AQI locations</p>
@@ -104,7 +133,9 @@ export function SettingsContent() {
                             className="flex items-center justify-between py-3 border-b border-border hover:bg-muted/50 px-2 rounded-lg transition"
                         >
                             <div className="flex items-center gap-3">
-                                <Download className="w-5 h-5 text-muted-foreground" />
+                                <div className="p-2 bg-primary/10 rounded-full text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                                    <Download className="w-5 h-5 " />
+                                </div>
                                 <div>
                                     <p className="font-medium">Export AQI Data</p>
                                     <p className="text-sm text-muted-foreground">Download reports and AQI history</p>
