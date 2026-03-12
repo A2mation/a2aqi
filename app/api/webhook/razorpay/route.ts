@@ -8,9 +8,11 @@ import { redeemCoupon } from "@/domains/payments/services/coupon.service";
 import {
     changePaymentStatusToPending,
     completePayment,
-    lockPaymentForProcessing, 
+    lockPaymentForProcessing,
     recordFailure
 } from "@/domains/payments/services/payment.service";
+import { UserBillingAddressService } from "@/domains/users/services/user.billing.address.service";
+import { DeviceSubscription, Payment } from "@prisma/client";
 
 export async function POST(req: Request) {
     try {
@@ -43,9 +45,11 @@ export async function POST(req: Request) {
 
                 if (!lock) return new Response("OK", { status: 200 });
 
-                try {
-                    const result = await prisma.$transaction(async (tx) => {
+                let userId: string = "";
+                let transactionResult: { payment: Payment; subscription: DeviceSubscription } | null = null;
 
+                try {
+                    transactionResult = await prisma.$transaction(async (tx) => {
                         const payment = await completePayment(
                             paymentData.order_id,
                             paymentData.id,
@@ -59,21 +63,33 @@ export async function POST(req: Request) {
 
                         const subscription = await activateSubscription(payment, tx);
 
-                        await generateInvoice(payment, subscription, tx);
-
-                        return "SUCCESS_COMPLETE";
+                        // Return both to be used for invoice generation
+                        return { payment, subscription };
                     });
 
-                    return new Response(result, { status: 200 });
 
                 } catch (txError) {
-                    console.log("Error", txError)
-                    // This allows a retry from Razorpay to succeed later
-                    await changePaymentStatusToPending(
-                        paymentData.order_id
-                    )
+                    console.error("Transaction Error:", txError);
+                    await changePaymentStatusToPending(paymentData.order_id);
                     throw txError;
                 }
+
+                // Invoice Generation
+                if (transactionResult) {
+                    const { payment, subscription } = transactionResult;
+                    const userId = payment.userId;
+
+                    const billingAdsOBJ = new UserBillingAddressService();
+                    const userBillingAddress = await billingAdsOBJ.getPrimaryBillingAddress(userId);
+
+                    if (userBillingAddress) {
+                        await generateInvoice(payment, subscription, userBillingAddress);
+                    }
+
+                    return new Response("SUCCESS_COMPLETE", { status: 200 });
+                }
+
+                return new Response("FAILED", { status: 500 });
             });
         }
 
