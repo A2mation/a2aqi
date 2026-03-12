@@ -159,7 +159,7 @@ export function AirPollutionTable() {
                                                 Status <SortIcon column="status" />
                                             </th>
                                             <th onClick={() => handleSort("aqi")} className="px-6 py-4 text-center text-xl font-medium cursor-pointer">
-                                                AQI (US) <SortIcon column="aqi" />
+                                                AQI  <SortIcon column="aqi" />
                                             </th>
                                             <th onClick={() => handleSort("pm25")} className="px-6 py-4 text-center text-xl font-medium cursor-pointer">
                                                 PM2.5
