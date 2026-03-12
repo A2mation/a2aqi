@@ -75,6 +75,7 @@ const AddressCard = ({ addr, user, isEditing, onEdit, onCancel }: any) => {
     const form = useForm<AddressFormValues>({
         resolver: zodResolver(addressSchema) as any,
         defaultValues: {
+            name: addr.name ? addr.name : user.organizationName ? user.organizationName : user.name  ?? "",
             email: addr.email || "",
             phoneNumber: addr.phoneNumber || "",
             zipCode: addr.zipCode || "",
@@ -118,7 +119,7 @@ const AddressCard = ({ addr, user, isEditing, onEdit, onCancel }: any) => {
 
     const { mutate: setAsDefault, isPending: isSettingDefault } = useMutation({
         mutationFn: async () => {
-        
+
             return await http.patch(`/api/user/address/${addr.id}`, {
                 ...addr,
                 isDefault: true
@@ -221,6 +222,16 @@ const AddressCard = ({ addr, user, isEditing, onEdit, onCancel }: any) => {
                         <form className="grid grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-2">
                             <FormField
                                 control={form.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <FormItem className="col-span-2">
+                                        <Input {...field} placeholder="Enter Billing Name" className="h-8 text-xs" />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
                                 name="email"
                                 render={({ field }) => (
                                     <FormItem className="col-span-2">
@@ -303,7 +314,7 @@ const AddressCard = ({ addr, user, isEditing, onEdit, onCancel }: any) => {
                     </Form>
                 ) : (
                     <div className="space-y-1 text-sm">
-                        <p className="font-semibold text-foreground">{user.name}</p>
+                        <p className="font-semibold text-foreground">{addr.name ? addr.name : user.organizationName ? user.organizationName : user.name  ?? ""}</p>
                         <p className="text-muted-foreground leading-relaxed">
                             {addr.street}<br />
                             {addr.city}, {addr.state} - {addr.zipCode}

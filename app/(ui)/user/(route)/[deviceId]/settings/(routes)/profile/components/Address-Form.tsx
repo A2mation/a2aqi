@@ -1,10 +1,15 @@
 "use client"
 
+import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { AddressType } from "@prisma/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, Mail, MapPin, Phone, Plus, Trash2, X } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, Mail, MapPin, Phone, Plus, X } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
 import {
   Form,
   FormControl,
@@ -23,16 +28,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { http } from "@/lib/http";
-import toast from "react-hot-toast";
-import { AddressType } from "@prisma/client";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { addressSchema } from "@/lib/validation/UserAddressSchema";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 
 
 interface Address {
   id: string;
+  name: string,
   type: AddressType;
   street: string;
   city: string;
@@ -54,13 +56,14 @@ interface AddressFormProps {
   showAddressSection?: boolean
 }
 
-export const AddressForm = ({ user, isLoading: profileLoading, showAddressSection=true }: AddressFormProps) => {
+export const AddressForm = ({ user, isLoading: profileLoading, showAddressSection = true }: AddressFormProps) => {
   const queryClient = useQueryClient()
   const [isAddingAddress, setIsAddingAddress] = useState(false)
 
   const form = useForm({
     resolver: zodResolver(addressSchema),
     defaultValues: {
+      name: "",
       zipCode: "",
       type: AddressType.BILLING,
       street: "",
@@ -129,6 +132,21 @@ export const AddressForm = ({ user, isLoading: profileLoading, showAddressSectio
           <Form {...form}>
             <form onSubmit={form.handleSubmit((vals) => addAddressMutation.mutate(vals))} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Billing Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter Billing Name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="phoneNumber"
@@ -282,6 +300,9 @@ export const AddressForm = ({ user, isLoading: profileLoading, showAddressSectio
                       )}
                     </div>
 
+                    <p className="text-sm text-gray-700 leading-snug max-w-50">
+                      {addr.name}
+                    </p>
                     <p className="text-sm text-gray-700 leading-snug max-w-50">
                       {addr.street}
                     </p>

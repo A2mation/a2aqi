@@ -76,6 +76,7 @@ export class UserBillingAddressRepository {
             const updatedAddress = await tx.address.update({
                 where: { id: addressId, userId },
                 data: {
+                    name: data.name,
                     type: data.type,
                     email: data.email,
                     phoneNumber: data.phoneNumber,

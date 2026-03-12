@@ -170,6 +170,7 @@ model Address {
   id   String      @id @default(auto()) @map("_id") @db.ObjectId
   type AddressType @default(HOME)
 
+  name        String?
   email       String?
   phoneNumber String?
 

@@ -31,6 +31,7 @@ export async function GET() {
                 addresses: {
                     select: {
                         id: true,
+                        name: true,
                         city: true,
                         type: true,
                         isDefault: true,

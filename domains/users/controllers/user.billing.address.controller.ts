@@ -11,7 +11,7 @@ export class UserBillingAddressController {
     }
 
     async createAddress(userId: string, body: any) {
-        // 1. Validation
+        
         const validation = addressSchema.safeParse(body);
 
         if (!validation.success) {
@@ -22,7 +22,7 @@ export class UserBillingAddressController {
         }
 
         try {
-            // 2. Transformation & Service Call
+            
             const { isDefault, ...addressData } = validation.data;
 
             const newAddress = await this.service.addNewBillingAddress(userId, {
@@ -54,7 +54,7 @@ export class UserBillingAddressController {
         const validation = addressSchema.safeParse(body);
 
         if (!validation.success) {
-            return NextResponse.json(validation.error.flatten().fieldErrors, { status: 400 });
+            return NextResponse.json(validation.error, { status: 400 });
         }
 
         try {

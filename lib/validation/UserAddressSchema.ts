@@ -2,6 +2,11 @@ import * as z from "zod";
 import { AddressType } from "@prisma/client";
 
 export const addressSchema = z.object({
+    name: z
+        .string()
+        .min(2, "Name is too small")
+        .max(100, "Name is too long"),
+
     email: z
         .email()
         .min(2, "Email is too short")
