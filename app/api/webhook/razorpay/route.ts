@@ -1,9 +1,10 @@
 import crypto from "crypto";
+import { DeviceSubscription, Payment } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { withAuditContext } from "@/lib/withAuditContext";
 import { activateSubscription } from "@/domains/payments/services/subscription.service";
-import { generateInvoice } from "@/domains/payments/services/invoice.service";
+import { generateAndSaveInvoice } from "@/domains/payments/services/invoice.service";
 import { redeemCoupon } from "@/domains/payments/services/coupon.service";
 import {
     changePaymentStatusToPending,
@@ -12,7 +13,6 @@ import {
     recordFailure
 } from "@/domains/payments/services/payment.service";
 import { UserBillingAddressService } from "@/domains/users/services/user.billing.address.service";
-import { DeviceSubscription, Payment } from "@prisma/client";
 
 export async function POST(req: Request) {
     try {
@@ -83,7 +83,7 @@ export async function POST(req: Request) {
                     const userBillingAddress = await billingAdsOBJ.getPrimaryBillingAddress(userId);
 
                     if (userBillingAddress) {
-                        await generateInvoice(payment, subscription, userBillingAddress);
+                        await generateAndSaveInvoice(payment, subscription, userBillingAddress);
                     }
 
                     return new Response("SUCCESS_COMPLETE", { status: 200 });

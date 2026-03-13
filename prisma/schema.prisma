@@ -861,6 +861,9 @@ model Invoice {
 
   currency String @default("INR")
 
+  seriesValue     Int     @default(0)
+  financialYear   String
+
   billingName    String?
   billingEmail   String?
   billingAddress String?
@@ -868,7 +871,7 @@ model Invoice {
 
   s3Key String?
 
-  status InvoiceStatus @default(GENERATED)
+  status InvoiceStatus @default(VOID)
 
   issuedAt DateTime @default(now())
 

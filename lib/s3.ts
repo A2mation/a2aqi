@@ -21,8 +21,7 @@ const BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME!;
  * UPLOADS a file to S3
  * For invoices, always pass 'application/pdf' as the contentType
  */
-export async function uploadToS3(folder: string, file: Buffer, fileName: string, contentType: string) {
-    const key = `${folder}/${Date.now()}-${fileName}`;
+export async function uploadToS3(key: string, file: Buffer, contentType: string) {
 
     const command = new PutObjectCommand({
         Bucket: BUCKET_NAME,
