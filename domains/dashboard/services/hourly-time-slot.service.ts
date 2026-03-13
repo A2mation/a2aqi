@@ -16,7 +16,7 @@ export class HourlyTimeSlotService {
         end.setDate(end.getDate() + 7); 
 
         const records = await this.repo.getHourlyTimeSlotAggregates(deviceId, start, end);
-        console.log(records)
+        // console.log(records)
         
         const grouped: Record<string, HourlyAggregateReading[]> = {};
 
@@ -24,7 +24,7 @@ export class HourlyTimeSlotService {
             // SHIFT TO IST: Add 5.5 hours to the UTC timestamp
             const istDate = new Date(record.hourStart.getTime() + (5.5 * 60 * 60 * 1000));
             const dayKey = istDate.toISOString().split("T")[0];
-            console.log(dayKey)
+            // console.log(dayKey)
 
             if (!grouped[dayKey]) grouped[dayKey] = [];
             grouped[dayKey].push(record);

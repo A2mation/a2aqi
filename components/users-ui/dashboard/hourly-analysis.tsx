@@ -82,7 +82,6 @@ export function HourlyAnalysis({ currentDeviceAssignDate }: {
             const res = await http.get(
                 `/api/user/dashboard/hourly-time-slot?deviceId=${deviceId}&startDate=${formatBackendDate(startDate)}`
             );
-            console.log(res.data)
             return res.data;
         },
         enabled: !!deviceId && isClient,

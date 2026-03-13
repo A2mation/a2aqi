@@ -155,11 +155,11 @@ export function StatsCards() {
                                     <Badge
                                         className={cn(
                                             "text-white px-4 py-1 rounded-md text-xl",
-                                            getAQIBgColor(latest.aqi),
-                                            `hover:${getAQIBgColor(latest.aqi)}`
+                                            getAQIBgColor(Math.round(Number(latest.aqi))),
+                                            `hover:${getAQIBgColor(Math.round(Number(latest.aqi)))}`
                                         )}
                                     >
-                                        {getAQIStatus(latest.aqi).toUpperCase()}
+                                        {getAQIStatus(Math.round(Number(latest.aqi))).toUpperCase()}
                                     </Badge>
                                 </div>
                             </div>

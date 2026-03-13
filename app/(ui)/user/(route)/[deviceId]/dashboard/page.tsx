@@ -5,7 +5,7 @@ import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import { useQuery } from "@tanstack/react-query"
 
-import { Sidebar } from "@/components/users-ui/dashboard/Sidebar"
+import { Sidebar, useSidebar } from "@/components/users-ui/dashboard/Sidebar"
 import { Header } from "@/components/users-ui/dashboard/Header"
 import { StatsCards } from "@/components/users-ui/dashboard/Stats-cards"
 import { WeeklyAqiAnalytics } from "@/components/users-ui/dashboard/Weekly-aqi-analytics"
@@ -26,8 +26,9 @@ import { ExportDrawer } from "@/components/Export-Drawer"
 
 
 export default function DashboardPage() {
-    const deviceModal = useDeviceModal();
     const { deviceId } = useParams();
+    const sidebarState = useSidebar();
+    const deviceModal = useDeviceModal();
     const [isClient, setisClient] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
     const[currentDeviceAssignDate, setCurrentDeviceAssignDate] = useState<Date | null>(null);
@@ -44,6 +45,7 @@ export default function DashboardPage() {
         queryKey: ["user-devices"],
         queryFn: async () => {
             const res = await http.get<Device[]>("/api/user/device")
+            sidebarState.badge = res.data.length;
             return res.data
         },
     })
@@ -61,7 +63,7 @@ export default function DashboardPage() {
         // safe Date here
     }, [deviceId, devices]);
 
-    console.log(currentDeviceAssignDate)
+    // console.log(currentDeviceAssignDate)
 
 
     if (!isClient) {
@@ -75,7 +77,7 @@ export default function DashboardPage() {
     return (
         <div className="flex min-h-screen bg-background">
             <div className="hidden lg:block">
-                <Sidebar isCollapsed={isCollapsed} onToggle={() => setIsCollapsed(!isCollapsed)} />
+                <Sidebar isCollapsed={isCollapsed} onToggle={() => setIsCollapsed(!isCollapsed)}/>
             </div>
 
             <main

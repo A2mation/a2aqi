@@ -28,6 +28,7 @@ import { NavbarLogo } from "@/components/ui/resizable-navbar"
 const SidebarContext = createContext<{
     isCollapsed: boolean
     setIsCollapsed: (collapsed: boolean) => void
+    badge?: number
 }>({
     isCollapsed: false,
     setIsCollapsed: () => { },
@@ -40,19 +41,21 @@ export function Sidebar({ isCollapsed = false, onToggle }: { isCollapsed?: boole
     // const [hoveredItem, setHoveredItem] = useState<string | null>(null)
     const pathname = usePathname()
     const { deviceId } = useParams();
+    const sidebarState = useSidebar();
+
 
     const menuItems = [
         { icon: LayoutDashboard, label: "Dashboard", href: `/user/${deviceId}/dashboard`, isActive: pathname === `/user/${deviceId}/dashboard` },
         {
             icon: MonitorSmartphone,
             label: "Devices",
-            badge: "6",
+            badge: sidebarState.badge,
             href: `/user/${deviceId}/devices`,
             isActive: pathname === `/user/${deviceId}/devices` || pathname === `/user/${deviceId}/edit`
         },
         { icon: MapPin, label: "Map", href: `/user/${deviceId}/map`, isActive: pathname === `/user/${deviceId}/map` },
         { icon: BarChart3, label: "Analytics", href: `/user/${deviceId}/analytics`, isActive: pathname === `/user/${deviceId}/analytics` },
-        { icon: Users, label: "Team", href: `/user/${deviceId}/team`, isActive: pathname === `/user/${deviceId}/team` },
+        // { icon: Users, label: "Team", href: `/user/${deviceId}/team`, isActive: pathname === `/user/${deviceId}/team` },
     ]
 
     const aiItems = [

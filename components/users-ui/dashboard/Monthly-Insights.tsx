@@ -43,6 +43,7 @@ export function MonthlyInsights() {
             const res = await http.get(
                 `/api/user/dashboard/monthly?deviceId=${deviceId}&year=${currentYear}&month=${monthNumber}`
             );
+            console.log(res.data)
             return res.data;
         },
     });
