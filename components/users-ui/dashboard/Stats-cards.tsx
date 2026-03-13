@@ -220,9 +220,9 @@ export function StatsCards() {
                             <ChartTooltip content={<ChartTooltipContent />} />
 
                             <Bar dataKey="aqi" radius={[6, 6, 0, 0]} maxBarSize={50}>
-                                <Cell fill={getAQIColor(data?.data?.daily?.minAqi)} />
-                                <Cell fill={getAQIColor(data?.data?.daily?.avgAqi)} />
-                                <Cell fill={getAQIColor(data?.data?.daily?.maxAqi)} />
+                                <Cell fill={getAQIColor(Math.round(data?.data?.daily?.minAqi))} />
+                                <Cell fill={getAQIColor(Math.round(data?.data?.daily?.avgAqi))} />
+                                <Cell fill={getAQIColor(Math.round(data?.data?.daily?.maxAqi))} />
                             </Bar>
                         </BarChart>
                     </ChartContainer>
@@ -270,7 +270,7 @@ export function StatsCards() {
                             <div className="w-[90%] h-1 bg-gray-200 rounded-full mt-2">
                                 <div className={cn(
                                     "w-1/2 h-1  rounded-full",
-                                    getAQIBgColor(item.value)
+                                    getAQIBgColor(Math.round(item.value))
                                 )}></div>
                             </div>
                         </div>
