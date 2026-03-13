@@ -225,11 +225,11 @@ export function MonthlyInsights() {
 
                         <div className="flex items-center justify-between">
                             <p className="text-sm text-slate-500">
-                                {maxEntry ? `On ${maxEntry.day} ${selectedMonth}` : "No Data"}
+                                {maxEntry ? `On ${Math.round(Number(maxEntry.day))} ${selectedMonth}` : "No Data"}
                             </p>
 
                             <div className="bg-red-600 text-white font-bold rounded px-4 py-2">
-                                {maxEntry ? maxEntry.aqi : "--"}
+                                {maxEntry ? Math.round(maxEntry.aqi) : "--"}
                             </div>
                         </div>
                     </div>

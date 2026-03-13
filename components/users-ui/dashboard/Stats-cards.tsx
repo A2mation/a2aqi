@@ -147,8 +147,8 @@ export function StatsCards() {
                             </h2>
 
                             <div>
-                                <p className={cn("text-5xl font-bold", getAQITextColor(latest.aqi))}>
-                                    {latest.aqi}
+                                <p className={cn("text-5xl font-bold", getAQITextColor(Math.round(latest.aqi)))}>
+                                    {Math.round(latest.aqi)}
                                 </p>
 
                                 <div className="mt-3">
