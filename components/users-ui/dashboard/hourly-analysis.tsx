@@ -95,6 +95,7 @@ export function HourlyAnalysis({ currentDeviceAssignDate }: {
             const labelDate = new Date(day.date).toLocaleDateString('en-US', {
                 month: 'short',
                 day: 'numeric',
+                timeZone: "UTC"
             });
             map[labelDate] = {};
             day.slots.forEach((slot: any) => {
@@ -110,6 +111,7 @@ export function HourlyAnalysis({ currentDeviceAssignDate }: {
             return addDays(startDate, i).toLocaleDateString('en-US', {
                 month: 'short',
                 day: 'numeric',
+                // timeZone: "UTC"
             });
         });
     }, [startDate]);
