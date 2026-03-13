@@ -10,5 +10,5 @@ export const TIME_SLOTS = [
     { label: "04-06PM", startHour: 16 },
     { label: "06-08PM", startHour: 18 },
     { label: "08-10PM", startHour: 20 },
-    { label: "10-12AM", startHour: 22 },
+    { label: "10-12PM", startHour: 22 },
 ];

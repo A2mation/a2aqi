@@ -10,30 +10,27 @@ export class HourlyTimeSlotService {
     }
 
     async getHeatmap(deviceId: string, startDate: string) {
-        const start = new Date(startDate);
-        // console.log(start)
-        start.setHours(0, 0, 0, 0);
-
+        // the query window in UTC to cover potential IST overlaps
+        const start = new Date(`${startDate}T00:00:00+05:30`);
         const end = new Date(start);
-        end.setDate(end.getDate() + 6);
-        end.setHours(23, 59, 59, 999);
+        end.setDate(end.getDate() + 7); 
 
         const records = await this.repo.getHourlyTimeSlotAggregates(deviceId, start, end);
-
-
-        // group by date
+        console.log(records)
+        
         const grouped: Record<string, HourlyAggregateReading[]> = {};
 
         for (const record of records) {
-            const dayKey = record.hourStart.toISOString().split("T")[0];
+            // SHIFT TO IST: Add 5.5 hours to the UTC timestamp
+            const istDate = new Date(record.hourStart.getTime() + (5.5 * 60 * 60 * 1000));
+            const dayKey = istDate.toISOString().split("T")[0];
+            console.log(dayKey)
 
             if (!grouped[dayKey]) grouped[dayKey] = [];
             grouped[dayKey].push(record);
         }
-        // console.log(grouped)
 
         const heatmap = [];
-
         const sortedDays = Object.keys(grouped).sort();
 
         for (const dayKey of sortedDays) {
@@ -44,7 +41,9 @@ export class HourlyTimeSlotService {
                 const slotEnd = slot.startHour + 2;
 
                 const slotRecords = dayRecords.filter((r) => {
-                    const hour = new Date(r.hourStart).getHours();
+                    // SHIFT TO IST: Add 5.5 hours before checking the hour
+                    const istDate = new Date(r.hourStart.getTime() + (5.5 * 60 * 60 * 1000));
+                    const hour = istDate.getUTCHours(); // Use getUTCHours on shifted date
                     return hour >= slotStart && hour < slotEnd;
                 });
 

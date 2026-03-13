@@ -55,11 +55,11 @@ export function HourlyAnalysis({ currentDeviceAssignDate }: {
 
     const maxDate = useMemo(() => {
         const d = new Date();
-        d.setHours(0, 0, 0, 0);
+        d.setUTCHours(0, 0, 0, 0);
         return d;
     }, []);
 
-    
+
     const [selectionDate, setSelectionDate] = useState(new Date());
     const [calendarMonth, setCalendarMonth] = useState(new Date());
     const [dateOpen, setDateOpen] = useState(false);
@@ -67,22 +67,22 @@ export function HourlyAnalysis({ currentDeviceAssignDate }: {
     useEffect(() => {
         setIsClient(true);
         const now = new Date();
-        now.setHours(0, 0, 0, 0);
+        now.setUTCHours(0, 0, 0, 0);
         setSelectionDate(now);
         setCalendarMonth(new Date(now.getFullYear(), now.getMonth(), 1));
     }, []);
 
-    
+
     const startDate = useMemo(() => minusDays(selectionDate, 6), [selectionDate]);
     const endDate = selectionDate;
 
-   
     const { data, isPending, error } = useQuery({
         queryKey: ['hourlyHeatmap', deviceId, formatBackendDate(startDate)],
         queryFn: async () => {
             const res = await http.get(
-                `/api/user/dashboard/hourly-time-slot?deviceId=${deviceId}&startDate=${formatBackendDate(addDays(startDate, 1))}`
+                `/api/user/dashboard/hourly-time-slot?deviceId=${deviceId}&startDate=${formatBackendDate(startDate)}`
             );
+            console.log(res.data)
             return res.data;
         },
         enabled: !!deviceId && isClient,
@@ -92,11 +92,7 @@ export function HourlyAnalysis({ currentDeviceAssignDate }: {
     const matrix = useMemo(() => {
         const map: Record<string, Record<string, number | null>> = {};
         heatmapData.forEach((day: any) => {
-            const labelDate = new Date(day.date).toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                timeZone: "UTC"
-            });
+            const labelDate = day.date
             map[labelDate] = {};
             day.slots.forEach((slot: any) => {
                 map[labelDate][slot.time] = slot.aqi;
@@ -105,14 +101,14 @@ export function HourlyAnalysis({ currentDeviceAssignDate }: {
         return map;
     }, [heatmapData]);
 
-    
+
     const dates = useMemo(() => {
         return Array.from({ length: 7 }).map((_, i) => {
-            return addDays(startDate, i).toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                // timeZone: "UTC"
-            });
+            const d = addDays(startDate, i);
+            return {
+                key: d.toISOString().split('T')[0], // "2026-03-13"
+                label: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) // "Mar 13"
+            };
         });
     }, [startDate]);
 
@@ -122,14 +118,14 @@ export function HourlyAnalysis({ currentDeviceAssignDate }: {
 
     const maxValue = allValues.length > 0 ? Math.max(...allValues) : 0;
 
-   
+
     const handleDateSelect = (day: number) => {
         const selected = new Date(
             calendarMonth.getFullYear(),
             calendarMonth.getMonth(),
             day
         );
-        selected.setHours(0, 0, 0, 0);
+        selected.setUTCHours(0, 0, 0, 0);
         setSelectionDate(selected);
     };
 
@@ -146,7 +142,7 @@ export function HourlyAnalysis({ currentDeviceAssignDate }: {
             } else {
                 const day = i - firstDayOfMonth(calendarMonth) + 1;
                 const currentDate = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), day);
-                currentDate.setHours(0, 0, 0, 0);
+                currentDate.setUTCHours(0, 0, 0, 0);
 
                 const isEnd = endDate.getTime() === currentDate.getTime();
                 const isStart = startDate.getTime() === currentDate.getTime();
@@ -224,9 +220,9 @@ export function HourlyAnalysis({ currentDeviceAssignDate }: {
                             }}
                         >
                             <div />
-                            {dates.map(date => (
-                                <div key={date} className="text-center text-[8px] sm:text-base font-semibold text-gray-500 pb-2">
-                                    {date}
+                            {dates.map(dateObj => (
+                                <div key={dateObj.key} className="text-center text-[8px] sm:text-base font-semibold text-gray-500 pb-2">
+                                    {dateObj.label}
                                 </div>
                             ))}
 
@@ -235,12 +231,12 @@ export function HourlyAnalysis({ currentDeviceAssignDate }: {
                                     <div className="text-right text-[10px] sm:text-base font-medium text-gray-400 pr-3 flex items-center justify-end">
                                         {slot.label}
                                     </div>
-                                    {dates.map((date) => {
-                                        const value = matrix?.[date]?.[slot.label] ?? null;
-                                        const color = value ? getAQIColor(value) : '#F9FAFB';
+                                    {dates.map((dateObj) => {
+                                        const value = matrix?.[dateObj.key]?.[slot.label] ?? null;
+                                        const color = value ? getAQIColor(Math.round(value)) : '#F9FAFB';
 
                                         return (
-                                            <HoverCard key={`${date}-${slot.label}`}>
+                                            <HoverCard key={`${dateObj.key}-${slot.label}`}>
                                                 <HoverCardTrigger asChild>
                                                     <div
                                                         className="rounded-sm transition-transform hover:scale-110 cursor-pointer border border-white"
@@ -253,7 +249,7 @@ export function HourlyAnalysis({ currentDeviceAssignDate }: {
                                                 </HoverCardTrigger>
                                                 <HoverCardContent className="w-40">
                                                     <div className="text-xs space-y-1">
-                                                        <p className="font-bold">{date} • {slot.label}</p>
+                                                        <p className="font-bold">{dateObj.label} • {slot.label}</p>
                                                         <p>AQI: <span className={cn("font-bold", getAQITextColor(value ?? 0))}>{value?.toFixed(2) ?? 'N/A'}</span></p>
                                                     </div>
                                                 </HoverCardContent>
