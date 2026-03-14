@@ -258,6 +258,8 @@ model Device {
   calibrations Calibration[]
 
   latestSensorReadings latestSensorReading?
+
+  @@index([lat, lng])
 }
 
 model AQIReading {

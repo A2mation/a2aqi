@@ -73,7 +73,7 @@ export const detectGpsLocation = () => {
 
         navigator.geolocation.getCurrentPosition(
             async (pos) => {
-                console.log(`GPS location obtained:${pos.coords}`)
+                // console.log(`GPS location obtained:${pos.coords}`)
                 try {
                     const lat = pos.coords.latitude
                     const lng = pos.coords.longitude

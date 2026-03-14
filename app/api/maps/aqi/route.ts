@@ -1,3 +1,4 @@
+import { transformInternalData } from "@/helpers/transformInternalData";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -16,32 +17,60 @@ export async function GET(req: Request) {
         return new Response("Invalid bounds", { status: 400 });
     }
 
-
-
-
     const readings = await prisma.aQIReading.findMany({
         where: {
             lat: { gte: south, lte: north },
             lng: { gte: west, lte: east },
         },
-        select: {
-            id: true,
-            city: true,
-            lat: true,
-            lng: true,
-            aqi: true,
-            pm25: true,
-            pm10: true,
-            o3: true,
-            no2: true,
-            so2: true,
-            co: true,
-        },
         orderBy: { measuredAt: "desc" },
         take: 500,
     });
 
-    const response = readings.map((r) => ({
+    const c = await prisma.latestSensorReading.findMany({
+        where: {
+            device: {
+                lat: { gte: south, lte: north },
+                lng: { gte: west, lte: east },
+            }
+        },
+        take: 10,
+        select: {
+            id: true,
+            aqi: true,
+            pm10: true,
+            pm25: true,
+            so2: true,
+            no2: true,
+            co2: true,
+            co: true,
+            o3: true,
+            noise: true,
+            pm1: true,
+            tvoc: true,
+            smoke: true,
+            methane: true,
+            h2: true,
+            ammonia: true,
+            h2s: true,
+            temperature: true,
+            humidity: true,
+            device: {
+                select: {
+                    serialNo: true,
+                    lat: true,
+                    lng: true,
+                    loaction: true
+                }
+            },
+            updatedAt: true
+        }
+    });
+
+    const sensorData = transformInternalData(c, readings[0].state ?? 'Not Found');
+
+    const allReadings = [...readings, ...sensorData]
+
+    const response = allReadings.map((r) => ({
         id: r.id,
         name: r.city,
         lat: r.lat,

@@ -1,33 +1,12 @@
-import axios from "axios"
-import { NextRequest, NextResponse } from "next/server"
 
-import { redis } from "@/lib/redis"
-import { rateLimit } from "@/helpers/rateLimiter"
-import { prisma } from "@/lib/prisma"
-import { getLocationCacheKey } from "@/helpers/cashKeys"
-import { fetchAqiByCoordinates } from "@/services/air-quality/fetchAqiByCoordinates"
-import { resolveLocationAqi } from "@/services/resolveLocationApi"
-import { haversine } from "@/helpers/haversine"
+import { NextRequest, NextResponse } from "next/server"
 import { AQIReading } from "@prisma/client"
 
-let geoip: any = null
-
-async function getGeoIp() {
-    if (!geoip) {
-        geoip = await import("geoip-lite")
-    }
-    return geoip
-}
-
-/* -----------------------------------
-   Axios instance
------------------------------------ */
-const http = axios.create({
-    timeout: 5000,
-    headers: {
-        "User-Agent": "AQI-App/1.0",
-    },
-})
+import { http } from "@/lib/http"
+import { prisma } from "@/lib/prisma"
+import { haversine } from "@/helpers/haversine"
+import { rateLimit } from "@/helpers/rateLimiter"
+import { transformInternalData } from "@/helpers/transformInternalData"
 
 
 /* -----------------------------------
@@ -54,7 +33,7 @@ function getClientIp(req: NextRequest): string {
         req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
         req.headers.get("x-real-ip")
 
-    console.log(`Raw client IP: ${raw}`)
+    // console.log(`Raw client IP: ${raw}`)
 
     const ip = normalizeIp(raw)
 
@@ -131,7 +110,7 @@ export async function GET(req: NextRequest) {
             // Else fallback to IP based location
             console.log(`No lat/lng params, resolving location for IP: ${ip}`)
             const { data } = await http.get(PROVIDERS[0].url(ip))
-            console.log(data)
+            // console.log(data)
             const location = PROVIDERS[0].normalize(data)
             // console.log(`IP-based location for IP ${ip}:`, location)
             if (!location) {
@@ -156,10 +135,52 @@ export async function GET(req: NextRequest) {
                 lat: { gte: lat - latDelta, lte: lat + latDelta },
                 lng: { gte: lng - lngDelta, lte: lng + lngDelta },
             },
-            take: 300,
+            take: 10,
         })
 
-        const nearest = candidates.reduce((best, curr) => {
+        const c = await prisma.latestSensorReading.findMany({
+            where: {
+                device: {
+                    lat: { gte: lat - latDelta, lte: lat + latDelta },
+                    lng: { gte: lng - lngDelta, lte: lng + lngDelta },
+                }
+            },
+            take: 10,
+            select: {
+                id: true,
+                aqi: true,
+                pm10: true,
+                pm25: true,
+                so2: true,
+                no2: true,
+                co2: true,
+                co: true,
+                o3: true,
+                noise: true,
+                pm1: true,
+                tvoc: true,
+                smoke: true,
+                methane: true,
+                h2: true,
+                ammonia: true,
+                h2s: true,
+                temperature: true,
+                humidity: true,
+                device: {
+                    select: {
+                        serialNo: true,
+                        lat: true,
+                        lng: true
+                    }
+                },
+                updatedAt: true
+            }
+        })
+        const sensorData = transformInternalData(c, candidates[0].state);
+
+        const allReadings = [...candidates, ...sensorData];
+
+        const nearest = allReadings.reduce((best, curr) => {
             const dist = haversine(lat, lng, curr.lat, curr.lng)
 
             if (!best || dist < best.dist) return { curr, dist }
@@ -176,4 +197,5 @@ export async function GET(req: NextRequest) {
         return new NextResponse("Internal Server Error", { status: 500 })
     }
 }
+
 
