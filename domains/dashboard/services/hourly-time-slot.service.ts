@@ -43,6 +43,7 @@ export class HourlyTimeSlotService {
                 const slotRecords = dayRecords.filter((r) => {
                     // SHIFT TO IST: Add 5.5 hours before checking the hour
                     const istDate = new Date(r.hourStart.getTime() + (5.5 * 60 * 60 * 1000));
+                    console.log(istDate)
                     const hour = istDate.getUTCHours(); // Use getUTCHours on shifted date
                     return hour >= slotStart && hour < slotEnd;
                 });
