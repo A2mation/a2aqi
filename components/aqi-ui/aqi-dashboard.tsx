@@ -1,14 +1,10 @@
 "use client"
 
-import { use, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import {
-  Heart,
   Share2,
   Cloud,
   Droplets,
-  Wind,
-  MapPin,
-  SquareDashed,
   Locate,
 } from "lucide-react"
 import dynamic from "next/dynamic"
@@ -33,6 +29,7 @@ import { BackgroundGradient } from "../ui/background-gradient"
 import { ShareDialog } from "@/components/Share-Button";
 import { ViewMapsButton } from "../ViewMapsButton"
 import { de } from "zod/v4/locales"
+import { AQIDashboardLoader } from "./loaders/aqi-dashboard-loader"
 
 const AQIMap = dynamic(() => import("./aqi-map"), { ssr: false })
 
@@ -97,9 +94,7 @@ export function AQIDashboard() {
 
   if (loading && !lastUpdated) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Skeleton className="h-10 w-80 rounded-2xl" />
-      </div>
+      <AQIDashboardLoader />
     )
   }
 
@@ -119,8 +114,8 @@ export function AQIDashboard() {
       </div>
 
       {/* Dashboard */}
-      <div className="max-w-[100rem] mx-auto px-4 -mt-32 relative z-10 pb-12">
-        <Card className={` shadow-2xl bg-gradient-to-br ${theme.bg}`}>
+      <div className="max-w-400 mx-auto px-4 -mt-32 relative z-10 pb-12">
+        <Card className={` shadow-2xl bg-linear-to-br ${theme.bg}`}>
 
           <div className="p-6 sm:p-8 lg:p-10 backdrop-blur-sm">
             {/* Header */}
@@ -281,8 +276,8 @@ export function AQIDashboard() {
               </div>
 
               {/* Image */}
-              <div className="lg:col-span-1 flex items-center justify-center min-h-[300px] md:min-h-[360px]">
-                <div className="relative w-full h-full max-w-[360px] rounded-3xl">
+              <div className="lg:col-span-1 flex items-center justify-center min-h-75 md:min-h-90">
+                <div className="relative w-full h-full max-w-90 rounded-3xl">
 
                   <SparklesCore
                     className="absolute inset-0 pointer-events-none"
