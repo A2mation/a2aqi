@@ -150,7 +150,7 @@ export function Header({ title, description, actions }: HeaderProps) {
                                                 <span>Account Settings</span>
                                             </Link>
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem className="cursor-pointer py-2 font-medium">
+                                        {/* <DropdownMenuItem className="cursor-pointer py-2 font-medium">
                                             <Link
                                                 href={`/user/${deviceId}/settings/payments`}
                                                 className="flex items-center"
@@ -167,6 +167,31 @@ export function Header({ title, description, actions }: HeaderProps) {
                                                 <CreditCard className="mr-2 h-4 w-4 text-slate-500" />
                                                 <span>Billing & Plans</span>
                                             </Link>
+                                        </DropdownMenuItem> */}
+                                        <DropdownMenuItem
+                                            disabled
+                                            className="py-2 font-medium opacity-50 cursor-not-allowed flex justify-between items-center"
+                                        >
+                                            <div className="flex items-center">
+                                                <History className="mr-2 h-4 w-4 text-slate-500" />
+                                                <span>Payments History</span>
+                                            </div>
+                                            <span className="text-[9px] bg-muted text-primary px-1.5 py-0.5 rounded uppercase tracking-tighter border border-border">
+                                                Soon
+                                            </span>
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuItem
+                                            disabled
+                                            className="py-2 font-medium opacity-50 cursor-not-allowed flex justify-between items-center"
+                                        >
+                                            <div className="flex items-center">
+                                                <CreditCard className="mr-2 h-4 w-4 text-slate-500" />
+                                                <span>Billing & Plans</span>
+                                            </div>
+                                            <span className="text-[9px] bg-muted text-primary px-1.5 py-0.5 rounded uppercase tracking-tighter border border-border">
+                                                Soon
+                                            </span>
                                         </DropdownMenuItem>
                                     </DropdownMenuGroup>
 

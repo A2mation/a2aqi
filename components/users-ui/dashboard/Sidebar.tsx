@@ -4,7 +4,6 @@ import {
     LayoutDashboard,
     MonitorSmartphone,
     BarChart3,
-    Users,
     Settings,
     HelpCircle,
     LogOut,
@@ -17,8 +16,8 @@ import {
     Lock,
 } from "lucide-react"
 import Link from "next/link"
-import { redirect, useParams, usePathname } from "next/navigation"
-import { useState, createContext, useContext } from "react"
+import { useParams, usePathname } from "next/navigation"
+import { createContext, useContext } from "react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -187,9 +186,10 @@ export function Sidebar({ isCollapsed = false, onToggle }: { isCollapsed?: boole
 
                         {!isCollapsed && (
                             <div className="absolute inset-x-0 bottom-0 top-8 bg-linear-to-t from-background/20 to-transparent flex items-end justify-center pb-2 opacity-0 group-hover/ai:opacity-100 transition-opacity">
-                                <Button className="text-[10px] bg-blue-700 hover:bg-blue-800 text-primary-foreground px-2 py-1 rounded shadow-lg font-medium">
-                                    Upgrade to Unlock
-                                </Button>
+                                <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary shadow-xl backdrop-blur-xl transition-transform hover:scale-105">
+                                    <Lock className="h-3 w-3" />
+                                    <span className="text-[10px] font-bold uppercase tracking-wider">Coming Soon</span>
+                                </div>
                             </div>
                         )}
                     </div>
