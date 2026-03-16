@@ -6,7 +6,7 @@ import ViewStats from "../ViewStats"
 const ROLES = [
     { label: "Administrator", href: "/admin/sign-in" },
     { label: "Moderator", href: "#" },
-    { label: "Local Authority", href: "#" },
+    { label: "Monitors", href: "/monitor/sign-in" },
     { label: "Writer", href: "/blogs/sign-in" },
 ];
 
