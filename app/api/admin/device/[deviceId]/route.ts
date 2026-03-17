@@ -53,7 +53,7 @@ export async function PATCH(
         }
 
         const body = await req.json();
-        const { name, user, isUserMode, serialNo, modelId, lat, lng, status } = body;
+        const { name, user, isUserMode, serialNo, modelId, lat, lng, status, assignedAt } = body;
 
 
         if (!serialNo) return new NextResponse("Serial No is required", { status: 400 });
@@ -98,7 +98,7 @@ export async function PATCH(
                 lng: isNaN(parsedLng!) ? null : parsedLng,
                 status: status || DeviceStatus.UNASSIGNED,
                 assignedAt: isTransitioningToAssigned
-                    ? new Date()
+                    ? assignedAt
                     : status === DeviceStatus.ASSIGNED
                         ? currentDevice?.assignedAt
                         : null,

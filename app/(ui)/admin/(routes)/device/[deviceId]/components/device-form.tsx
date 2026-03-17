@@ -3,7 +3,7 @@
 import * as z from "zod";
 import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
-import { Check, ChevronsUpDown, Loader2, Settings2, Trash } from "lucide-react"
+import { CalendarIcon, Check, ChevronsUpDown, Loader2, Settings2, Trash } from "lucide-react"
 import { DeviceStatus, DeviceModel, User } from "@prisma/client"
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,6 +39,8 @@ import { useDebounce } from "@/hooks/use-debounce";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
+import { format, setHours, setMinutes, setSeconds } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
 
 // Define the Schema First
 const formSchema = z.object({
@@ -47,12 +49,13 @@ const formSchema = z.object({
     modelId: z.string().min(1, "Model selection is required"),
     apiKey: z.string().min(1, "API Key is required"),
     status: z.enum(DeviceStatus),
+    assignedAt: z.date().optional(),
     isUserMode: z.boolean().default(false),
     lat: z.string().optional().default(""),
     lng: z.string().optional().default(""),
     user: z.string().optional().default(""),
 }).superRefine((data, ctx) => {
-    if (data.isUserMode && (!data.user || data.user.trim() === "")) {
+    if (data.isUserMode && data.status == DeviceStatus.ASSIGNED && (!data.user || data.user.trim() === "")) {
         ctx.addIssue({
             code: "custom",
             message: "User selection is mandatory when User Mode is active",
@@ -70,6 +73,7 @@ interface DevicePops {
         name: string;
         serialNo: string;
         status: DeviceStatus;
+        assignedAt: Date | null;
         apiKey: string;
         modelId: string;
         modelName: string;
@@ -103,6 +107,7 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
             modelId: initialData.modelId || "",
             apiKey: initialData.apiKey || "",
             status: initialData.status || DeviceStatus.UNASSIGNED,
+            assignedAt: initialData.assignedAt || new Date(),
             isUserMode: !!initialData.userId,
             lat: initialData.lat || "",
             lng: initialData.lng || "",
@@ -113,6 +118,7 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
             modelId: "",
             apiKey: "",
             status: DeviceStatus.UNASSIGNED,
+            assignedAt: new Date(),
             isUserMode: false,
             lat: "",
             lng: "",
@@ -207,6 +213,13 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
     const onSubmit = (data: DeviceFormValues) => {
         saveDevice(data);
     };
+
+    useEffect(() => {
+        if (form.getValues('status') === DeviceStatus.UNASSIGNED) {
+            form.setValue('user', '');
+        }
+    }, [form.watch('status')])
+
 
     return (
         <>
@@ -446,6 +459,78 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
                                                         ? "The device will be moved to the inventory pool and removed from the current user."
                                                         : "Choose the current operational state of this hardware."}
                                             </FormDescription>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="assignedAt"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-col">
+                                            <FormLabel>Assignment Date & Time</FormLabel>
+                                            <div className="flex items-center gap-2">
+                                                {/* Date Part */}
+                                                <Popover>
+                                                    <PopoverTrigger asChild>
+                                                        <FormControl>
+                                                            <Button
+                                                                variant={"outline"}
+                                                                className={cn(
+                                                                    "w-50 pl-3 text-left font-normal",
+                                                                    !field.value && "text-muted-foreground"
+                                                                )}
+                                                            >
+                                                                {field.value ? (
+                                                                    format(field.value, "PPP")
+                                                                ) : (
+                                                                    <span>Pick a date</span>
+                                                                )}
+                                                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                            </Button>
+                                                        </FormControl>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-auto p-0" align="start">
+                                                        <Calendar
+                                                            mode="single"
+                                                            selected={field.value}
+                                                            onSelect={(newDate) => {
+                                                                if (!newDate) return;
+                                                                const currentTime = field.value || new Date();
+                                                                const updatedDate = setHours(
+                                                                    setMinutes(
+                                                                        setSeconds(newDate, currentTime.getSeconds()),
+                                                                        currentTime.getMinutes()
+                                                                    ),
+                                                                    currentTime.getHours()
+                                                                );
+                                                                field.onChange(updatedDate);
+                                                            }}
+                                                        />
+                                                    </PopoverContent>
+                                                </Popover>
+
+                                                {/* Time Part */}
+                                                <FormControl>
+                                                    <Input
+                                                        type="time"
+                                                        step="1"
+                                                        className="w-32.5"
+                                                        value={field.value ? format(field.value, "HH:mm:ss") : ""}
+                                                        onChange={(e) => {
+                                                            const [hours, minutes, seconds] = e.target.value
+                                                                .split(":")
+                                                                .map(Number);
+                                                            const baseDate = field.value || new Date();
+                                                            const updatedDate = setHours(
+                                                                setMinutes(setSeconds(baseDate, seconds || 0), minutes || 0),
+                                                                hours || 0
+                                                            );
+                                                            field.onChange(updatedDate);
+                                                        }}
+                                                    />
+                                                </FormControl>
+                                            </div>
                                             <FormMessage />
                                         </FormItem>
                                     )}
