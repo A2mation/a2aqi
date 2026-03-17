@@ -85,10 +85,10 @@ export function NavbarMiddleSection({ className }: { className?: string }) {
 
         <MenuItem setActive={setActive} active={active} item="Resources">
           <div className="flex flex-col space-y-4 text-sm">
-            <HoveredLink href="/#soon">Contact us</HoveredLink>
-            <HoveredLink href="/#soon">Company</HoveredLink>
-            <HoveredLink href="/#soon">Manage Data</HoveredLink>
-            <HoveredLink href="/#soon">Aqi related query</HoveredLink>
+            <HoveredLink href="/contact-us">Contact us</HoveredLink>
+            <HoveredLink href="/company">Company</HoveredLink>
+            <HoveredLink href="/about-us">About us</HoveredLink>
+            <HoveredLink href="#soon">Aqi related query</HoveredLink>
           </div>
         </MenuItem>
       </Menu>
