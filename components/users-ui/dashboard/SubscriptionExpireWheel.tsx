@@ -17,8 +17,8 @@ import {
 } from "@/components/ui/chart"
 
 export function SubscriptionExpireWheel() {
-    const today = new Date(2026, 3, 15)
-    const expiryDate = new Date(2027, 3, 15) 
+    const today = new Date()
+    const expiryDate = new Date(2027, 2, 16)  // Here Month satrt from 0
 
     const actualDaysLeft = differenceInDays(expiryDate, today)
     const daysRemaining = Math.max(0, Math.min(actualDaysLeft, 365))

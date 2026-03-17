@@ -278,14 +278,14 @@ export function WeeklyAqiAnalytics() {
 
             {/* Summary stats */}
             <div className="pt-4 border-t border-muted/50 flex items-center justify-between">
-                <div className="text-sm">
-                    <span className=" text-blue-400">Average: </span>
-                    <span className="font-semibold text-muted-foreground">
+                <div className="text-base">
+                    <span className=" text-red-600">Average: </span>
+                    <span className="font-semibold text-primary">
                         {average.toFixed(2)} {metricLabel}
                     </span>
                 </div>
 
-                <div className="text-sm">
+                <div className="text-base">
                     <span className=" text-red-600">Peak: </span>
                     <span className="font-semibold text-primary">
                         {maxValue.toFixed(2)} {metricLabel}

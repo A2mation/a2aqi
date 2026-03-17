@@ -20,6 +20,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useParams } from "next/navigation";
+import { AnalyticsSkeleton } from "./analytics-skeleton";
 
 type QuarterlyRecord = {
     dayStart: string;
@@ -93,7 +94,7 @@ export function AnalyticsContent() {
     }, [availableMetrics, selectedMetric]);
 
     if (isLoading) {
-        return <div className="p-4 text-sm opacity-70">Loading analytics...</div>;
+        return <AnalyticsSkeleton />;
     }
 
     if (isError) {

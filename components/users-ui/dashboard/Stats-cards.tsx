@@ -96,6 +96,9 @@ export function StatsCards() {
 
     // pollutants row
     const pollutants = [
+        { key: "temperature", label: "Temperature", value: latest.temperature, unit: "°C", icon: sensorIcons.temperature },
+        { key: "humidity", label: "Humidity", value: latest.humidity, unit: "%", icon: sensorIcons.humidity },
+        
         { key: "pm25", label: "PM2.5", value: latest.pm25, unit: "µg/m³", icon: sensorIcons.pm25 },
         { key: "pm10", label: "PM10", value: latest.pm10, unit: "µg/m³", icon: sensorIcons.pm10 },
         { key: "pm1", label: "PM1", value: latest.pm1, unit: "µg/m³", icon: sensorIcons.pm1 },
@@ -115,8 +118,6 @@ export function StatsCards() {
 
         { key: "noise", label: "Noise", value: latest.noise, unit: "dB", icon: sensorIcons.noise },
 
-        { key: "temperature", label: "Temperature", value: latest.temperature, unit: "°C", icon: sensorIcons.temperature },
-        { key: "humidity", label: "Humidity", value: latest.humidity, unit: "%", icon: sensorIcons.humidity },
     ].filter((item) => item.value !== null && item.value !== undefined);
 
 
