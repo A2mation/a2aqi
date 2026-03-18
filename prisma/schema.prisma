@@ -714,7 +714,7 @@ model PricingPlan {
 model DeviceSubscription {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  deviceId String @db.ObjectId
+  deviceId String @db.ObjectId @unique
   device   Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
 
   userId String @db.ObjectId
@@ -740,7 +740,6 @@ model DeviceSubscription {
   updatedAt DateTime  @updatedAt
   invoices  Invoice[]
 
-  @@index([deviceId])
   @@index([userId])
   @@index([endDate])
   @@index([status])

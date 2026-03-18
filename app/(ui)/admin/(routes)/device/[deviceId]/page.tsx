@@ -4,6 +4,8 @@ import { DeviceForm } from "./components/device-form";
 import { DeviceSubscription } from "./components/device-subscription-form";
 import { DeviceSubscriptionStatus } from "@prisma/client";
 import { DeleteDeviceSection } from "./components/reset-button";
+import { DeviceSubscriptionTable } from "./components/device-subscription-table";
+import { Badge } from "@/components/ui/badge";
 
 const SingleDeviceModelPage = async ({
     params,
@@ -12,63 +14,63 @@ const SingleDeviceModelPage = async ({
 }) => {
     const deviceId = (await params).deviceId;
 
-    if (!deviceId) {
-        return null;
-    }
-
-    const device = await prisma.device.findFirst({
-        where: {
-            id: deviceId == 'new' ? '60530408203d565918dc80e7' : deviceId // dummy id for new device model
-        },
-        select: {
-            id: true,
-            name: true,
-            serialNo: true,
-            status: true,
-            apiKey: true,
-            lat: true,
-            lng: true,
-            assignedAt: true,
-            model: {
-                select: {
-                    id: true,
-                    name: true,
-                    pricingPlans: {
-                        select: {
-                            id: true,
-                            duration: true,
-                            price: true
+    const device = deviceId === 'new'
+        ? null
+        : await prisma.device.findFirst({
+            where: {
+                id: deviceId
+            },
+            select: {
+                id: true,
+                name: true,
+                serialNo: true,
+                status: true,
+                apiKey: true,
+                lat: true,
+                lng: true,
+                assignedAt: true,
+                model: {
+                    select: {
+                        id: true,
+                        name: true,
+                        pricingPlans: {
+                            select: {
+                                id: true,
+                                duration: true,
+                                price: true
+                            }
                         }
                     }
-                }
-            },
-            user: {
-                select: {
-                    id: true,
-                    name: true,
-                    email: true
-                }
-            },
-            createdAt: true,
-        }
-    });
+                },
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true
+                    }
+                },
+                createdAt: true,
+            }
+        });
 
-    const deviceSubscripion = await prisma.deviceSubscription.findFirst({
-        where: {
-            deviceId: deviceId,
-            status: DeviceSubscriptionStatus.ACTIVE
-        }, select: {
-            id: true,
-            planType: true,
-            paidAmount: true,
-            autoRenew: true,
-            adminModified: true,
-            startDate: true,
-            endDate: true,
-            status: true,
-            notes: true
-        }
-    })
+    const deviceSubscripion = deviceId === 'new'
+        ? null
+        : await prisma.deviceSubscription.findFirst({
+            where: {
+                deviceId: deviceId,
+                status: DeviceSubscriptionStatus.ACTIVE
+            }, select: {
+                id: true,
+                planType: true,
+                paidAmount: true,
+                autoRenew: true,
+                adminModified: true,
+                startDate: true,
+                endDate: true,
+                status: true,
+                notes: true
+            },
+        })
 
 
     const formattedDevice = device
@@ -92,6 +94,7 @@ const SingleDeviceModelPage = async ({
 
 
     const formattedSubscription = device && device.user ? {
+        id: device.id,
         serialNo: device.serialNo,
         email: device.user.email,
         paidAmount: deviceSubscripion?.paidAmount,
@@ -105,15 +108,48 @@ const SingleDeviceModelPage = async ({
         pricingPlans: device.model.pricingPlans
     } : null
 
+    const subscriptionHistory = deviceId === 'new'
+        ? null
+        : await prisma.deviceSubscription.findMany({
+            where: {
+                deviceId: device?.id,
+                userId: device?.user?.id
+            }
+        })
+
     return (
         <div className='flex-col'>
             <div className='flex-1 space-y-4 p-8'>
                 <DeviceForm initialData={formattedDevice} />
-                <DeviceSubscription initialData={formattedSubscription} />
                 {
-                    device && (
-                        <DeleteDeviceSection id={device.id} serialNo={device.serialNo} />
+                    device && (<>
+                        <DeviceSubscription initialData={formattedSubscription} />
+                    </>)
+                }
+                {
+                    (device && subscriptionHistory) && (
+                        <>
+                            <section className="space-y-8 my-4">
+                                <div className="flex items-center justify-between px-2">
+                                    <div>
+                                        <h3 className="text-xl font-bold tracking-tight">Subscription History</h3>
+                                        <p className="text-sm text-muted-foreground">Detailed logs of all past and present plans for this device.</p>
+                                    </div>
+                                    <Badge variant="outline" className="h-fit py-1">
+                                        Total Records: {subscriptionHistory.length || 0}
+                                    </Badge>
+                                </div>
+
+                                <DeviceSubscriptionTable data={subscriptionHistory || []} />
+                            </section>
+                        </>
                     )
+                }
+
+                 {
+                    device && (<>
+                        <DeleteDeviceSection id={device.id} serialNo={device.serialNo} />
+                    </>)
                 }
             </div>
         </div>
