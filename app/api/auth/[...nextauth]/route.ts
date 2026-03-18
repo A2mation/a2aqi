@@ -32,7 +32,6 @@ export const authOptions: NextAuthOptions = {
                     if (!credentials?.email || !credentials?.password) return null;
 
                     const res = await http.post("api/admin/auth/sign-in", credentials);
-                    console.log(res)
                     return res.data;
                 } catch (error) {
                     console.error("Admin login failed:", error);

@@ -69,3 +69,38 @@ export async function POST(request: Request) {
         return handleAdminError(error);
     }
 }
+
+export async function DELETE(request: Request) {
+    try {
+
+        await adminGuard();
+
+        const { searchParams } = new URL(request.url);
+        const deviceId = searchParams.get('id');
+
+        if (!deviceId) {
+            return new NextResponse("Device ID is required", { status: 400 });
+        }
+
+        await prisma.$transaction(async (tx) => {
+            await tx.sensorReading.deleteMany({ where: { deviceId } });
+            await tx.hourlyAggregateReading.deleteMany({ where: { deviceId } });
+            await tx.dailyAggregateReading.deleteMany({ where: { deviceId } });
+            await tx.payment.deleteMany({ where: { deviceId } });
+            await tx.couponRedemption.deleteMany({ where: { deviceId } });
+            await tx.deviceSubscription.deleteMany({ where: { deviceId } });
+            await tx.exportLog.deleteMany({ where: { deviceId } });
+            await tx.calibration.deleteMany({ where: { deviceId } });
+            await tx.latestSensorReading.deleteMany({ where: { deviceId } });
+        });
+
+
+        return NextResponse.json({
+            message: "Device deleted successfully"
+        });
+
+
+    } catch (error) {
+        return handleAdminError(error);
+    }
+}

@@ -1,6 +1,9 @@
 import { prisma } from "@/lib/prisma";
 
 import { DeviceForm } from "./components/device-form";
+import { DeviceSubscription } from "./components/device-subscription-form";
+import { DeviceSubscriptionStatus } from "@prisma/client";
+import { DeleteDeviceSection } from "./components/reset-button";
 
 const SingleDeviceModelPage = async ({
     params,
@@ -30,6 +33,13 @@ const SingleDeviceModelPage = async ({
                 select: {
                     id: true,
                     name: true,
+                    pricingPlans: {
+                        select: {
+                            id: true,
+                            duration: true,
+                            price: true
+                        }
+                    }
                 }
             },
             user: {
@@ -42,6 +52,24 @@ const SingleDeviceModelPage = async ({
             createdAt: true,
         }
     });
+
+    const deviceSubscripion = await prisma.deviceSubscription.findFirst({
+        where: {
+            deviceId: deviceId,
+            status: DeviceSubscriptionStatus.ACTIVE
+        }, select: {
+            id: true,
+            planType: true,
+            paidAmount: true,
+            autoRenew: true,
+            adminModified: true,
+            startDate: true,
+            endDate: true,
+            status: true,
+            notes: true
+        }
+    })
+
 
     const formattedDevice = device
         ? {
@@ -62,12 +90,31 @@ const SingleDeviceModelPage = async ({
         }
         : null;
 
-        // console.log(formattedDevice)
+
+    const formattedSubscription = device && device.user ? {
+        serialNo: device.serialNo,
+        email: device.user.email,
+        paidAmount: deviceSubscripion?.paidAmount,
+        planType: deviceSubscripion?.planType,
+        status: deviceSubscripion?.status,
+        startDate: deviceSubscripion?.startDate,
+        endDate: deviceSubscripion?.endDate,
+        autoRenew: deviceSubscripion?.autoRenew,
+        adminModified: deviceSubscripion?.adminModified,
+        notes: deviceSubscripion?.notes,
+        pricingPlans: device.model.pricingPlans
+    } : null
 
     return (
         <div className='flex-col'>
             <div className='flex-1 space-y-4 p-8'>
                 <DeviceForm initialData={formattedDevice} />
+                <DeviceSubscription initialData={formattedSubscription} />
+                {
+                    device && (
+                        <DeleteDeviceSection id={device.id} serialNo={device.serialNo} />
+                    )
+                }
             </div>
         </div>
     )
