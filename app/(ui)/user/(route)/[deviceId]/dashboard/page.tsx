@@ -23,6 +23,9 @@ import { HourlyAnalysis } from "@/components/users-ui/dashboard/hourly-analysis"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useExportDrawerStore } from "@/store/use-export-drawer-store"
 import { ExportDrawer } from "@/components/Export-Drawer"
+import { useDeviceStore } from "@/store/use-device.store"
+import { SubscriptionModal } from "@/components/modals/subscription-alert-modal"
+import { useSubscription } from "@/hooks/use-subscription"
 
 
 export default function DashboardPage() {
@@ -31,12 +34,23 @@ export default function DashboardPage() {
     const deviceModal = useDeviceModal();
     const [isClient, setisClient] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const[currentDeviceAssignDate, setCurrentDeviceAssignDate] = useState<Date | null>(null);
+    const [currentDeviceAssignDate, setCurrentDeviceAssignDate] = useState<Date | null>(null);
+    const setDevices = useDeviceStore((set) => set.setDevices);
+    const selectDevice = useDeviceStore((state) => state.selectDevice);
     const openDrawer = useExportDrawerStore((s) => s.openDrawer);
+
+    const { isLocked, isLoading: isSubLoading } = useSubscription(deviceId);
+
 
     useEffect(() => {
         setisClient(true);
-    }, [])
+    }, []);
+
+    useEffect(() => {
+        if (deviceId) {
+            selectDevice(deviceId as string);
+        }
+    }, [deviceId])
 
     const {
         data: devices = [],
@@ -46,24 +60,13 @@ export default function DashboardPage() {
         queryFn: async () => {
             const res = await http.get<Device[]>("/api/user/device")
             sidebarState.badge = res.data.length;
-            return res.data
+            setDevices(res.data);
+            return res.data;
         },
     })
 
 
-    useEffect(() => {
-        if (!deviceId) return;
 
-        const device = devices.find(d => d.id === deviceId);
-        // console.log(device)
-        if (!device) return;
-
-        setCurrentDeviceAssignDate(device.assignedAt);
-
-        // safe Date here
-    }, [deviceId, devices]);
-
-    // console.log(currentDeviceAssignDate)
 
 
     if (!isClient) {
@@ -75,9 +78,17 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="flex min-h-screen bg-background">
+        <div className={cn(
+            "flex min-h-screen bg-background",
+            isLocked && "blur-xl pointer-events-none select-none brightness-75")}
+        >
+            <SubscriptionModal
+                isOpen={!!isLocked}
+                onClose={() => { }}
+            />
+
             <div className="hidden lg:block">
-                <Sidebar isCollapsed={isCollapsed} onToggle={() => setIsCollapsed(!isCollapsed)}/>
+                <Sidebar isCollapsed={isCollapsed} onToggle={() => setIsCollapsed(!isCollapsed)} />
             </div>
 
             <main
@@ -87,6 +98,8 @@ export default function DashboardPage() {
                 )}
             >
                 <DeviceModal />
+
+
                 <Header
                     title="A2aqi Dashboard"
                     description="Monitor air quality with accurate, data-driven insights."
@@ -114,7 +127,7 @@ export default function DashboardPage() {
                     }
                 />
 
-                {!isLoading && devices?.length > 0 && (
+                {!isLoading && devices?.length > 0 && isLocked && (
                     <ExportDrawer devices={devices} />
                 )}
 

@@ -48,7 +48,7 @@ const sensorIcons: Record<string, string> = {
 };
 
 export function StatsCards() {
-    const { deviceId } = useParams();;
+    const { deviceId } = useParams();
 
     const { data, isPending, error } = useQuery({
         queryKey: ["dashboardOverview", deviceId],
