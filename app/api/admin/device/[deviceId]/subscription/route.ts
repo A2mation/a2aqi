@@ -5,6 +5,10 @@ import { adminGuard } from "@/lib/adminAuth";
 import { handleAdminError } from "@/lib/handleRoleError";
 import { DeviceSubscriptionSchema } from "@/lib/validation/AdminDeviceSubscription";
 import { withAuditContext } from "@/lib/withAuditContext";
+import { subscriptionKey } from "@/constant/SubscriptionKey";
+import { redis } from "@/lib/redis";
+import { cancelSubscription, refreshSubscriptionCache, revokeDevice } from "@/domains/subscription/service/subscription.service";
+import { DeviceSubscriptionStatus } from "@prisma/client";
 
 export async function POST(
     req: Request,
@@ -94,6 +98,13 @@ export async function POST(
             });
 
         })
+
+        if (data.status === DeviceSubscriptionStatus.SUSPENDED) {
+            await cancelSubscription(device.id);
+        } else{
+            await refreshSubscriptionCache(device.id);
+        }
+
 
         return NextResponse.json({
             message: "Subscription processed successfully",
