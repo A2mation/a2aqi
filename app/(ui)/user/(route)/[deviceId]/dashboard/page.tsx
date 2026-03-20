@@ -127,7 +127,7 @@ export default function DashboardPage() {
                     }
                 />
 
-                {!isLoading && devices?.length > 0 && isLocked && (
+                {!isLoading && devices?.length > 0 && (
                     <ExportDrawer devices={devices} />
                 )}
 

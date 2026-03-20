@@ -39,6 +39,7 @@ export const SubscriptionModal = ({
             description="This device is currently inactive. Please upgrade your plan to access real-time AQI analytics and reporting."
             isOpen={isOpen}
             onClose={onClose}
+            activeProfileIcon={false}
         >
             <div className='flex flex-col items-center justify-center space-y-4 py-4'>
                 <div className='p-4 bg-primary/10 rounded-full'>

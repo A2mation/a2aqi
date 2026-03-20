@@ -44,6 +44,7 @@ const ConfirmActionModal = ({
             description={`Please type "${passphrase}" to confirm.`}
             isOpen={isOpen}
             onClose={onClose}
+            activeProfileIcon={false}
         >
             <div className="space-y-4 py-4">
                 <Input

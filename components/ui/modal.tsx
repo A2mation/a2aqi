@@ -27,6 +27,7 @@ interface ModalProps {
     isOpen: boolean;
     onClose: () => void;
     children: React.ReactNode;
+    activeProfileIcon?: boolean
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -34,7 +35,8 @@ export const Modal: React.FC<ModalProps> = ({
     description,
     isOpen,
     onClose,
-    children
+    children,
+    activeProfileIcon = true
 }) => {
 
     const session = useSession();
@@ -54,7 +56,7 @@ export const Modal: React.FC<ModalProps> = ({
                             <div>
                                 {title}
                             </div>
-                            {session.data && (
+                            {activeProfileIcon && (session.data && (
                                 <>
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
@@ -83,7 +85,7 @@ export const Modal: React.FC<ModalProps> = ({
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </>
-                            )}
+                            ))}
                         </DialogTitle>
                         <DialogDescription className="flex justify-start">
                             {description}
