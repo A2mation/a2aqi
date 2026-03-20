@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from 'react'
+
 import { Modal } from '../ui/modal'
 import { Button } from '../ui/button'
 
@@ -10,8 +11,6 @@ interface AlertModalProps {
     onConfirm: () => void
     loading: boolean
 }
-
-
 
 const AlertModal = ({
     isOpen,
@@ -36,6 +35,7 @@ const AlertModal = ({
                 description='This action cannot be undone'
                 isOpen={isOpen}
                 onClose={onClose}
+                activeProfileIcon={false}
             >
                 <div className='pt-6 space-x-2 flex items-center justify-end w-full'>
                     <Button disabled={loading} variant="outline" onClick={onClose} > Cancel</Button>

@@ -13,7 +13,7 @@ const Heading = ({
     return (
         <>
             <div>
-                <h2 className="text-3xl font-bold tracking-tight">
+                <h2 className="text-3xl font-bold text-foreground tracking-tight">
                     {title}
                 </h2>
                 <p className="text-sm text-muted-foreground">

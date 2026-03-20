@@ -1,3 +1,5 @@
+import { getAuthSession } from '@/auth'
+import AuthSessionProviders from '@/providers/auth-session-provider'
 import React from 'react'
 
 const layout = async ({
@@ -5,11 +7,15 @@ const layout = async ({
 }: {
     children: React.ReactNode
 }) => {
+    const session = await getAuthSession()
     return (
         <>
-            <section className='px-0 md:px-2'>
-                {children}
-            </section>
+            <AuthSessionProviders>
+
+                <section className='bg-background'>
+                    {children}
+                </section>
+            </AuthSessionProviders>
         </>
     )
 }
