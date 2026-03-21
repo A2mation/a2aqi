@@ -8,10 +8,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-import { MapPin, Activity, Shield, ChevronLeft, ChevronRight, Plus, Search } from "lucide-react"
+import { MapPin, Activity, Shield, ChevronLeft, ChevronRight, Plus, Search, GitGraph } from "lucide-react"
 import { getAQIBgColor, getAQIColor } from "@/helpers/aqi-color-pallet"
 import AddDeviceModal from "../modals/monior-add-device-modal"
 import Heading from "../ui/Heading"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 // Updated Interface based on your Prisma Schema + AQI field
 interface Device {
@@ -39,6 +41,7 @@ const initialDevices: Device[] = [
 const ITEMS_PER_PAGE = 7
 
 export function DeviceList() {
+    const router = useRouter();
     const [devices, setDevices] = useState<Device[]>(initialDevices)
     const [isDarkMode, setIsDarkMode] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
@@ -101,7 +104,7 @@ export function DeviceList() {
 
             {/* Main Content */}
             <div className="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
-                <div className="flex items-center mb-6 gap-4">
+                <div className="flex items-center justify-between mb-6 gap-4">
                     <div className="relative flex-1 max-w-sm">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
@@ -111,6 +114,14 @@ export function DeviceList() {
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
+
+                    <Link
+                        href={'/monitor/analytics'}
+                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 rounded-xl text-sm font-bold text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all"
+                    >
+                        <GitGraph size={16} /> Advanced Analysis
+                    </Link>
+
                 </div>
 
                 <div className="border rounded-xl bg-card overflow-hidden shadow-sm">
@@ -127,7 +138,11 @@ export function DeviceList() {
                             </thead>
                             <tbody className="divide-y">
                                 {paginatedItems.map((device) => (
-                                    <tr key={device.id} className="hover:bg-muted/20 transition-colors">
+                                    <tr
+                                        key={device.id}
+                                        className="hover:bg-muted/20 cursor-pointer transition-colors"
+                                        onClick={() => router.push(`/monitor/device/${device.id}`)}
+                                    >
                                         <td className="px-6 py-4">
                                             <div className="flex flex-col">
                                                 <span className="text-sm font-semibold text-foreground">{device.name || "Unnamed Device"}</span>
