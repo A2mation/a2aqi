@@ -2,7 +2,6 @@ import { prisma } from "@/lib/prisma"
 import { DeviceStatus } from "@prisma/client"
 
 // Monitor can see only the assigned devices.
-
 export async function getDevicesByMonitorId(monitorId: string) {
     const result = await prisma.monitorDevice.findMany({
         where: {
@@ -28,6 +27,27 @@ export async function getDevicesByMonitorId(monitorId: string) {
     return result.map(item => item.device)
 }
 
+// 
+export async function getDevicesByDeviceId(deviceId: string) {
+    const result = await prisma.device.findUnique({
+        where: {
+            id: deviceId,
+
+            status: DeviceStatus.ASSIGNED
+
+        },
+        select: {
+            id: true,
+            name: true,
+            serialNo: true,
+            status: true,
+            lat: true,
+            lng: true
+        }
+    })
+
+    return result;
+}
 
 export async function getDeviceById(deviceId: string) {
     return prisma.device.findUnique({

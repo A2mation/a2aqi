@@ -12,3 +12,31 @@ export const TIME_SLOTS = [
     { label: "08-10PM", startHour: 20 },
     { label: "10-12PM", startHour: 22 },
 ];
+
+
+export const HOURLY_SLOTS = [
+    { label: "0.00", startHour: 0 },
+    { label: "1.00", startHour: 1 },
+    { label: "2.00", startHour: 2 },
+    { label: "3.00", startHour: 3 },
+    { label: "4.00", startHour: 4 },
+    { label: "5.00", startHour: 5 },
+    { label: "6.00", startHour: 6 },
+    { label: "7.00", startHour: 7 },
+    { label: "8.00", startHour: 8 },
+    { label: "9.00", startHour: 9 },
+    { label: "10.00", startHour: 10 },
+    { label: "11.00", startHour: 11 },
+    { label: "12.00", startHour: 12 },
+    { label: "13.00", startHour: 13 },
+    { label: "14.00", startHour: 14 },
+    { label: "15.00", startHour: 15 },
+    { label: "16.00", startHour: 16 },
+    { label: "17.00", startHour: 17 },
+    { label: "18.00", startHour: 18 },
+    { label: "19.00", startHour: 19 },
+    { label: "20.00", startHour: 20 },
+    { label: "21.00", startHour: 21 },
+    { label: "22.00", startHour: 22 },
+    { label: "23.00", startHour: 23 },
+];
