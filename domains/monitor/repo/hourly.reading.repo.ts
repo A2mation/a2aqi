@@ -1,11 +1,9 @@
 import { prisma } from "@/lib/prisma";
-import { DeviceStatus } from "@prisma/client";
 
 export async function getHeatmapAgg(deviceId: string, startDate: string) {
     const startingDate = new Date(`${startDate}T00:00:00+05:30`);
     const endingDate = new Date(startingDate);
     endingDate.setDate(endingDate.getDate() + 1);
-
 
     const start = { "$date": startingDate };
     const end = { "$date": endingDate };
@@ -15,10 +13,7 @@ export async function getHeatmapAgg(deviceId: string, startDate: string) {
             {
                 $match: {
                     deviceId: { $oid: deviceId },
-                    hourStart: {
-                        $gte: start,
-                        $lt: end,
-                    },
+                    hourStart: { $gte: start, $lt: end },
                 },
             },
             {
@@ -36,42 +31,19 @@ export async function getHeatmapAgg(deviceId: string, startDate: string) {
                     "deviceDetails.status": "ASSIGNED" 
                 }
             },
-            // convert to IST
             {
                 $addFields: {
-                    istDate: {
-                        $dateAdd: {
-                            startDate: "$hourStart",
-                            unit: "minute",
-                            amount: 330,
-                        },
-                    },
+                    istDate: { $dateAdd: { startDate: "$hourStart", unit: "minute", amount: 330 } },
                 },
             },
-
-            {
-                $addFields: {
-                    date: {
-                        $dateToString: {
-                            format: "%Y-%m-%d",
-                            date: "$istDate",
-                        },
-                    },
-                    hour: {
-                        $hour: "$istDate",
-                    },
-                },
-            },
-
             {
                 $group: {
                     _id: {
-                        date: "$date",
-                        hour: "$hour",
+                        date: { $dateToString: { format: "%Y-%m-%d", date: "$istDate" } },
+                        hour: { $hour: "$istDate" },
                     },
-
                     totalCount: { $sum: "$count" },
-
+                    
                     sumAqi: { $sum: "$sumAqi" },
                     sumPm10: { $sum: "$sumPm10" },
                     sumPm25: { $sum: "$sumPm25" },
@@ -90,49 +62,55 @@ export async function getHeatmapAgg(deviceId: string, startDate: string) {
                     sumH2s: { $sum: "$sumH2s" },
                     sumTemperature: { $sum: "$sumTemperature" },
                     sumHumidity: { $sum: "$sumHumidity" },
+                    
+                    // We count how many documents actually HAD a value for these fields
+                    countAqi: { $sum: { $cond: [{ $gt: ["$sumAqi", null] }, 1, 0] } },
+                    countPm10: { $sum: { $cond: [{ $gt: ["$sumPm10", null] }, 1, 0] } },
+                    countPm25: { $sum: { $cond: [{ $gt: ["$sumPm25", null] }, 1, 0] } },
+                    countSo2: { $sum: { $cond: [{ $gt: ["$sumSo2", null] }, 1, 0] } },
+                    countNo2: { $sum: { $cond: [{ $gt: ["$sumNo2", null] }, 1, 0] } },
+                    countCo2: { $sum: { $cond: [{ $gt: ["$sumCo2", null] }, 1, 0] } },
+                    countCo: { $sum: { $cond: [{ $gt: ["$sumCo", null] }, 1, 0] } },
+                    countO3: { $sum: { $cond: [{ $gt: ["$sumO3", null] }, 1, 0] } },
+                    countNoise: { $sum: { $cond: [{ $gt: ["$sumNoise", null] }, 1, 0] } },
+                    countPM1: { $sum: { $cond: [{ $gt: ["$sumPM1", null] }, 1, 0] } },
+                    countTvoc: { $sum: { $cond: [{ $gt: ["$sumTvoc", null] }, 1, 0] } },
+                    countSmoke: { $sum: { $cond: [{ $gt: ["$sumSmoke", null] }, 1, 0] } },
+                    countMethane: { $sum: { $cond: [{ $gt: ["$sumMethane", null] }, 1, 0] } },
+                    countH2: { $sum: { $cond: [{ $gt: ["$sumH2", null] }, 1, 0] } },
+                    countAmmonia: { $sum: { $cond: [{ $gt: ["$sumAmmonia", null] }, 1, 0] } },
+                    countH2s: { $sum: { $cond: [{ $gt: ["$sumH2s", null] }, 1, 0] } },
+                    countTemp: { $sum: { $cond: [{ $gt: ["$sumTemperature", null] }, 1, 0] } },
+                    countHum: { $sum: { $cond: [{ $gt: ["$sumHumidity", null] }, 1, 0] } },
                 },
             },
-
             {
                 $project: {
                     _id: 0,
                     date: "$_id.date",
                     hour: "$_id.hour",
-
-                    aqi: {
-                        $cond: [
-                            { $eq: ["$totalCount", 0] },
-                            null,
-                            { $divide: ["$sumAqi", "$totalCount"] },
-                        ],
-                    },
-
-                    pm10: { $divide: ["$sumPm10", "$totalCount"] },
-                    pm25: { $divide: ["$sumPm25", "$totalCount"] },
-                    so2: { $divide: ["$sumSo2", "$totalCount"] },
-                    no2: { $divide: ["$sumNo2", "$totalCount"] },
-                    co2: { $divide: ["$sumCo2", "$totalCount"] },
-                    co: { $divide: ["$sumCo", "$totalCount"] },
-                    o3: { $divide: ["$sumO3", "$totalCount"] },
-                    noise: { $divide: ["$sumNoise", "$totalCount"] },
-                    pm1: { $divide: ["$sumPM1", "$totalCount"] },
-                    tvoc: { $divide: ["$sumTvoc", "$totalCount"] },
-                    smoke: { $divide: ["$sumSmoke", "$totalCount"] },
-                    methane: { $divide: ["$sumMethane", "$totalCount"] },
-                    h2: { $divide: ["$sumH2", "$totalCount"] },
-                    ammonia: { $divide: ["$sumAmmonia", "$totalCount"] },
-                    h2s: { $divide: ["$sumH2s", "$totalCount"] },
-                    temperature: { $divide: ["$sumTemperature", "$totalCount"] },
-                    humidity: { $divide: ["$sumHumidity", "$totalCount"] },
+                    // If count of records with this sensor is 0, return null, else divide
+                    aqi: { $cond: [{ $gt: ["$countAqi", 0] }, { $divide: ["$sumAqi", "$totalCount"] }, null] },
+                    pm10: { $cond: [{ $gt: ["$countPm10", 0] }, { $divide: ["$sumPm10", "$totalCount"] }, null] },
+                    pm25: { $cond: [{ $gt: ["$countPm25", 0] }, { $divide: ["$sumPm25", "$totalCount"] }, null] },
+                    so2: { $cond: [{ $gt: ["$countSo2", 0] }, { $divide: ["$sumSo2", "$totalCount"] }, null] },
+                    no2: { $cond: [{ $gt: ["$countNo2", 0] }, { $divide: ["$sumNo2", "$totalCount"] }, null] },
+                    co2: { $cond: [{ $gt: ["$countCo2", 0] }, { $divide: ["$sumCo2", "$totalCount"] }, null] },
+                    co: { $cond: [{ $gt: ["$countCo", 0] }, { $divide: ["$sumCo", "$totalCount"] }, null] },
+                    o3: { $cond: [{ $gt: ["$countO3", 0] }, { $divide: ["$sumO3", "$totalCount"] }, null] },
+                    noise: { $cond: [{ $gt: ["$countNoise", 0] }, { $divide: ["$sumNoise", "$totalCount"] }, null] },
+                    pm1: { $cond: [{ $gt: ["$countPM1", 0] }, { $divide: ["$sumPM1", "$totalCount"] }, null] },
+                    tvoc: { $cond: [{ $gt: ["$countTvoc", 0] }, { $divide: ["$sumTvoc", "$totalCount"] }, null] },
+                    smoke: { $cond: [{ $gt: ["$countSmoke", 0] }, { $divide: ["$sumSmoke", "$totalCount"] }, null] },
+                    methane: { $cond: [{ $gt: ["$countMethane", 0] }, { $divide: ["$sumMethane", "$totalCount"] }, null] },
+                    h2: { $cond: [{ $gt: ["$countH2", 0] }, { $divide: ["$sumH2", "$totalCount"] }, null] },
+                    ammonia: { $cond: [{ $gt: ["$countAmmonia", 0] }, { $divide: ["$sumAmmonia", "$totalCount"] }, null] },
+                    h2s: { $cond: [{ $gt: ["$countH2s", 0] }, { $divide: ["$sumH2s", "$totalCount"] }, null] },
+                    temperature: { $cond: [{ $gt: ["$countTemp", 0] }, { $divide: ["$sumTemperature", "$totalCount"] }, null] },
+                    humidity: { $cond: [{ $gt: ["$countHum", 0] }, { $divide: ["$sumHumidity", "$totalCount"] }, null] },
                 },
             },
-
-            {
-                $sort: {
-                    date: 1,
-                    hour: 1,
-                },
-            },
+            { $sort: { date: 1, hour: 1 } },
         ],
     });
 }
