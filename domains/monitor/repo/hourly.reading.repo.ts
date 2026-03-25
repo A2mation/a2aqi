@@ -1,11 +1,12 @@
 import { prisma } from "@/lib/prisma";
+import { DeviceStatus } from "@prisma/client";
 
 export async function getHeatmapAgg(deviceId: string, startDate: string) {
     const startingDate = new Date(`${startDate}T00:00:00+05:30`);
     const endingDate = new Date(startingDate);
     endingDate.setDate(endingDate.getDate() + 1);
 
-   
+
     const start = { "$date": startingDate };
     const end = { "$date": endingDate };
 
@@ -20,7 +21,21 @@ export async function getHeatmapAgg(deviceId: string, startDate: string) {
                     },
                 },
             },
-
+            {
+                $lookup: {
+                    from: "Device",
+                    localField: "deviceId",
+                    foreignField: "_id",
+                    as: "deviceDetails"
+                }
+            },
+            { $unwind: "$deviceDetails" },
+            {
+                $match: {
+                    "deviceDetails.isActive": true,
+                    "deviceDetails.status": "ASSIGNED" 
+                }
+            },
             // convert to IST
             {
                 $addFields: {

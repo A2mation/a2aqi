@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { getHeatmap } from "../service/hourly.reading.monitor.service";
 import { getSingleDeviceDetails } from "../service/device.monitor.service";
+import { getDailyBasicDashboardStats } from "../service/dailycustom.readings.service";
 
 export async function deviceIdController(req: Request,
     params: {
@@ -35,10 +36,16 @@ export async function deviceIdController(req: Request,
 
         const data = await getHeatmap(deviceId, startDate);
         const device = await getSingleDeviceDetails(deviceId);
+        const last30Days = await getDailyBasicDashboardStats(deviceId, {
+            type: 'custom',
+            dateStr: startDate,
+            day: 30
+        });
 
         return NextResponse.json({
             success: true,
             hourly: data.heatmap,
+            last30Days,
             device,
         });
 
