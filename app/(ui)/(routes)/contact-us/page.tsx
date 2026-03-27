@@ -26,7 +26,7 @@ const ContactusPage = () => {
                                 </div>
                                 <div>
                                     <h4 className="text-slate-900 font-semibold text-lg">Sales Manager</h4>
-                                    <p className="text-blue-600 font-medium">Sujan Ghosh</p>
+                                    <p className="text-blue-600 font-medium">Reply within 24 hours</p>
                                 </div>
                             </div>
 
@@ -48,7 +48,7 @@ const ContactusPage = () => {
                                 </div>
                                 <div>
                                     <h4 className="text-slate-900 font-semibold text-lg">Call Us</h4>
-                                    <p className="text-slate-600">+91 8777353002</p>
+                                    <p className="text-slate-600">+91 8777353002, +91 7980264700</p>
                                 </div>
                             </div>
                         </div>

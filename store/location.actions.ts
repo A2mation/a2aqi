@@ -41,7 +41,7 @@ export const detectIpLocation = async () => {
                     wind: data.wind,
                     co: data.co,
                     so2: data.so2,
-                    source: data.source || "ip",
+                    source: data.source || "CPCB",
                     loading: false,
                     lastUpdated: new Date(),
                 })
@@ -103,7 +103,7 @@ export const detectGpsLocation = () => {
                         wind: data.wind,
                         co: data.co,
                         so2: data.so2,
-                        source: "gps",
+                        source: data.source || "CPCB",
                         loading: false,
                         lastUpdated: new Date(),
                     })

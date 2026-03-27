@@ -30,6 +30,7 @@ import { ShareDialog } from "@/components/Share-Button";
 import { ViewMapsButton } from "../ViewMapsButton"
 import { de } from "zod/v4/locales"
 import { AQIDashboardLoader } from "./loaders/aqi-dashboard-loader"
+import { format } from "date-fns"
 
 const AQIMap = dynamic(() => import("./aqi-map"), { ssr: false })
 
@@ -46,6 +47,7 @@ export function AQIDashboard() {
     pm10,
     pm25,
     aqi,
+    source,
     error
   } = useLocationStore()
   const [open, setOpen] = useState(false);
@@ -135,7 +137,10 @@ export function AQIDashboard() {
 
 
                 <div className="text-sm md:text-lg text-muted-foreground">
-                  {lastUpdated ? `Last updated: ${lastUpdated}` : ""}
+                  {lastUpdated ? `Last updated: ${format(lastUpdated, "MMMM do, yyyy 'at' h:mm a")}` : "--"}
+                </div>
+                <div className="text-xs md:text-sm text-muted-foreground">
+                  {source ? `Source: ${source}` : "--"}
                 </div>
                 <div className="flex items-center justify-start">
                   <span className="text-sm pr-2">

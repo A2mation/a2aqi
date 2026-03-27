@@ -113,7 +113,7 @@ export default function AirQualityDashboard() {
 
   return (
     <div className="min-h-full bg-background p-6">
-      <div className="max-w-[90rem] mx-auto">
+      <div className="max-w-360 mx-auto">
         <div className="flex items-start justify-between mb-8">
           <div>
             <h1 className="text-4xl font-bold text-foreground mb-1">
@@ -159,7 +159,7 @@ export default function AirQualityDashboard() {
               )}
               <div className="p-6 flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="flex-shrink-0">{
+                  <div className="shrink-0">{
                     <Image
                       src={pollutant.icon}
                       width={60}
@@ -185,7 +185,7 @@ export default function AirQualityDashboard() {
                       {pollutant.unit}
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                  <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
                 </div>
               </div>
             </Card>

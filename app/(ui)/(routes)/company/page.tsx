@@ -1,10 +1,12 @@
 "use client"
 
-import React from 'react'
-import { ShieldCheck, Cpu, Map, Activity, ArrowRight, ExternalLink, Download } from 'lucide-react'
+import { useRouter } from 'next/navigation';
+import { ShieldCheck, Cpu, Map, Activity, ExternalLink, Download } from 'lucide-react'
+
 import { Button } from "@/components/ui/button"
 
 const CompanyPage = () => {
+    const router = useRouter()
     const driveDownloadUrl = "https://drive.google.com/file/d/1GJpWV2uJi-M3riv8z3PYEZ1_uzZw5ltW/view?usp=sharing";
     return (
         <div className="bg-slate-50 min-h-screen font-sans">
@@ -111,13 +113,16 @@ const CompanyPage = () => {
                             <div className="max-w-md text-center md:text-left">
                                 <h2 className="text-3xl font-bold mb-4">Ready to implement A2aqi?</h2>
                                 <p className="text-blue-100 text-lg">
-                                    Connect with our Sales Manager, <strong>Sujan Ghosh</strong>,
+                                    Connect with our Sales Manager,
                                     to discuss enterprise sensor deployments.
                                 </p>
                             </div>
                             <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-                                <Button className="bg-white text-blue-600 hover:bg-slate-100 h-14 px-10 font-bold text-lg">
-                                    Contact Sujan Ghosh
+                                <Button
+                                    className="bg-white text-blue-600 hover:bg-slate-100 h-14 px-10 font-bold text-lg"
+                                    onClick={() => router.push('/contact-us')}
+                                >
+                                    Contact Sales Manager
                                 </Button>
                                 <Button variant="link" className="text-white hover:text-blue-100">
                                     <a href="https://www.google.com/maps/search/?api=1&query=A2MATION+TECHNOLOGY+SOLUTION+Kolkata&query_place_id=ChIJQ1DfFA6R-DkRfbnEwQZ1kns" target="_blank" className="flex items-center">
