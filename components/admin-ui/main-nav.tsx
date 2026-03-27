@@ -54,6 +54,11 @@ const MainNav = ({
             active: pathName === `/admin/writer` || pathName === `/admin/writer/new` || pathName === `/admin/writer/${params.writerId}`
         },
         {
+            href: `/admin/monitor`,
+            label: 'Monitor',
+            active: pathName === `/admin/monitor` || pathName === `/admin/monitor/new` || pathName === `/admin/monitor/${params.monitorId}`
+        },
+        {
             href: `/admin/settings`,
             label: 'Settings',
             active: pathName === `/admin/settings` || pathName === `/admin/settings/new` || pathName === `/admin/settings/${params.settingId}`

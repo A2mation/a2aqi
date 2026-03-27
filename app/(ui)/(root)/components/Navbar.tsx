@@ -1,13 +1,13 @@
 "use client";
+
 import { useState } from "react";
 import { usePathname, useRouter } from 'next/navigation'
-import { PencilLine } from "lucide-react";
-
+import { Phone, PencilLine } from "lucide-react";
+import Link from "next/link";
 
 import {
   Navbar,
   NavBody,
-  NavItems,
   MobileNav,
   NavbarLogo,
   MobileNavHeader,
@@ -17,12 +17,12 @@ import {
 import Searchbar from "./Searchbar";
 import { NavbarMiddleSection } from "./NavMiddleSection";
 import { Button, buttonVariants } from "@/components/ui/button";
-import Link from "next/link";
 import { cn } from "@/lib/utils";
 
+
 export function NavbarMain() {
-  const pathname = usePathname();
   const router = useRouter();
+  const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -59,7 +59,13 @@ export function NavbarMain() {
               </Link>
             </>}
 
-            <Button variant="default">Book a call</Button>
+            <Link
+              href='/contact-us'
+              className={cn(buttonVariants({ variant: 'outline' }), "gap-2")}
+            >
+              <Phone className="h-4 w-4 text-blue-700" />
+              Contact Us
+            </Link>
           </div>
         </NavBody>
 
@@ -104,13 +110,13 @@ export function NavbarMain() {
                 </Link>
               </>}
 
-              <Button
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="default"
-                className="w-full"
+              <Link
+                href='/contact-us'
+                className={cn(buttonVariants({ variant: 'outline' }), "gap-2")}
               >
-                Book a call
-              </Button>
+                <Phone className="h-4 w-4 text-blue-700" />
+                Contact Us
+              </Link>
             </div>
           </MobileNavMenu>
         </MobileNav>
