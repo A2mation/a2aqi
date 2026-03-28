@@ -50,7 +50,6 @@ const MultiDeviceSyncHub = () => {
     }, []);
 
     const visibleData = useMemo(() => fullHistory.slice(-selectedDays), [selectedDays, fullHistory]);
-    console.log(visibleData)
 
     const deltaData = useMemo(() => {
         return visibleData.map((entry: DeviceDataPoint) => {

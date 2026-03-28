@@ -1,3 +1,4 @@
+import { MonitorAnalyticsDevice } from '@/types/monitors/monitor.analytics.type';
 import { motion } from 'framer-motion';
 import {
     Compass,
@@ -7,25 +8,6 @@ import {
     Navigation,
 } from 'lucide-react';
 
-interface DeviceData {
-    id: string;
-    name: string;
-    serialNo: string;
-    location: string;
-    lat: number;
-    lng: number;
-    type: 'OUTDOOR' | 'INDOOR';
-}
-
-const device: DeviceData = {
-    id: "65f2a1b",
-    name: "GreenZone-Monitor-04",
-    serialNo: "GZ-7721-X9",
-    location: "4th Avenue, Sunset Boulevard, LA",
-    lat: 20.5937, // India Latitude
-    lng: 78.9629, // India Longitude
-    type: 'OUTDOOR'
-};
 
 const getMapPos = (lat: number, lng: number) => {
     /**
@@ -53,14 +35,18 @@ const getMapPos = (lat: number, lng: number) => {
     };
 };
 
-const LocationStats = () => {
+const LocationStats = ({
+    device
+}: {
+    device: MonitorAnalyticsDevice
+}) => {
     const mapPos = getMapPos(device.lat, device.lng);
 
     return (
         <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col h-full transition-all hover:shadow-md">
 
             {/* 1. Header Area */}
-            <div className="p-7 pb-5 flex items-center justify-between border-b border-gray-50/80">
+            <div className="p-7 pb-5 flex items-center h-fit justify-between border-b border-gray-50/80">
                 <div className="flex items-center gap-4">
                     <div className="p-3 bg-rose-50/80 rounded-2xl text-rose-500 shadow-sm shadow-rose-100">
                         <MapPin size={22} />
@@ -86,7 +72,7 @@ const LocationStats = () => {
                 <div className="bg-gray-50/60 p-5 rounded-3xl border border-gray-100 transition-colors hover:bg-gray-50">
                     <label className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Primary Placement</label>
                     <p className="text-sm font-extrabold text-gray-800 leading-relaxed">
-                        {device.location}
+                        {device.location ? device.location : 'INDIA'}
                     </p>
                 </div>
 
@@ -119,7 +105,7 @@ const LocationStats = () => {
                             <div className="relative h-5 w-5 bg-indigo-600 border-[3px] border-white rounded-full shadow-2xl group/marker">
                                 {/* Coordinates Tooltip on Hover */}
                                 <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover/marker:opacity-100 transition-opacity bg-gray-900 text-white text-[8px] px-2 py-1 rounded whitespace-nowrap shadow-xl">
-                                    {device.lat}, {device.lng}
+                                    {device.lat.toFixed(2)}, {device.lng.toFixed(2)}
                                 </div>
                             </div>
                         </div>
@@ -152,7 +138,7 @@ const LocationStats = () => {
                         </motion.div>
                         <div>
                             <span className="block text-[9px] font-black text-gray-400 uppercase tracking-wider">Latitude</span>
-                            <span className="text-xs font-mono font-bold text-gray-700">{device.lat}</span>
+                            <span className="text-xs font-mono font-bold text-gray-700">{device.lat.toFixed(2)}</span>
                         </div>
                     </motion.div>
 
@@ -174,7 +160,7 @@ const LocationStats = () => {
                         </motion.div>
                         <div>
                             <span className="block text-[9px] font-black text-gray-400 uppercase tracking-wider">Longitude</span>
-                            <span className="text-xs font-mono font-bold text-gray-700">{device.lng}</span>
+                            <span className="text-xs font-mono font-bold text-gray-700">{device.lng.toFixed(2)}</span>
                         </div>
                     </motion.div>
                 </div>
