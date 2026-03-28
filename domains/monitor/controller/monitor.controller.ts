@@ -1,45 +1,30 @@
-
 import { NextResponse } from "next/server";
 
-import { latestsensorReadingWithDeviceDetails } from "../service/latest.sensor.monitor.service";
+import { monitorGuard } from "@/lib/monitorAuth";
+import { handleMonitorError } from "@/lib/handleRoleError";
+import { getDevicesByMonitorWithLatestAQIReadings } from "../service/device.monitor.service";
 
-export async function MonitorController(req: Request,
-) {
+
+export async function MonitorController(req: Request,) {
     try {
 
+        const { monitor } = await monitorGuard();
+
         const { searchParams } = new URL(req.url);
+        const search = searchParams.get("search") || "";
+        const page = parseInt(searchParams.get("page") || "1");
+        const limit = parseInt(searchParams.get("limit") || "10");
+        const skip = (page - 1) * limit;
 
-        const deviceId = searchParams.get("deviceId");
-
-        if (!deviceId || typeof deviceId !== "string") {
-            return NextResponse.json({
-                success: false,
-                message: "deviceId is required",
-            }, {
-                status: 400
-            });
-        }
-
-        if (typeof deviceId !== "string") {
-            return NextResponse.json({
-                success: false,
-                message: "startDate is required (YYYY-MM-DD)",
-            }, {
-                status: 400
-            });
-        }
-
-        const device = await latestsensorReadingWithDeviceDetails(deviceId);
+        const data = await getDevicesByMonitorWithLatestAQIReadings(monitor.id, search, limit, skip);
 
         return NextResponse.json({
             success: true,
-            device
+            devices: data.formattedDevices.map((item) => item.devices),
+            totalCount: data.totalCount
         });
 
     } catch (error: any) {
-        return NextResponse.json({
-            success: false,
-            message: error.message || "Internal Server Error",
-        });
+        return handleMonitorError(error);
     }
 }

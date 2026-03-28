@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getHeatmap } from "../service/hourly.reading.monitor.service";
 import { getSingleDeviceDetails } from "../service/device.monitor.service";
 import { getDailyBasicDashboardStats } from "../service/dailycustom.readings.service";
+import { handleMonitorError } from "@/lib/handleRoleError";
 
 export async function deviceIdController(req: Request,
     params: {
@@ -50,9 +51,6 @@ export async function deviceIdController(req: Request,
         });
 
     } catch (error: any) {
-        return NextResponse.json({
-            success: false,
-            message: error.message || "Internal Server Error",
-        });
+        return handleMonitorError(error);
     }
 }

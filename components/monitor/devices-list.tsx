@@ -1,18 +1,20 @@
 "use client"
 
 import Link from "next/link"
-import { useState, useMemo } from "react"
+import { useState } from "react"
+import { useQuery } from "@tanstack/react-query"
 import { MapPin, Activity, Shield, ChevronLeft, ChevronRight, Search, GitGraph } from "lucide-react"
 import { useRouter } from "next/navigation"
 
-import Header from "./Header"
+import { cn } from "@/lib/utils"
+import { http } from "@/lib/http"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { getAQIBgColor } from "@/helpers/aqi-color-pallet"
 import AddDeviceModal from "../modals/monior-add-device-modal"
+import Header from "./Header"
 
-// Updated Interface based on your Prisma Schema + AQI field
 interface Device {
     id: string
     name: string | null
@@ -23,40 +25,45 @@ interface Device {
     lat: number | null
     lng: number | null
     status: "UNASSIGNED" | "ACTIVE" | "MAINTENANCE"
-    aqi: number // Extra field requested
-    createdAt: string
+    aqi: number
+    createdAt: string,
+    totalCount: string
 }
 
-const initialDevices: Device[] = [
-    { id: "65f1a...", name: "Downtown Station", serialNo: "SN-9921-X", isActive: true, type: "OUTDOOR", location: "Central Park", lat: 40.785, lng: -73.968, status: "ACTIVE", aqi: 42, createdAt: "2024-01-10" },
-    { id: "65f1b...", name: "Office Lobby", serialNo: "SN-4432-B", isActive: true, type: "INDOOR", location: "HQ Floor 1", lat: 40.758, lng: -73.985, status: "ACTIVE", aqi: 12, createdAt: "2024-02-15" },
-    { id: "65f1c...", name: null, serialNo: "SN-1100-Z", isActive: false, type: "OUTDOOR", location: "West Pier", lat: 34.019, lng: -118.491, status: "UNASSIGNED", aqi: 85, createdAt: "2024-03-01" },
-    { id: "65f1d...", name: "Industrial Zone A", serialNo: "SN-8877-K", isActive: true, type: "OUTDOOR", location: "Factory Road", lat: 41.878, lng: -87.629, status: "MAINTENANCE", aqi: 156, createdAt: "2024-03-05" },
-    { id: "65f1e...", name: "Retail Center", serialNo: "SN-2233-L", isActive: true, type: "INDOOR", location: "Mall Entrance", lat: 34.052, lng: -118.243, status: "ACTIVE", aqi: 35, createdAt: "2024-03-10" },
-]
+interface DevicesResponse {
+    devices: Device[];
+    totalCount: number;
+}
 
 const ITEMS_PER_PAGE = 7
 
 export function DeviceList() {
     const router = useRouter();
-    const [devices, setDevices] = useState<Device[]>(initialDevices)
     const [isDarkMode, setIsDarkMode] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
     const [currentPage, setCurrentPage] = useState(1)
     const [searchQuery, setSearchQuery] = useState("")
 
-    // Filter and Search Logic
-    const filteredDevices = useMemo(() => {
-        return devices.filter(d =>
-            d.serialNo.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (d.name?.toLowerCase() || "").includes(searchQuery.toLowerCase())
-        )
-    }, [devices, searchQuery])
+    const { data, isLoading, isPlaceholderData } = useQuery<DevicesResponse>({
+        queryKey: ["devices", searchQuery, currentPage],
+        queryFn: async () => {
+            const response = await http.get(`/api/monitor`, {
+                params: {
+                    search: searchQuery,
+                    page: currentPage,
+                    limit: ITEMS_PER_PAGE,
+                },
+            });
+            return response.data;
+        },
+        placeholderData: (previousData) => previousData,
+        staleTime: 120000 // 2 mins
+    });
 
-    // Pagination Logic
-    const totalPages = Math.ceil(filteredDevices.length / ITEMS_PER_PAGE)
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
-    const paginatedItems = filteredDevices.slice(startIndex, startIndex + ITEMS_PER_PAGE)
+
+    const paginatedItems = data?.devices || [];
+    const totalCount = data?.totalCount || 0;
+    const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
 
     const getStatusBadge = (status: Device["status"]) => {
@@ -69,7 +76,10 @@ export function DeviceList() {
     }
 
     return (
-        <div className={`min-h-screen flex flex-col bg-background ${isDarkMode ? "dark" : ""}`}>
+        <div className={cn(
+            "min-h-screen flex flex-col bg-background",
+            isDarkMode && "dark",
+        )}>
             {/* Header */}
             <Header
                 setIsOpen={setIsOpen}
@@ -105,7 +115,10 @@ export function DeviceList() {
 
                 </div>
 
-                <div className="border rounded-xl bg-card overflow-hidden shadow-sm">
+                <div className={cn(
+                    "border rounded-xl bg-card overflow-hidden shadow-sm",
+                    isPlaceholderData ? "opacity-50 pointer-events-none" : "opacity-100"
+                )}>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
@@ -118,51 +131,59 @@ export function DeviceList() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y">
-                                {paginatedItems.map((device) => (
-                                    <tr
-                                        key={device.id}
-                                        className="hover:bg-muted/20 cursor-pointer transition-colors"
-                                        onClick={() => router.push(`/monitor/device/${device.id}`)}
-                                    >
-                                        <td className="px-6 py-4">
-                                            <div className="flex flex-col">
-                                                <span className="text-sm font-semibold text-foreground">{device.name || "Unnamed Device"}</span>
-                                                <span className="text-xs text-muted-foreground font-mono">{device.serialNo}</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex flex-col gap-1.5">
-                                                <div className="flex items-center gap-1.5 text-[11px] font-medium">
-                                                    {device.type === "OUTDOOR" ? <Shield className="h-3 w-3" /> : <Activity className="h-3 w-3" />}
-                                                    {device.type}
-                                                </div>
-                                                {getStatusBadge(device.status)}
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex flex-col">
-                                                <span className="text-sm text-foreground flex items-center gap-1">
-                                                    <MapPin className="h-3 w-3 text-muted-foreground" />
-                                                    {device.location || "Not Set"}
-                                                </span>
-                                                <span className="text-[10px] text-muted-foreground ml-4">
-                                                    {device.lat?.toFixed(3)}, {device.lng?.toFixed(3)}
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <Badge className={`${getAQIBgColor(device.aqi)} hover:${getAQIBgColor(device.aqi)}/80 text-center font-mono px-3`}>
-                                                {device.aqi} AQI
-                                            </Badge>
-                                        </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <div className={`inline-flex h-2 w-2 rounded-full ${device.isActive ? "bg-green-500 animate-pulse" : "bg-red-400"}`} />
-                                            <span className="text-xs ml-2 text-muted-foreground">
-                                                {device.isActive ? "Online" : "Offline"}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))}
+                                {isLoading || isPlaceholderData ?
+                                    <TableSkeleton /> :
+                                    paginatedItems.length !== 0 ?
+                                        (paginatedItems.map((device) => (
+                                            <tr
+                                                key={device.id}
+                                                className="hover:bg-muted/20 cursor-pointer transition-colors"
+                                                onClick={() => router.push(`/monitor/device/${device.id}`)}
+                                            >
+                                                <td className="px-6 py-4">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm font-semibold text-foreground">{device.name || "Unnamed Device"}</span>
+                                                        <span className="text-xs text-muted-foreground font-mono">{device.serialNo}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex flex-col gap-1.5">
+                                                        <div className="flex items-center gap-1.5 text-[11px] font-medium">
+                                                            {device.type === "OUTDOOR" ? <Shield className="h-3 w-3" /> : <Activity className="h-3 w-3" />}
+                                                            {device.type}
+                                                        </div>
+                                                        {getStatusBadge(device.status)}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm text-foreground flex items-center gap-1">
+                                                            <MapPin className="h-3 w-3 text-muted-foreground" />
+                                                            {device.location || "Not Set"}
+                                                        </span>
+                                                        <span className="text-[10px] text-muted-foreground ml-4">
+                                                            {device.lat?.toFixed(2)}, {device.lng?.toFixed(2)}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <Badge className={`${getAQIBgColor(Math.round(device.aqi))} hover:${getAQIBgColor(device.aqi)}/80 text-center font-mono px-3`}>
+                                                        {Math.round(device.aqi)} AQI
+                                                    </Badge>
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <div className={`inline-flex h-2 w-2 rounded-full ${device.isActive ? "bg-green-500 animate-pulse" : "bg-red-400"}`} />
+                                                    <span className="text-xs ml-2 text-muted-foreground">
+                                                        {device.isActive ? "Online" : "Offline"}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))) : (<tr>
+                                            <td colSpan={5} className="px-6 py-10 text-center text-muted-foreground">
+                                                No devices found matching your search.
+                                            </td>
+                                        </tr>)
+                                }
                             </tbody>
                         </table>
                     </div>
@@ -170,7 +191,7 @@ export function DeviceList() {
                     {/* Footer / Pagination */}
                     <div className="flex items-center justify-between px-6 py-4 bg-muted/10 border-t">
                         <span className="text-xs text-muted-foreground">
-                            Total Devices: <strong>{filteredDevices.length}</strong>
+                            Total Devices: <strong>{data?.totalCount}</strong>
                         </span>
                         <div className="flex items-center gap-4">
                             <span className="text-xs font-medium">Page {currentPage} of {totalPages}</span>
@@ -189,3 +210,31 @@ export function DeviceList() {
         </div>
     )
 }
+
+
+const TableSkeleton = () => (
+    <>
+        {[...Array(ITEMS_PER_PAGE)].map((_, i) => (
+            <tr key={i} className="border-b animate-pulse">
+                <td className="px-6 py-4">
+                    <div className="h-4 w-32 bg-muted rounded mb-2" />
+                    <div className="h-3 w-20 bg-muted/60 rounded" />
+                </td>
+                <td className="px-6 py-4">
+                    <div className="h-4 w-16 bg-muted rounded mb-2" />
+                    <div className="h-4 w-20 bg-muted/60 rounded" />
+                </td>
+                <td className="px-6 py-4">
+                    <div className="h-4 w-24 bg-muted rounded mb-2" />
+                    <div className="h-3 w-16 bg-muted/60 rounded" />
+                </td>
+                <td className="px-6 py-4">
+                    <div className="h-8 w-20 bg-muted rounded-full" />
+                </td>
+                <td className="px-6 py-4 text-right">
+                    <div className="inline-block h-4 w-12 bg-muted rounded" />
+                </td>
+            </tr>
+        ))}
+    </>
+);
