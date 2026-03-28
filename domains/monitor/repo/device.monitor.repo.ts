@@ -96,7 +96,12 @@ export async function getDevicesByDeviceId(deviceId: string) {
             serialNo: true,
             status: true,
             lat: true,
-            lng: true
+            lng: true,
+            model: {
+                select: {
+                    name: true
+                }
+            }
         }
     })
 

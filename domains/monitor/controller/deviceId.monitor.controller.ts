@@ -1,8 +1,10 @@
 
 import { NextResponse } from "next/server";
+
 import { getHeatmap } from "../service/hourly.reading.monitor.service";
 import { getSingleDeviceDetails } from "../service/device.monitor.service";
 import { getDailyBasicDashboardStats } from "../service/dailycustom.readings.service";
+import { getLatestSensorData } from "../service/latest.sensor.monitor.service";
 import { handleMonitorError } from "@/lib/handleRoleError";
 
 export async function deviceIdController(req: Request,
@@ -42,12 +44,14 @@ export async function deviceIdController(req: Request,
             dateStr: startDate,
             day: 30
         });
+        const latestReading = await getLatestSensorData(deviceId);
 
         return NextResponse.json({
             success: true,
+            device,
             hourly: data.heatmap,
             last30Days,
-            device,
+            latestReading,
         });
 
     } catch (error: any) {
