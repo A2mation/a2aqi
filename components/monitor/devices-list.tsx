@@ -1,19 +1,16 @@
 "use client"
 
-import type React from "react"
-import { useState, useCallback, useMemo } from "react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { MapPin, Activity, Shield, ChevronLeft, ChevronRight, Plus, Search, GitGraph } from "lucide-react"
-import { getAQIBgColor, getAQIColor } from "@/helpers/aqi-color-pallet"
-import AddDeviceModal from "../modals/monior-add-device-modal"
-import Heading from "../ui/Heading"
 import Link from "next/link"
+import { useState, useMemo } from "react"
+import { MapPin, Activity, Shield, ChevronLeft, ChevronRight, Search, GitGraph } from "lucide-react"
 import { useRouter } from "next/navigation"
+
+import Header from "./Header"
+import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { getAQIBgColor } from "@/helpers/aqi-color-pallet"
+import AddDeviceModal from "../modals/monior-add-device-modal"
 
 // Updated Interface based on your Prisma Schema + AQI field
 interface Device {
@@ -74,27 +71,11 @@ export function DeviceList() {
     return (
         <div className={`min-h-screen flex flex-col bg-background ${isDarkMode ? "dark" : ""}`}>
             {/* Header */}
-            <div className="border-b bg-card shrink-0">
-                <div className="max-w-7xl mx-auto px-6 py-6">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div>
-                            <Heading
-                                title="Device Management"
-                                description="Monitor and configure your sensor network"
-                            />
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-2 mr-4">
-                                <Label htmlFor="dark-mode" className="text-xs text-foreground">{isDarkMode ? `Dark Mode` : 'Light Mode'}</Label>
-                                <Switch id="dark-mode" checked={isDarkMode} onCheckedChange={setIsDarkMode} />
-                            </div>
-                            <Button size="sm" className="gap-2" onClick={() => setIsOpen(true)}>
-                                <Plus className="h-4 w-4" /> Register Device
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <Header
+                setIsOpen={setIsOpen}
+                isDarkMode={isDarkMode}
+                setIsDarkMode={setIsDarkMode}
+            />
 
             <AddDeviceModal
                 isOpen={isOpen}

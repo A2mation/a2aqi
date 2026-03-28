@@ -47,22 +47,20 @@ const MonitorLoginFrom = () => {
         );
         try {
             setLoading(true);
-            console.log(value);
             form.reset();
-            throw new Error();
 
-            // const res = await signIn("admin", {
-            //     ...value,
-            //     redirect: false
-            // })
+            const res = await signIn("monitor", {
+                ...value,
+                redirect: false
+            })
 
-            // if (res?.error) {
-            //     toast.error(res.error, { id: toastId });
-            //     return;
-            // }
+            if (res?.error) {
+                toast.error(res.error, { id: toastId });
+                return;
+            }
 
-            // toast.success(`Welcome back Monitor 👋`, { id: toastId });
-            // router.push("/monitor");
+            toast.success(`Welcome back Monitor 👋`, { id: toastId });
+            router.push("/monitor");
         } catch (error: any) {
             const message =
                 error?.response?.data?.message || "Something went wrong";

@@ -38,7 +38,27 @@ export const authOptions: NextAuthOptions = {
                     return null;
                 }
             },
+        }),    
+        
+
+        // 🖥️ Monitor
+        Credentials({
+            id: "monitor",
+            name: "Monitor Login",
+            credentials: { email: {}, password: {} },
+            async authorize(credentials) {
+                try {
+                    if (!credentials?.email || !credentials?.password) return null;
+
+                    const res = await http.post("api/monitor/auth", credentials);
+                    return res.data;
+                } catch (error) {
+                    console.error("Monitor login failed:", error);
+                    return null;
+                }
+            },
         }),
+
 
         // ✍️ WRITER
         Credentials({
@@ -54,9 +74,10 @@ export const authOptions: NextAuthOptions = {
                 } catch (error) {
                     console.error("Writer login failed:", error);
                     return null;
-                }
-            },
-        }),
+                }    
+            },    
+        }),    
+
 
         // 👤 USER
         Credentials({

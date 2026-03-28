@@ -11,7 +11,7 @@ export async function proxy(req: NextRequest) {
     const { pathname } = req.nextUrl;
 
     // Public admin sign-in
-    if (pathname === "/admin/sign-in" || pathname === "/admin-unauthorized") {
+    if (pathname === "/admin/sign-in" || pathname === "/admin-unauthorized" || pathname === "/monitor/sign-in") {
         return NextResponse.next();
     }
 
@@ -23,6 +23,10 @@ export async function proxy(req: NextRequest) {
 
         if (pathname.startsWith("/blogs/write")) {
             return NextResponse.redirect(new URL("/blogs/sign-in", req.url));
+        }
+
+        if (pathname.startsWith("/monitor")) {
+            return NextResponse.redirect(new URL("/monitor/sign-in", req.url));
         }
     }
 
@@ -36,8 +40,13 @@ export async function proxy(req: NextRequest) {
         return NextResponse.redirect(new URL("/admin-unauthorized", req.url));
     }
 
+    // MONITOR-only
+    if (pathname.startsWith("/monitor") && token?.role !== ROLE.MONITOR) {
+        return NextResponse.redirect(new URL("/monitor-unauthorized", req.url));
+    }
+
     return NextResponse.next();
 }
 export const config = {
-    matcher: ["/blogs/write", "/admin/:path*"]
+    matcher: ["/blogs/write", "/admin/:path*", "/monitor/:path*"]
 }

@@ -1,12 +1,12 @@
 import jwt from "jsonwebtoken";
-import { ContentWriterStatus } from "@prisma/client";
+import { ContentWriterStatus, MonitorStatus } from "@prisma/client";
 
 const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET!;
 
 export function signToken(
     id: string,
     email: string,
-    status: ContentWriterStatus
+    status: ContentWriterStatus | MonitorStatus
 ) {
     return jwt.sign(
         { id: id, email, status },

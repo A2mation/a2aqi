@@ -36,7 +36,7 @@ export function Unauthorized({
                     </Button>
                     <Button asChild className="w-full sm:w-auto">
                         <Link href={
-                            type === ROLE.ADMIN ? "/admin/sign-in" : type === ROLE.WRITER ? '/blogs/sign-in' : '/user/sing-in'
+                            type === ROLE.ADMIN ? "/admin/sign-in" : type === ROLE.WRITER ? '/blogs/sign-in' : type === ROLE.MONITOR ? '/monitor/sign-in' : '/user/sign-in'
                         }>Return to Login</Link>
                     </Button>
                 </div>
