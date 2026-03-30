@@ -1,6 +1,83 @@
 import { AQIReading, AQISource } from "@prisma/client";
 
-export const transformInternalData = (records: any[], state: string): AQIReading[] => {
+export const transformInternalData = (records: any[]) => {
+  return records.map((data) => {
+
+    return {
+      id: data.device.id || String(data.id),
+      lat: Number(data.device?.lat || data.lat),
+      lng: Number(data.device?.lng || data.lng),
+      aqi: Number(data.aqi),
+    };
+  });
+};
+
+
+export const transformInternalHistoryData = (records: any[], source: string) => {
+  return records.map((data) => {
+    const isAggregate = 'sumAqi' in data;
+    const count = data.count || 1;
+
+    // Helper to extract average (for aggregates) or raw (for latest)
+    const getVal = (field: string) => {
+      let value;
+      if (isAggregate) {
+        // Map standard field names to their "sum" counterparts in DailyAggregateReading
+        const sumField = `sum${field.charAt(0).toUpperCase() + field.slice(1)}`;
+        value = data[sumField];
+      } else {
+        value = data[field];
+      }
+
+      if (value === null || value === undefined) return null;
+      return Number(Number(value / (isAggregate ? count : 1)).toFixed(1));
+    };
+
+    const timestamp = data.dayStart || data.updatedAt || data.createdAt || new Date();
+
+    return {
+      id: String(data.id),
+      location: data.device?.loaction || data.location || "Local Area",
+      city: data.device?.city || data.city || "Local City",
+      state: data.state || 'Not Set Yet',
+      country: "India",
+      lat: Number(data.device?.lat || data.lat || 0),
+      lng: Number(data.device?.lng || data.lng || 0),
+
+      // 1-8: Core Pollution & Weather
+      aqi: getVal("aqi"),
+      pm25: getVal("pm25"),
+      pm10: getVal("pm10"),
+      no2: getVal("no2"),
+      so2: getVal("so2"),
+      o3: getVal("o3"),
+      co: getVal("co"),
+      co2: getVal("co2"),
+
+      // 9-16: Advanced Sensors
+      pm1: getVal("pm1"),
+      noise: getVal("noise"),
+      tvoc: getVal("tvoc"),
+      smoke: getVal("smoke"),
+      methane: getVal("methane"),
+      h2: getVal("h2"),
+      ammonia: getVal("ammonia"),
+      h2s: getVal("h2s"),
+
+      // 17-18: Environment
+      temperature: getVal("temperature"),
+      humidity: getVal("humidity"),
+
+      // Meta
+      source: source || "INTERNAL",
+      stationId: data.device?.serialNo || null,
+      measuredAt: timestamp,
+    };
+  });
+};
+
+
+export const transformInternalForNearbyLocationsData = (records: any[], state: string): AQIReading[] => {
   return records.map((data) => {
     const timestamp = data.updatedAt ? new Date(data.updatedAt) : new Date();
 

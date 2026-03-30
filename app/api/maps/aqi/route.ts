@@ -23,6 +23,12 @@ export async function GET(req: Request) {
             lng: { gte: west, lte: east },
         },
         orderBy: { measuredAt: "desc" },
+        select:{
+            id: true,
+            lat: true,
+            lng: true,
+            aqi: true,
+        },
         take: 500,
     });
 
@@ -37,51 +43,26 @@ export async function GET(req: Request) {
         select: {
             id: true,
             aqi: true,
-            pm10: true,
-            pm25: true,
-            so2: true,
-            no2: true,
-            co2: true,
-            co: true,
-            o3: true,
-            noise: true,
-            pm1: true,
-            tvoc: true,
-            smoke: true,
-            methane: true,
-            h2: true,
-            ammonia: true,
-            h2s: true,
-            temperature: true,
-            humidity: true,
             device: {
                 select: {
-                    serialNo: true,
+                    id: true,
                     lat: true,
-                    lng: true,
-                    loaction: true
+                    lng: true
                 }
             },
-            updatedAt: true
         }
     });
 
-    const sensorData = transformInternalData(c, readings[0].state ?? 'Not Found');
+    const sensorData = transformInternalData(c);
 
     const allReadings = [...readings, ...sensorData]
 
     const response = allReadings.map((r) => ({
         id: r.id,
-        name: r.city,
         lat: r.lat,
         lng: r.lng,
         aqi: r.aqi,
-        pm25: r.pm25 ?? 0,
-        pm10: r.pm10 ?? 0,
-        o3: r.o3 ?? 0,
-        no2: r.no2 ?? 0,
-        so2: r.so2 ?? 0,
-        co: r.co ?? 0,
+        
     }));
 
     return new Response(JSON.stringify(response), {

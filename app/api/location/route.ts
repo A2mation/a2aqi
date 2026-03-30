@@ -6,7 +6,7 @@ import { http } from "@/lib/http"
 import { prisma } from "@/lib/prisma"
 import { haversine } from "@/helpers/haversine"
 import { rateLimit } from "@/helpers/rateLimiter"
-import { transformInternalData } from "@/helpers/transformInternalData"
+import { transformInternalForNearbyLocationsData } from "@/helpers/transformInternalData"
 
 
 /* -----------------------------------
@@ -176,7 +176,7 @@ export async function GET(req: NextRequest) {
                 updatedAt: true
             }
         })
-        const sensorData = transformInternalData(c, candidates[0].state);
+        const sensorData = transformInternalForNearbyLocationsData(c, candidates[0].state);
 
         const allReadings = [...candidates, ...sensorData];
 
