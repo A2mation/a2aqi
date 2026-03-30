@@ -1,18 +1,17 @@
 "use client";
 
-import axios from "axios";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import dynamic from "next/dynamic";
-import { Popup, useMapEvents } from "react-leaflet";
-import { useEffect, useRef, useState } from "react";
-
-import { getAQIBgColor } from "@/helpers/aqi-color-pallet";
-import { AirQualityCard } from "./air-quality-card";
-import { AQIMarker } from "../page";
+import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, RefreshCcw } from "lucide-react";
-import { useDebounce } from "@/hooks/use-debounce";
+import { useMap, useMapEvents } from "react-leaflet";
+
+import { http } from "@/lib/http";
+import { AirQualityCard } from "./air-quality-card";
+import { getAQIBgColor } from "@/helpers/aqi-color-pallet";
+
 
 const MapContainer = dynamic(
   () => import("react-leaflet").then((m) => m.MapContainer),
@@ -27,6 +26,7 @@ const Marker = dynamic(
   { ssr: false }
 );
 
+
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
@@ -34,24 +34,41 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
 
-const aqiIcon = (value: number) =>
-  L.divIcon({
+
+const aqiIcon = (value: number) => {
+  const bgColor = getAQIBgColor(value);
+
+  return L.divIcon({
     className: "bg-transparent",
     html: `
-      <div class="relative flex items-center justify-center">
-        <span class="absolute inline-flex h-10 w-10 rounded-full ${getAQIBgColor(
-      value
-    )} opacity-60 animate-ping"></span>
-        <span class="relative inline-flex items-center justify-center px-2 py-2 rounded-full ${getAQIBgColor(
-      value
-    )} text-white text-sm font-bold shadow-md">
-          ${value}
-        </span>
+      <div class="relative flex items-center justify-center group">
+        <div class="relative flex items-center justify-center 
+                    min-w-11 h-11
+                    rounded-[18px] ${bgColor} 
+                    text-white text-[14px] font-black
+                    shadow-[0_8px_16px_-4px_rgba(0,0,0,0.3)] 
+                    border-[2.5px] border-white
+                    transition-all duration-200 group-hover:scale-110 group-hover:-translate-y-1">
+          
+          <span class="drop-shadow-sm">${value}</span>
+
+          <div class="absolute -bottom-1.25 left-1/2 -translate-x-1/2 
+                      w-3 h-3 ${bgColor} rotate-45 
+                      border-r-[2.5px] border-b-[2.5px] border-white"></div>
+        </div>
       </div>
     `,
-    iconSize: [40, 40],
-    iconAnchor: [20, 20],
+    iconSize: [50, 50],
+    iconAnchor: [25, 40],
   });
+};
+
+export type StationData = {
+  id: string;
+  lat: number;
+  lng: number;
+  aqi: number;
+}
 
 export default function Map({
   lat,
@@ -61,27 +78,30 @@ export default function Map({
   lng: number | null;
 }) {
   const [mounted, setMounted] = useState(false);
-  const [selectedStation, setSelectedStation] = useState<AQIMarker | null>(null);
+  const [selectedStation, setSelectedStation] = useState<StationData | null>(null);
   const [bounds, setBounds] = useState<any>(null);
-
-  const debouncedBounds = useDebounce(bounds, 400);
 
   const { data: markers = [],
     isPending,
     isFetching,
     isError
   } = useQuery({
-    queryKey: ["map-aqi-bounds", debouncedBounds],
-    queryFn: async () => {
-      const res = await axios.get("/api/maps/aqi", { params: debouncedBounds });
+    queryKey: ["map-aqi-bounds", bounds],
+    queryFn: async ({ signal }) => {
+      const res = await http.get("/api/maps/aqi", {
+        params: bounds,
+        signal
+      });
       return res.data;
     },
-    enabled: !!debouncedBounds,
+    enabled: !!bounds,
 
     placeholderData: (previousData) => previousData,
+
+    staleTime: 30000,
   });
 
-  const showFullLoader = isPending && !!debouncedBounds;
+  const showFullLoader = isPending || (isFetching && markers.length === 0);
   const showBackgroundLoader = isFetching && !isPending;
 
   useEffect(() => { setMounted(true); }, []);
@@ -106,22 +126,29 @@ export default function Map({
         <MapEvents onBoundsChange={setBounds} />
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-        {markers.map((station: AQIMarker) => (
+        {markers && markers.length > 0 ? (markers.map((station: StationData) => (
           <Marker
             key={station.id}
             position={[station.lat, station.lng]}
             icon={aqiIcon(station.aqi)}
             eventHandlers={{ click: () => setSelectedStation(station) }}
           />
-        ))}
+        ))) : <div className="absolute top-20 left-1/2 -translate-x-1/2 z-1000 pointer-events-none">
+          <div className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border border-amber-200 flex items-center gap-2">
+            <span className="text-amber-600 text-sm font-medium">
+              No air quality stations found in this area.
+            </span>
+            <ZoomOutButton />
+          </div>
+        </div>}
       </MapContainer>
 
-      <div className="absolute top-3/4 md:top-1/4 left-3 z-">
+      <div className="fixed inset-x-0 bottom-0 z-100 h-[45vh] md:h-auto md:absolute md:top-24 md:left-6 md:w-95 md:bottom-auto">
         <AirQualityCard station={selectedStation} />
       </div>
 
       {showFullLoader && (
-        <div className="absolute inset-0 z- flex items-center justify-center bg-white/50 backdrop-blur-sm">
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/50 backdrop-blur-sm">
           <div className="flex flex-col items-center gap-2">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
             <p className="text-sm font-medium">Loading AQI Data...</p>
@@ -168,4 +195,22 @@ function MapEvents({ onBoundsChange }: { onBoundsChange: (b: any) => void }) {
   }, [map, onBoundsChange]);
 
   return null;
+}
+
+
+function ZoomOutButton() {
+  const map = useMap();
+
+  const handleZoomOut = () => {
+    map.setZoom(map.getZoom() - 2);
+  };
+
+  return (
+    <button
+      onClick={handleZoomOut}
+      className="pointer-events-auto mt-1 text-xs font-semibold text-blue-600 hover:text-blue-800 underline transition-colors"
+    >
+      Try zooming out
+    </button>
+  );
 }
