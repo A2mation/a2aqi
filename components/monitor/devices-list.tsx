@@ -90,7 +90,7 @@ export function DeviceList() {
             <AddDeviceModal
                 isOpen={isOpen}
                 onClose={() => setIsOpen(false)}
-                loading={false}
+                loading={isLoading}
             />
 
             {/* Main Content */}

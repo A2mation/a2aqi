@@ -1,6 +1,9 @@
 
 import {
+    checkDeviceAssignment,
+    createDeviceRegistration,
     getDeviceById,
+    getDeviceIdBySerialNo,
     getDevices,
     getDevicesByDeviceId,
     getDevicesByMonitorId,
@@ -78,6 +81,13 @@ export async function getSingleDeviceDetails(deviceId: string) {
     return devices
 }
 
+export async function getSingleDeviceDetailsSerialNo(serialNo: string) {
+   
+    const devices = await getDeviceIdBySerialNo(serialNo);
+
+    return devices
+}
+
 // Service: Get single device by ID
 export async function getDevice(deviceId: string) {
     if (!deviceId) {
@@ -116,4 +126,23 @@ export async function getAllDevices(filters?: {
     const devices = await getDevices(filters)
 
     return devices
+}
+
+// Service: Add device by monitor through serial number
+export async function registerDevice(serialNo: string, monitorId: string) {
+    if (!serialNo) {
+        throw new Error("Serial number is required")
+    }
+    if (!monitorId) {
+        throw new Error("Monitor ID is required")
+    }
+    
+    const deviceId = await getDeviceIdBySerialNo(serialNo);
+
+    return await createDeviceRegistration(deviceId, monitorId);
+}
+
+export async function existingAssignment(deviceId: string) {
+    const assignment = await checkDeviceAssignment(deviceId);
+    return !!assignment;
 }

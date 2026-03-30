@@ -152,3 +152,36 @@ export async function getDevices(filters?: {
         }
     })
 }
+
+export async function getDeviceIdBySerialNo(serialNo: string) {
+    const device = await prisma.device.findUnique({
+        where: { serialNo },
+        select: { id: true }
+    })
+    if (!device) {
+        throw new Error(`Device with serialNo ${serialNo} not found`)
+    }
+    return device.id;
+}
+
+export async function createDeviceRegistration(deviceId: string, monitorId: string) {
+    return prisma.monitor.update({
+        where: { id: monitorId },
+        data: {
+            devices: {
+                create: {
+                    device: {
+                        connect: { id: deviceId }
+                    }
+                }
+            }
+        }
+    })
+}
+
+export async function checkDeviceAssignment(deviceId: string) {
+    return prisma.monitorDevice.findFirst({
+        where: { deviceId },
+        select: { id: true }
+    });
+}

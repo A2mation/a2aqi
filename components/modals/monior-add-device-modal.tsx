@@ -1,16 +1,19 @@
 "use client"
 
+import toast from 'react-hot-toast'
 import { useEffect, useState } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { Modal } from '../ui/modal'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
+import { http } from '@/lib/http'
 
 interface AddDeviceModalProps {
     isOpen: boolean
     onClose: () => void
-    loading?: boolean
+    loading: boolean
 }
 
 const AddDeviceModal = ({
@@ -18,14 +21,36 @@ const AddDeviceModal = ({
     onClose,
     loading
 }: AddDeviceModalProps) => {
+    const queryClient = useQueryClient();
     const [isMounted, setIsMounted] = useState(false);
     const [serialNo, setSerialNo] = useState("");
 
     useEffect(() => {
         setIsMounted(true);
-    }, [])
+    }, []);
 
-    // Reset the input field whenever the modal is closed/opened
+    const { mutate: registerDevice, isPending } = useMutation({
+        mutationFn: async (newSerial: string) => {
+            const response = await http.post('/api/monitor/device/register-device', {
+                serialNo: newSerial
+            });
+            if(!response.data.success) {
+                throw new Error(response.data.message || "Failed to register device");
+            }
+            return response.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['devices'] });
+            toast.success("Device registered successfully!");
+            setSerialNo("");
+            onClose();
+        },
+        onError: (error) => {
+            toast.error(error.message || "Failed to register device");
+            console.error("Registration failed:", error);
+        }
+    });
+
     useEffect(() => {
         if (!isOpen) {
             setSerialNo("");
@@ -34,12 +59,10 @@ const AddDeviceModal = ({
 
     const onSubmit = () => {
         if (!serialNo.trim()) return;
-        console.log(serialNo)
+        registerDevice(serialNo);
     }
 
-    if (!isMounted) {
-        return null;
-    }
+    if (!isMounted) return null;
 
     return (
         <Modal
@@ -54,7 +77,7 @@ const AddDeviceModal = ({
                     <Label htmlFor="serialNo">Device Serial Number</Label>
                     <Input
                         id="serialNo"
-                        disabled={loading}
+                        disabled={isPending}
                         placeholder="e.g. SN-9921-X"
                         value={serialNo}
                         onChange={(e) => setSerialNo(e.target.value)}
@@ -66,21 +89,21 @@ const AddDeviceModal = ({
             </div>
             <div className='pt-6 space-x-2 flex items-center justify-end w-full'>
                 <Button
-                    disabled={loading}
+                    disabled={isPending}
                     variant="outline"
                     onClick={onClose}
                 >
                     Cancel
                 </Button>
                 <Button
-                    disabled={loading || !serialNo.trim()}
+                    disabled={isPending || !serialNo.trim() || loading}
                     onClick={onSubmit}
                 >
-                    Register Device
+                    {isPending ? "Registering..." : "Register Device"}
                 </Button>
             </div>
         </Modal>
     )
 }
 
-export default AddDeviceModal
+export default AddDeviceModal;
