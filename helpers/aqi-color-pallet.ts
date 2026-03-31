@@ -25,7 +25,7 @@ export const aqiColorPallet: AQIPallet[] = [
         color: "#ACB015",
         borderClass: "border-yellow-400",
         backgroundColor: "bg-yellow-500",
-        bg: "from-white via-yellow-50 to-yellow-100 dark:from-yellow-950 dark:via-yellow-900 dark:to-yellow-950",
+        bg: "from-yellow-50 via-yellow-50 to-yellow-100 dark:from-yellow-950 dark:via-yellow-900 dark:to-yellow-950",
         text: "text-yellow-700 dark:text-yellow-400",
         card: "bg-yellow-50/80 dark:bg-yellow-950/40",
         range: [51, 100]
@@ -72,7 +72,7 @@ export const aqiColorPallet: AQIPallet[] = [
     },
 ];
 
-export const getAQIStatus = (aqi: number) : string => {
+export const getAQIStatus = (aqi: number): string => {
     return aqiColorPallet.find(
         (p) => aqi >= p.range[0] && aqi <= p.range[1]
     )?.label ?? "Hazardous";
@@ -109,25 +109,63 @@ export const getAQIBgColor = (aqi: number): string => {
 };
 
 export type AQITheme = {
-  label: string
-  color: string
-  borderClass: string
-  bg: string
-  text: string
-  card: string
+    label: string
+    color: string
+    borderClass: string
+    bg: string
+    text: string
+    card: string
 }
 
 export const getAQITheme = (value: number): AQITheme => {
-  return (
-    aqiColorPallet.find(
-      (p) => value >= p.range[0] && value <= p.range[1]
-    ) ?? {
-      label: "Unknown",
-      color: "#000000",
-      borderClass: "border-gray-300",
-      bg: "from-gray-100 to-gray-50 dark:from-gray-900 dark:to-gray-800",
-      text: "text-gray-600 dark:text-gray-400",
-      card: "bg-gray-50/80 dark:bg-gray-900/40",
-    }
-  )
+    return (
+        aqiColorPallet.find(
+            (p) => value >= p.range[0] && value <= p.range[1]
+        ) ?? {
+            label: "Unknown",
+            color: "#000000",
+            borderClass: "border-gray-300",
+            bg: "from-gray-100 to-gray-50 dark:from-gray-900 dark:to-gray-800",
+            text: "text-gray-600 dark:text-gray-400",
+            card: "bg-gray-50/80 dark:bg-gray-900/40",
+        }
+    )
 }
+
+
+export const getAQIRecommendation = (aqi: number) => {
+    if (aqi <= 50) {
+        return {
+            text: "Perfect time for outdoor exercise and opening windows for fresh air.",
+            short: "Excellent Conditions"
+        };
+    }
+    if (aqi <= 100) {
+        return {
+            text: "Air quality is acceptable. Sensitive individuals should limit prolonged outdoor exertion.",
+            short: "Acceptable Air"
+        };
+    }
+    if (aqi <= 150) {
+        return {
+            text: "Members of sensitive groups may experience health effects. General public is less likely to be affected.",
+            short: "Use Caution"
+        };
+    }
+    if (aqi <= 200) {
+        return {
+            text: "Everyone may begin to experience health effects. Avoid prolonged outdoor activities.",
+            short: "Unhealthy Environment"
+        };
+    }
+    if (aqi <= 300) {
+        return {
+            text: "Health alert: everyone may experience more serious health effects. Stay indoors as much as possible.",
+            short: "Health Warning"
+        };
+    }
+    return {
+        text: "Emergency conditions. The entire population is likely to be affected. Keep all windows closed.",
+        short: "Hazardous Alert"
+    };
+};

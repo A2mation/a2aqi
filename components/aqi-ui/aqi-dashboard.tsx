@@ -2,375 +2,329 @@
 
 import { useEffect, useState } from "react"
 import {
-  Share2,
-  Cloud,
   Droplets,
   Locate,
+  Sun,
+  Map as MapIcon,
 } from "lucide-react"
 import dynamic from "next/dynamic"
 import Image from 'next/image'
+import { motion } from "framer-motion"
+import { format } from "date-fns"
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { AQITheme, getAQITheme } from "@/helpers/aqi-color-pallet"
+import { getAQITheme, AQITheme, getAQIRecommendation } from "@/helpers/aqi-color-pallet"
 import { detectIpLocation, detectGpsLocation } from "@/store/location.actions"
 import { useLocationStore } from "@/store/location.store"
-import { Skeleton } from "@/components/ui/skeleton"
-import { AQIScale } from "./aqi-scale"
+import { AQIDashboardLoader } from "./loaders/aqi-dashboard-loader"
 import { cn } from "@/lib/utils"
 import { SparklesCore } from "../ui/sparkles"
-import { BackgroundGradient } from "../ui/background-gradient"
-import { ShareDialog } from "@/components/Share-Button";
-import { ViewMapsButton } from "../ViewMapsButton"
-import { de } from "zod/v4/locales"
-import { AQIDashboardLoader } from "./loaders/aqi-dashboard-loader"
-import { format } from "date-fns"
+import Link from "next/link"
+import DashboardToggle from "../ui/DashboardToggle"
 
 const AQIMap = dynamic(() => import("./aqi-map"), { ssr: false })
 
-export function AQIDashboard() {
+
+const AirQualityImages: Record<string, string> = {
+  Good: "/assets/aqi-moods/Good.png",
+  Moderate: "/assets/aqi-moods/Moderate.png",
+  Poor: "/assets/aqi-moods/Poor.png",
+  Unhealthy: "/assets/aqi-moods/Unhealthy.png",
+  Severe: "/assets/aqi-moods/Severe.png",
+  Hazardous: "/assets/aqi-moods/Hazard.png",
+};
+
+export default function AQIDashboard() {
   const {
-    location,
-    state,
-    country,
-    loading,
-    lastUpdated,
-    temp,
-    humidity,
-    wind,
-    pm10,
-    pm25,
-    aqi,
-    source,
-    error
+    location, state, country, loading, lastUpdated,
+    temp, humidity, wind, pm10, pm25, aqi, source, error
   } = useLocationStore()
-  const [open, setOpen] = useState(false);
 
-  const [theme, setTheme] = useState<AQITheme>({
-    label: "Unknown",
-    color: "#9CA3AF",
-    borderClass: "border-gray-200 dark:border-gray-800",
-    bg: "from-white via-gray-50 to-gray-100 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900",
-    text: "text-gray-700 dark:text-gray-300",
-    card: "bg-white/80 dark:bg-neutral-900/60 backdrop-blur-md",
-
-  })
-
-  const AirQualityImages: Record<string, string> = {
-    Good: "/assets/aqi-moods/Good.png",
-    Moderate: "/assets/aqi-moods/Moderate.png",
-    Poor: "/assets/aqi-moods/Poor.png",
-    Unhealthy: "/assets/aqi-moods/Unhealthy.png",
-    Severe: "/assets/aqi-moods/Severe.png",
-    Hazardous: "/assets/aqi-moods/Hazard.png",
-  };
-
+  const [view, setView] = useState<"aqi" | "temp">("aqi");
+  const [theme, setTheme] = useState<AQITheme>(getAQITheme(0))
 
   useEffect(() => {
     const initLocation = async () => {
-      try {
-        await detectGpsLocation()
-      } catch {
-        await detectIpLocation()
-      }
+      try { await detectGpsLocation() } catch { await detectIpLocation() }
     }
-
     initLocation()
   }, [])
 
-
-
-
   useEffect(() => {
-    if (typeof aqi === "number") {
-      setTheme(getAQITheme(aqi))
-    }
+    if (typeof aqi === "number") setTheme(getAQITheme(aqi))
   }, [aqi])
-  const moodImage = AirQualityImages[theme.label]
 
-  if (loading && !lastUpdated) {
-    return (
-      <AQIDashboardLoader />
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-red-500">
-        {error}
-      </div>
-    )
-  }
+  if (loading && !lastUpdated) return <AQIDashboardLoader />
+  if (error) return <div className="min-h-screen flex items-center justify-center text-destructive font-bold">{error}</div>
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Map */}
-      <div className="relative h-[35vh] bg-muted">
-        <AQIMap />
-      </div>
+    <div className="min-h-fit bg-background text-foreground selection:bg-primary/20">
 
-      {/* Dashboard */}
-      <div className="max-w-400 mx-auto px-4 -mt-32 relative z-10 pb-12">
-        <Card className={` shadow-2xl bg-linear-to-br ${theme.bg}`}>
+      <main className="pt-28 pb-12 px-6 max-w-350 mx-auto space-y-12">
 
-          <div className="p-6 sm:p-8 lg:p-10 backdrop-blur-sm">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:justify-between gap-4 mb-8">
-              <div className="flex gap-y-2 flex-col">
-                <h1 className="text-3xl md:text-5xl font-semibold">Real-time Air Quality Index (AQI)</h1>
+        {/* --- Hero Section --- */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className={cn(
+              "lg:col-span-8 rounded-4xl p-8 md:p-12 border border-border/60 hover:shadow-lg flex flex-col justify-between min-h-112.5 relative transition-colors duration-700",
+              `bg-linear-to-br from-${theme.bg}`
+            )}
+          >
+            {/* Floating Mood Image Layer */}
+            <motion.div
+              key={theme.label}
+              initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              className="absolute top-1/2 right-0 -translate-y-1/2 pointer-events-none z-0"
+            >
+              <Image
+                src={AirQualityImages[theme.label] || AirQualityImages.Good}
+                alt={theme.label}
+                width={150}
+                height={150}
+                className="object-contain"
+              />
+            </motion.div>
 
-                <div className={`font-semibold text-sm md:text-2xl underline ${theme.text}`}>
-                  {location || state || country ? (
-                    `${(location ?? "").split(",").slice(0, 3).map(s => s.trim()).join(", ")}, ${state}`
-                  ) : (
-                    <span className="text-muted-foreground">
-                      Location unavailable
-                    </span>
-                  )}
-                </div>
-
-
-                <div className="text-sm md:text-lg text-muted-foreground">
-                  {lastUpdated ? `Last updated: ${format(lastUpdated, "MMMM do, yyyy 'at' h:mm a")}` : "--"}
-                </div>
-                <div className="text-xs md:text-sm text-muted-foreground">
-                  {source ? `Source: ${source}` : "--"}
-                </div>
-                <div className="flex items-center justify-start">
-                  <span className="text-sm pr-2">
-                    Powered by
-                    <a href="https://a2mation.in/" className="pl-1">
-                      A2mation
-                    </a>
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-8">
+                <span
+                  className="inline-flex items-center gap-2 px-4 py-1.5 text-white text-[10px] font-bold tracking-[0.2em] uppercase rounded-full shadow-lg"
+                  style={{ backgroundColor: theme.color }}
+                >
+                  <span className="relative flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-600"></span>
                   </span>
-                  <div>
-                    {/* <Image
-                      src="/assets/a2mation-logo.png"
-                      width={90}
-                      height={5}
-                      alt="Picture of the author"
-                    /> */}
+                  LIVE STATUS • {location?.split(',')[0].toUpperCase() || 'LOCAL'}, {state ? `${state.toUpperCase()}, ` : ''}{country || 'CH'}
+                </span>
+
+                <div className="hidden md:flex flex-col items-end opacity-60">
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">Last Updated</span>
+                  <span className="text-[10px] font-bold text-foreground">
+                    {lastUpdated ? format(new Date(lastUpdated), 'iii, hh:mm a') : '--:--'}
+                  </span>
+                </div>
+              </div>
+
+              <h1 className="text-5xl md:text-6xl lg:text-8xl font-black tracking-tighter leading-[0.9] text-foreground max-w-2xl">
+                Your air quality is
+                <span className="ml-4 px-4 py-2 rounded-full" style={{ color: theme.color }}>
+                  {theme.label}
+                </span>
+                .
+              </h1>
+
+              {/* Weather Quick-Stats */}
+              <div className="mt-10 flex flex-wrap gap-4 relative z-10">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 15 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.2, ease: [0.19, 1, 0.22, 1] }}
+                  whileHover={{ y: -4 }}
+                  className="bg-background/30 backdrop-blur-md px-4 md:px-6 py-4 rounded-2xl border border-white/10 flex items-center gap-4 shadow-xl transition-all duration-300"
+                >
+                  <div className="p-2.5 rounded-xl bg-orange-500/10 border border-orange-500/20 shadow-[0_0_15px_rgba(249,115,22,0.1)]">
+                    <motion.div
+                      animate={{
+                        rotate: 360
+                      }}
+                      transition={{
+                        duration: 8,
+                        repeat: Infinity,
+                        ease: "linear"
+                      }}
+                    >
+                      <Sun className="h-5 w-5 text-orange-500" />
+                    </motion.div>
                   </div>
-                </div>
-              </div>
 
-              <div className="flex items-start md:items-center flex-col md:flex-row gap-3">
-                {/* Map Button – Primary Action */}
-                <Button
-                  disabled={loading}
-                  onClick={async () => {
-                    if (loading) return
+                  <div>
+                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.15em] leading-none mb-1.5 opacity-80">
+                      Current Temp
+                    </p>
+                    <p className="text-3xl font-black tracking-tighter text-foreground italic">
+                      {temp != null ? `${parseFloat(temp.toString()).toFixed(1)}°` : '--'}
+                      <span className="text-xl font-bold text-muted-foreground/60 not-italic ml-1">C</span>
+                    </p>
+                  </div>
+                </motion.div>
 
-                    try {
-                      await detectGpsLocation()
-                    } catch {
-                      await detectIpLocation()
-                    }
-                  }}
-                  className="flex items-center cursor-pointer"
-                  variant="outline"
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 15 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.2, delay: 0.15, ease: [0.19, 1, 0.22, 1] }}
+                  whileHover={{ y: -4 }}
+                  className="bg-background/30 backdrop-blur-md px-4 md:px-6 py-4 rounded-2xl border border-white/10 flex items-center gap-4 shadow-xl transition-all duration-300"
                 >
-                  <Locate className="h-5 w-5 mr-2" /> Locate me
-                </Button>
+                  <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.1)]">
+                    <motion.div
+                      animate={{
+                        y: [0, -4, 0],
+                        rotate: [0, -5, 5, 0]
+                      }}
+                      transition={{
+                        duration: 4,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    >
+                      <Droplets className="h-5 w-5 text-blue-500" />
+                    </motion.div>
+                  </div>
 
-                <div className="flex flex-row gap-4">
-
-                  <a href="/air-quality-map">
-                    <ViewMapsButton />
-                  </a>
-
-                  {/* Favorite Button */}
-                  {/* <Button
-                  variant="outline"
-                  size="lg"
-                  className="h-12 w-12 rounded-xl border-blue-300 
-               transition-all duration-300
-               hover:bg-pink-50 hover:text-pink-600
-               hover:scale-110 hover:shadow-md"
-                >
-                  <Heart className="h-5 w-5" />
-                </Button> */}
-
-                  {/* Share Button */}
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          onClick={() => setOpen(true)}
-                          variant="outline"
-                          size="icon"
-                          className="h-12 w-12 rounded-xl border-blue-300
-                         transition-all duration-300
-                         hover:bg-blue-50 hover:text-blue-600
-                         hover:scale-110 hover:shadow-md"
-                        >
-                          <Share2 className="h-5 w-5" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom">Share</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-
-                  <ShareDialog open={open} onOpenChange={setOpen} />
-                </div>
-
+                  <div>
+                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.15em] leading-none mb-1.5 opacity-80">
+                      Relative Humidity
+                    </p>
+                    <p className="text-3xl font-black tracking-tighter text-foreground italic">
+                      {humidity != null ? `${Math.round(humidity)}` : '--'}
+                      <span className="text-xl font-bold text-muted-foreground/60 not-italic ml-1">%</span>
+                    </p>
+                  </div>
+                </motion.div>
               </div>
-
             </div>
 
-            {/* Main Grid */}
-            <div className="grid lg:grid-cols-3 gap-8">
-              {/* AQI Section */}
-              <div className="lg:col-span-1 space-y-6">
-                <div className="flex items-start gap-8">
-                  <div>
-                    <div className={cn(
-                      `flex items-center gap-2 `,
-                      aqi && (aqi > 200 ? " ring-red-500 animate-pulse" : "")
-                    )}>
-                      <span className="relative flex size-3">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                        <span className="relative inline-flex size-3 rounded-full bg-red-600"></span>
-                      </span>
-                      <span className="text-sm md:text-xl">Live AQI</span>
-                    </div>
-
-                    <p
-                      style={{ color: theme.color }}
-                      className="text-6xl md:text-8xl font-bold"
-                    >
-                      {typeof aqi === "number" ? aqi : "--"}
-                    </p>
-                  </div>
-
-                  <div className="px-8 py-3 rounded-2xl flex flex-col items-center">
-                    <p className="text-sm md:text-xl opacity-70">Air Quality</p>
-                    <p
-                      style={{ color: theme.color }}
-                      className="text-lg md:text-4xl font-bold"
-                    >
-                      {theme.label}
-                    </p>
-                  </div>
-                </div>
-
-                {/* PM Cards */}
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div className={`${theme.card} rounded-xl p-5`}>
-                    <p className="text-sm md:text-2xl">PM10</p>
-                    <p className="text-2xl md:text-4xl font-bold">
-                      {typeof pm10 === "number" ? `${pm10} µg/m³` : "--"}
-                    </p>
-                  </div>
-
-                  <div className={`${theme.card} rounded-xl p-5`}>
-                    <p className="text-sm md:text-3xl">PM2.5</p>
-                    <p className="text-2xl md:text-4xl font-bold">
-                      {typeof pm25 === "number" ? `${pm25} µg/m³` : "--"}
-                    </p>
-                  </div>
-                </div>
-
-                {typeof aqi === "number" && <AQIScale currentValue={aqi} />}
-              </div>
-
-              {/* Image */}
-              <div className="lg:col-span-1 flex items-center justify-center min-h-75 md:min-h-90">
-                <div className="relative w-full h-full max-w-90 rounded-3xl">
-
-                  <SparklesCore
-                    className="absolute inset-0 pointer-events-none"
-                    background="transparent"
-                    minSize={0.4}
-                    maxSize={1.6}
-                    particleDensity={10 * (aqi ? aqi : 1)}
-                    particleColor="#000000"
-                  />
-
-                  {moodImage && (
-                    <div className="absolute inset-0 flex items-center justify-center z-10">
-                      <Image
-                        src={moodImage}
-                        width={150}
-                        height={150}
-                        alt="Air quality mood"
-                        className="object-contain"
-                      />
-                    </div>
-                  )}
-
+            <div className="flex flex-col md:flex-row items-start md:items-end justify-between relative z-10 gap-6 mt-12">
+              <div className="flex flex-col">
+                <span className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">CURRENT AQI</span>
+                <span className="text-8xl md:text-9xl font-black -mt-4" style={{ color: theme.color }}>
+                  {aqi || '--'}
+                </span>
+                <div className="flex items-center gap-1.5 mt-2 opacity-70">
+                  <div className="h-1.5 w-1.5 rounded-full bg-foreground/50" />
+                  <span className="text-[9px] font-bold uppercase tracking-tighter text-muted-foreground">Source: {source || 'Station Data'}</span>
                 </div>
               </div>
 
+              <div className="bg-background/40  backdrop-blur-xl p-6 rounded-2xl border border-border/50 max-w-sm shadow-xl transition-all duration-500">
+                <div className="flex justify-between items-start mb-2">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground block">
+                    RECOMMENDATION
+                  </span>
+                  {/* Subtle badge for the specific alert level */}
+                  <span
+                    className="text-[10px] font-bold px-2 py-0.5 rounded-md uppercase"
+                    style={{
+                      color: theme.color,
+                      backgroundColor: `${theme.color}15`
+                    }}
+                  >
+                    {getAQIRecommendation(aqi || 0).short}
+                  </span>
+                </div>
 
+                <p className="text-foreground font-semibold text-sm leading-relaxed">
+                  {aqi ? getAQIRecommendation(aqi).text : "Fetching real-time local air quality data..."}
+                </p>
 
+                {/* Optional: Small "Action" footer for premium feel */}
+                {aqi && aqi > 100 && (
+                  <div className="mt-4 pt-4 border-t border-border/20 flex items-center gap-2 text-red-500">
+                    <div className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
+                    <span className="text-[10px] font-bold uppercase tracking-tighter">
+                      Mask Recommended
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
 
-              {/* Weather */}
+            <SparklesCore
+              className="absolute inset-0 pointer-events-none opacity-30"
+              background="transparent"
+              minSize={0.6}
+              maxSize={1.8}
+              particleDensity={aqi ? aqi * 0.5 : 20}
+              particleColor={theme.color}
+            />
+          </motion.div>
 
-              <BackgroundGradient className="rounded-[22px] bg-inherit mx-auto p-4 sm:p-10 dark:bg-zinc-900">
-                <div className={`${theme.card} rounded-2xl p-6 space-y-6`}>
-                  <div className="flex items-center gap-4">
-                    <Cloud className="h-12 w-12" />
+          {/* Map Container */}
+          <motion.div
+            initial={{ opacity: 0, x: +20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="lg:col-span-4 h-full"
+          >
+            <section
+              className={cn("rounded-4xl p-6 border border-border/60 hover:shadow-lg h-full flex flex-col shadow-inner",
+                `bg-linear-to-br from-${theme.bg}`
+              )}
+            >
+              {/* Header & Layer Toggles */}
+              <div className="flex justify-between items-center mb-6">
+                <div className="space-y-0.5">
+                  <h2 className="text-xl font-black tracking-tight leading-none">Localized Map</h2>
+                  <p className="text-[10px] text-muted-foreground">Nearby monitoring stations</p>
+                </div>
+
+                <DashboardToggle view={view} setView={setView} />
+              </div>
+
+              {/* Map Container */}
+              <div className="relative grow rounded-2xl overflow-hidden border border-border/40 min-h-100">
+                <AQIMap view={view} />
+
+                <div className="absolute top-3 right-3 flex items-center gap-2.5 z-1000">
+
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Link
+                      href="/air-quality-map"
+                      className="flex h-10 items-center gap-2.5 px-5 bg-background/90 backdrop-blur-md text-foreground rounded-xl border border-border/50 shadow-lg text-xs font-bold leading-none active:scale-95 transition-all"
+                    >
+                      <MapIcon className="h-4 w-4 text-primary" />
+                      <span>View Full Map</span>
+                    </Link>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, ease: "easeOut", delay: 0.1 }}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    <Button
+                      size="icon"
+                      className="h-10 w-10 rounded-xl bg-background/90 backdrop-blur-md shadow-lg border border-border/50"
+                      onClick={detectGpsLocation}
+                    >
+                      <Locate className="h-4 w-4 text-foreground" />
+                    </Button>
+                  </motion.div>
+                </div>
+
+                {/* Existing Bottom Station Card (Remains Same) */}
+                <div className="absolute bottom-3 left-3 right-3 z-1000">
+                  <div className="bg-background/95 backdrop-blur-sm p-3 rounded-xl border shadow-lg flex items-center gap-3">
+                    <div className="h-8 w-8 rounded-lg bg-yellow-500/20 flex items-center justify-center font-bold text-yellow-600 text-xs">
+                      85
+                    </div>
                     <div>
-                      <p className="text-4xl md:text-7xl font-bold">
-                        {typeof temp === "number" ? `${parseFloat(temp.toString()).toFixed(1)}°C` : "--"}
+                      <p className="text-[10px] font-bold uppercase text-muted-foreground">
+                        {location?.split(',')[0].toUpperCase() || 'LOCAL'}, {state ? `${state.toUpperCase()}, ` : ''}{country || 'CH'}
                       </p>
-                      <p className="text-sm md:text-xl md:ml-2 opacity-70">Weather</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center text-lg md:text-2xl">
-                      <span className="flex gap-2 ">
-                        <Droplets className="h-8 w-8" /> Humidity
-                      </span>
-                      <span>
-                        {typeof humidity === "number" ? `${Math.round(humidity)}%` : "--"}
-                      </span>
-                    </div>
-
-                    {/* <div className="flex justify-between text-lg md:text-2xl">
-                      <span className="flex gap-2">
-                        <Wind className="h-8 w-8 items-center" /> Wind
-                      </span>
-                      <span>
-                        {typeof wind === "number" ? `${parseFloat(wind.toString()).toFixed(2)} km/h` : "--"}
-                      </span>
-                    </div> */}
-
-                    <div className="flex justify-center">
-                      <div className="flex items-center justify-start mt-4">
-                        <span className="text-sm text-muted-foreground pr-2">
-                          Powered by
-                        </span>
-                        <a
-                          href="https://a2mation.in/"
-                        >
-                          <Image
-                            src="/assets/a2mation-logo.png"
-                            width={90}
-                            height={5}
-                            alt="Picture of the author"
-                          />
-                        </a>
-                      </div>
+                      <p className="text-[11px] font-medium leading-none">
+                        Moderate Conditions
+                      </p>
                     </div>
                   </div>
                 </div>
-              </BackgroundGradient>
+              </div>
+            </section>
+          </motion.div>
+        </section>
 
-
-            </div>
-          </div>
-
-        </Card>
-      </div >
-    </div >
+      </main>
+    </div>
   )
 }
