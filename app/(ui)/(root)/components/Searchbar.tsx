@@ -1,10 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { Search, X } from "lucide-react"
+import { useState, useRef } from "react"
+import { Search, X, MapPin, Building2, Loader2, Command } from "lucide-react"
+import { useQuery } from "@tanstack/react-query"
 import { http } from "@/lib/http"
-import { getAQIBgColor, getAQITextColor } from "@/helpers/aqi-color-pallet"
+import { getAQIBgColor } from "@/helpers/aqi-color-pallet"
 import { cn } from "@/lib/utils"
+import Link from "next/link"
+import { useDebounce } from "@/hooks/use-debounce"
+import { useOutsideClick } from "@/hooks/use-outside-click"
 
 type Result = {
     id: string
@@ -14,184 +18,145 @@ type Result = {
     aqi: number
 }
 
-
 const Searchbar = () => {
     const [query, setQuery] = useState("")
-    const [open, setOpen] = useState(false)
-    const [loading, setLoading] = useState(false)
-    const [results, setResults] = useState<{
-        states: Result[]
-        cities: Result[]
-    } | null>(null)
+    const [isOpen, setIsOpen] = useState(false)
+    const containerRef = useRef<HTMLDivElement>(null)
+    const debouncedQuery = useDebounce(query, 400)
 
+    useOutsideClick(containerRef, () => setIsOpen(false))
 
-    useEffect(() => {
-        if (!query) {
-            setOpen(false)
-            setResults(null)
-            return
-        }
-
-        setOpen(true)
-        setLoading(true)
-
-        const controller = new AbortController()
-
-        const timer = setTimeout(async () => {
-            try {
-                const res = await http.get(`/api/aqi/search?q=${query}`, {
-                    signal: controller.signal,
-                })
-                const data = await res.data
-                setResults(data)
-            } catch (e) {
-                if ((e as any).name !== "AbortError" && (e as any).code !== "ERR_CANCELED") {
-                    console.error(e)
-                }
-            } finally {
-                setLoading(false)
-            }
-        }, 500)
-
-        return () => {
-            controller.abort()
-            clearTimeout(timer)
-        }
-    }, [query])
-
+    const { data, isLoading } = useQuery({
+        queryKey: ["search", debouncedQuery],
+        queryFn: async () => {
+            if (!debouncedQuery) return null
+            const res = await http.get(`/api/aqi/search?q=${debouncedQuery}`)
+            return res.data as { states: Result[]; cities: Result[] }
+        },
+        enabled: debouncedQuery.length > 0,
+    })
 
     return (
-        <div className="relative w-full md:w-70">
-            {/* Search Input */}
-            <div className="relative flex items-center justify-center">
-                <Search className="absolute left-6 md:left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
+        <div ref={containerRef} className="relative w-full max-w-md group">
+            {/* Search Input Container */}
+            <div className={cn(
+                "relative flex items-center transition-all duration-300 rounded-2xl border bg-background shadow-sm px-4",
+                isOpen ? "ring-2 ring-primary/20 border-primary shadow-md" : "border-border hover:border-muted-foreground/50"
+            )}>
+                <Search className={cn(
+                    "h-4 w-4 transition-colors",
+                    isOpen ? "text-primary" : "text-muted-foreground"
+                )} />
 
                 <input
-                    id="search"
                     value={query}
+                    onFocus={() => setIsOpen(true)}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search"
-                    name="search"
-                    className="
-                        h-10
-                        pl-10 pr-8
-                        w-[90%]
-                        md:w-full
-                        rounded-lg
-                        border border-slate-200
-                        bg-white
-                        text-base
-                        text-slate-800
-                        placeholder:text-slate-400
-                        focus:outline-none
-                        focus:border-blue-600
-                        focus:ring-2
-                        focus:ring-blue-500/30
-                        shadow-sm
-                        transition
-                    "
+                    placeholder="Search for a city or state..."
+                    className="flex-1 h-12 bg-transparent pl-3 pr-2 text-sm focus:outline-none placeholder:text-muted-foreground/60"
                 />
 
-                {query && (
-                    <button
-                        onClick={() => setQuery("")}
-                        className="absolute right-2 text-slate-400 hover:text-slate-700"
-                    >
-                        <X className="h-4 w-4" />
-                    </button>
-                )}
+                <div className="flex items-center gap-2">
+                    {isLoading && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
+                    {query && (
+                        <button
+                            onClick={() => { setQuery(""); setIsOpen(false); }}
+                            className="p-1 hover:bg-muted rounded-md transition-colors"
+                        >
+                            <X className="h-4 w-4 text-muted-foreground" />
+                        </button>
+                    )}
+                    {!query && (
+                        <div className="hidden md:flex items-center gap-1 px-1.5 py-0.5 rounded border border-border bg-muted/50 text-[10px] text-muted-foreground font-mono">
+                            <Command className="h-2.5 w-2.5" /> K
+                        </div>
+                    )}
+                </div>
             </div>
 
-            {/* Dropdown */}
-            {open && (
-                <div className="absolute z-50 mt-2 w-full rounded-xl border bg-white shadow-lg">
-                    {loading ? (
-                        <Skeleton />
-                    ) : (
-                        results && <Results data={results} />
-                    )}
+            {/* Dropdown Results */}
+            {isOpen && (query.length > 0) && (
+                <div className="absolute z-50 mt-3 w-full overflow-hidden rounded-2xl border bg-background/95 backdrop-blur-xl shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+                    <div className="max-h-100 overflow-y-auto p-2 scrollbar-thin">
+                        {isLoading ? (
+                            <SkeletonLoader />
+                        ) : data && (data.states.length > 0 || data.cities.length > 0) ? (
+                            <ResultsList data={data} onSelect={() => setIsOpen(false)} />
+                        ) : (
+                            <div className="p-8 text-center">
+                                <p className="text-sm text-muted-foreground">No results found for "{query}"</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
         </div>
     )
 }
 
-export default Searchbar
-
-
-
-const Skeleton = () => {
+const ResultsList = ({ data, onSelect }: { data: any, onSelect: () => void }) => {
     return (
-        <div className="p-4 space-y-3">
-            {[1, 2, 3, 4].map((i) => (
-                <div
-                    key={i}
-                    className="h-11 w-full rounded-lg bg-slate-200 animate-pulse"
-                />
-            ))}
+        <div className="space-y-4">
+            {Object.entries(data).map(([key, items]: [string, any]) => {
+                if (items.length === 0 && !items) return null
+                return (
+                    <div key={key}>
+                        <div className="flex items-center gap-2 px-3 py-2 text-[11px] font-black uppercase tracking-widest text-muted-foreground/70">
+                            {key === 'states' ? <MapPin className="h-3 w-3" /> : <Building2 className="h-3 w-3" />}
+                            {key}
+                        </div>
+                        <div className="space-y-1">
+                            {items.map((item: Result) => (
+                                <Link
+                                    key={item.id}
+                                    onClick={onSelect}
+                                    href={key === 'states'
+                                        ? `/dashboard/${slugify(item.country)}/${slugify(item.name)}`
+                                        : `/dashboard/${slugify(item.country)}/${slugify(item.state)}/${slugify(item.name)}`
+                                    }
+                                    className="flex items-center justify-between group/item p-3 rounded-xl hover:bg-primary/5 transition-all duration-200"
+                                >
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-bold text-foreground group-hover/item:text-primary transition-colors">
+                                            {item.name}
+                                        </span>
+                                        <span className="text-[11px] text-muted-foreground">
+                                            {item.state ? `${item.state}, ` : ""}{item.country}
+                                        </span>
+                                    </div>
+                                    <div className={cn(
+                                        "flex items-center gap-2 px-2.5 py-1 rounded-lg text-white text-xs font-black shadow-sm transition-transform group-hover/item:scale-110",
+                                        getAQIBgColor(item.aqi)
+                                    )}>
+                                        {item.aqi}
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                )
+            })}
         </div>
     )
 }
 
+const SkeletonLoader = () => (
+    <div className="p-2 space-y-2">
+        {[1, 2, 3].map((i) => (
+            <div key={i} className="flex items-center justify-between p-3">
+                <div className="space-y-2">
+                    <div className="h-4 w-32 bg-muted animate-pulse rounded-md" />
+                    <div className="h-3 w-20 bg-muted animate-pulse rounded-md" />
+                </div>
+                <div className="h-8 w-12 bg-muted animate-pulse rounded-lg" />
+            </div>
+        ))}
+    </div>
+)
 
-function slugify(value: string | undefined): string {
-    if (value == undefined) return ''
+function slugify(value?: string): string {
+    if (!value) return ""
     return value.toLowerCase().trim().replace(/\s+/g, "-")
 }
 
-const Results = ({
-    data,
-}: {
-    data: { states: Result[]; cities: Result[] }
-}) => {
-
-    return (
-        <div className="max-h-80 overflow-y-auto">
-
-            {(["states", "cities"] as const).map(
-                (section) =>
-                    ( data[section] !== undefined && data[section].length > 0 ) && (
-                        <div key={section}>
-                            <p className="px-4  pt-4  pb-2 text-base font-semibold text-slate-500 uppercase">
-                                {section}
-                            </p>
-
-                            {data[section].map((item) => (
-                                <a
-                                    key={item.id}
-                                    href={
-                                        section == 'states' ? `/dashboard/${slugify(item.country)}/${slugify(item.state)}` :
-                                            section == 'cities' ? `/dashboard/${slugify(item.country)}/${slugify(item.state)}/${slugify(item.name)}` : ""
-                                    }
-                                    className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 cursor-pointer"
-                                >
-
-
-                                    <div>
-                                        <p className="text-lg font-medium text-slate-800">
-                                            {item.name}
-                                        </p>
-                                        {item.country && (
-                                            <p className="text-base text-slate-400">
-                                                {item.country}
-                                            </p>
-                                        )}
-                                    </div>
-
-                                    <span
-                                        className={cn(`px-3 py-1 rounded-md text-base font-semibold `,
-                                            getAQIBgColor(item.aqi),
-                                            "text-white"
-                                        )}
-                                    >
-                                        {item.aqi}
-                                    </span>
-
-                                </a>
-                            ))}
-                        </div>
-                    )
-            )}
-        </div>
-    )
-}
+export default Searchbar
