@@ -1,87 +1,80 @@
 "use client"
 
-import {
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-    PaginationLink,
-} from "@/components/ui/pagination"
-import { ChevronRight, LayoutDashboard } from "lucide-react"
+import Link from "next/link"
 import { usePathname } from "next/navigation"
-import clsx from "clsx"
+import { ChevronRight, LayoutDashboard } from "lucide-react"
+import { cn } from "@/lib/utils"
 import { formatPlaceName } from "@/helpers/format-place-name"
 
 interface Props {
     items: string[]
 }
 
-
 const DynamicPagination = ({ items }: Props) => {
     const pathname = usePathname()
 
-    if (!items || items.length === 0) {
-        return null
-    }
-
-    const isDashboardActive = pathname.startsWith("/dashboard")
+    if (!items || items.length === 0) return null
 
     let currentPath = "/dashboard"
 
     return (
-        <Pagination>
-            <PaginationContent className="flex items-center justify-center">
-
-                {/* Dashboard */}
-                <PaginationItem>
-                    <PaginationLink
+        <nav aria-label="Breadcrumb" className="w-full">
+            {/* - flex-wrap: Ensures items flow to next line instead of overlapping
+                - items-center: Keeps icons and text aligned
+                - gap-x-1: Tight spacing for a premium breadcrumb look 
+            */}
+            <ol className="flex flex-wrap items-center gap-x-1 gap-y-2">
+                
+                {/* Home/Dashboard Node */}
+                <li className="flex items-center">
+                    <Link
                         href="/dashboard"
-                        size="lg"
-                        className={clsx(
-                            "p-1 md:p-4 text-sm md:text-xl flex items-center gap-2",
-                            isDashboardActive && "text-blue-500 font-semibold",
-                            "hover:bg-inherit hover:text-blue-400"
+                        className={cn(
+                            "flex items-center gap-2 px-2 py-1 rounded-lg transition-colors duration-200",
+                            "hover:bg-secondary/80",
+                            pathname === "/dashboard" 
+                                ? "text-primary font-bold" 
+                                : "text-muted-foreground"
                         )}
                     >
-                        <LayoutDashboard size={25} className="h-8 w-8" />
-                        Dashboard
-                    </PaginationLink>
-                </PaginationItem>
+                        <LayoutDashboard className="h-4 w-4 shrink-0" />
+                        <span className="text-[10px] md:text-base font-black uppercase tracking-widest">
+                            Dashboard
+                        </span>
+                    </Link>
+                </li>
 
-                {/* Separator */}
-                <PaginationItem className="pointer-events-none">
-                    <ChevronRight size={16} />
-                </PaginationItem>
-
-                {/* Dynamic breadcrumbs */}
+                {/* Dynamic Location Nodes */}
                 {items.map((item, index) => {
-                    currentPath += `/${item}`.replace(" ", "-")
-                    const isActive = pathname.startsWith(currentPath)
+                    const slugifiedItem = item.toLowerCase().trim().replace(/\s+/g, "-")
+                    currentPath += `/${slugifiedItem}`
+                    const isActive = pathname === currentPath
 
                     return (
-                        <PaginationItem key={currentPath} className="flex items-center">
+                        <li key={currentPath} className="flex items-center gap-1">
+                            {/* Separator Icon */}
+                            <ChevronRight 
+                                size={14} 
+                                className="text-muted-foreground/30 shrink-0" 
+                                strokeWidth={2.5} 
+                            />
 
-                            <PaginationLink
+                            <Link
                                 href={currentPath}
-                                size="lg"
-                                className={clsx(
-                                    "p-1 md:p-4 text-sm md:text-xl",
-                                    isActive && "text-blue-600 font-semibold",
-                                    "hover:bg-inherit hover:text-blue-400"
+                                className={cn(
+                                    "px-2 py-1 rounded-lg text-[10px] md:text-base transition-all duration-200",
+                                    isActive 
+                                        ? "text-foreground font-black bg-secondary/40 border border-border/20 shadow-sm" 
+                                        : "text-muted-foreground/60 hover:text-foreground hover:bg-secondary/20"
                                 )}
                             >
                                 {formatPlaceName(item)}
-                            </PaginationLink>
-
-                            {index < items.length - 1 && (
-                                <ChevronRight size={16} />
-                            )}
-
-                        </PaginationItem>
+                            </Link>
+                        </li>
                     )
                 })}
-
-            </PaginationContent>
-        </Pagination>
+            </ol>
+        </nav>
     )
 }
 

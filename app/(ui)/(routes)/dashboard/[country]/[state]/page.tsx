@@ -1,10 +1,12 @@
 'use client'
 
 import axios from 'axios'
-import { use, useEffect, useState } from 'react'
+import { use } from 'react'
+import { useQuery } from "@tanstack/react-query";
 
 import { UniversalAQIDashboard } from '@/components/aqi-ui/universal-aqi-dashboard'
 import { http } from '@/lib/http'
+import { UniversalAQIDashboardSkeleton } from '@/components/aqi-ui/loaders/universal-aqi-dashboard-loader'
 
 interface AQIData {
     averages: {
@@ -15,7 +17,8 @@ interface AQIData {
         humidity: number | null
         state: string
         country: string
-    }
+    },
+    message?: string
 }
 
 const StatePage = ({
@@ -24,88 +27,51 @@ const StatePage = ({
     params: Promise<{ country: string, state: string }>
 }) => {
     const { state, country } = use(params)
-    const [data, setData] = useState<AQIData | null>(null)
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState<string | null>(null)
-
-
-    useEffect(() => {
-        let isMounted = true
-
-        async function fetchCountryData() {
-            setLoading(true)
-            setError(null)
-
+    const {
+        data,
+        isLoading,
+        isError,
+        error
+    } = useQuery({
+        queryKey: ['aqi', country, state],
+        queryFn: async () => {
             try {
                 const res = await http.get<AQIData>('/api/aqi/state', {
                     params: { country, state },
-                })
-
-                if (res.status === 404) {
-                    setError('No data available for today')
-                    return;
-                } else if (res.status === 500) {
-                    setError('Server error. Please try again later.')
-                    return;
-                } 
-
-                if (isMounted) {
-                    setData(res.data)
+                });
+                if (res.status !== 200) {
+                    throw new Error(res.data.message)
                 }
-
+                return res.data;
             } catch (err) {
-                if (!isMounted) return
-
                 if (axios.isAxiosError(err)) {
-                    const status = err.response?.status
-
-                    if (status === 404) {
-                        setError('No data available for today')
-                    } else if (status === 500) {
-                        setError('Server error. Please try again later.')
-                    } else {
-                        setError('Failed to fetch AQI data')
-                    }
-                } else {
-                    setError('Unexpected error occurred')
+                    const status = err.response?.status;
+                    if (status === 404) throw new Error('No data available for today');
+                    if (status === 500) throw new Error('Server error. Please try again later.');
                 }
-
-            } finally {
-                if (isMounted) {
-                    setLoading(false)
-                }
+                throw new Error('Failed to fetch AQI data');
             }
-        }
+        },
+        enabled: !!country && !!state,
+        staleTime: 1000 * 60 * 5, // 5 mins cache
+        retry: 1,
+    });
 
-        fetchCountryData()
-
-        return () => {
-            isMounted = false
-        }
-    }, [country])
-
-    console.log(data)
-
-    if (loading) {
+    if (isLoading) {
         return (
-            <section className="relative w-full flex justify-center py-20">
-                <p className="text-muted-foreground text-lg">
-                    Loading AQI data…
-                </p>
-            </section>
+            <UniversalAQIDashboardSkeleton />
         )
     }
 
-    if (error) {
+    if (isError) {
         return (
             <section className="relative w-full flex justify-center py-20">
                 <p className="text-red-600 text-lg font-medium">
-                    {error}
+                    {error.message}
                 </p>
             </section>
         )
     }
-
     if (!data) {
         return null
     }
