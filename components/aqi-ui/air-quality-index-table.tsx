@@ -136,7 +136,7 @@ const AirQualityIndexTable = () => {
 
                 {/* Right: Premium Showcase Card */}
                 <aside className="lg:col-span-4 sticky top-25">
-                    <div className="relative group overflow-hidden rounded-[3rem] bg-slate-900 aspect-4/5 shadow-2xl">
+                    <div className="relative group overflow-hidden rounded-[3rem] bg-purple-900 aspect-4/5 shadow-2xl">
                         <Image
                             src="/assets/ads/main-banner.jpg"
                             alt="Indoor Air Quality Monitor"
@@ -173,7 +173,7 @@ const QUALITY_LEVELS_BY_TAB: Record<TabType, AirQualityLevel[]> = {
         { level: "Poor", range: "101 to 150", color: "bg-orange-500", glow: "bg-orange-500", icon: "/assets/aqi-moods/Poor.png", description: "Breathing may become slightly uncomfortable, especially for those with respiratory issues." },
         { level: "Unhealthy", range: "151 to 200", color: "bg-rose-500", glow: "bg-rose-500", icon: "/assets/aqi-moods/Unhealthy.png", description: "This air quality is particularly risky for children, pregnant women, and the elderly." },
         { level: "Severe", range: "201 to 300", color: "bg-purple-600", glow: "bg-purple-600", icon: "/assets/aqi-moods/Severe.png", description: "Prolonged exposure can cause chronic health issues. Avoid outdoor activities." },
-        { level: "Hazardous", range: "301+", color: "bg-slate-900", glow: "bg-slate-600", icon: "/assets/aqi-moods/Hazard.png", description: "Life-threatening pollution levels. Stay indoors and use air purifiers." },
+        { level: "Hazardous", range: "301+", color: "bg-purple-900", glow: "bg-purple-900", icon: "/assets/aqi-moods/Hazard.png", description: "Life-threatening pollution levels. Stay indoors and use air purifiers." },
     ],
     pm: [
         { level: "Good", range: "0–12 µg/m³", color: "bg-emerald-500", glow: "bg-emerald-500", icon: "/assets/aqi-moods/Good.png", description: "PM2.5 concentration is low and poses minimal risk." },
@@ -181,7 +181,7 @@ const QUALITY_LEVELS_BY_TAB: Record<TabType, AirQualityLevel[]> = {
         { level: "Poor", range: "35.5–55.4 µg/m³", color: "bg-orange-500", glow: "bg-orange-500", icon: "/assets/aqi-moods/Poor.png", description: "Children, elderly, and asthmatics should limit exposure." },
         { level: "Unhealthy", range: "55.5–150.4 µg/m³", color: "bg-rose-500", glow: "bg-rose-500", icon: "/assets/aqi-moods/Unhealthy.png", description: "Everyone may experience respiratory discomfort." },
         { level: "Severe", range: "150.5–250.4 µg/m³", color: "bg-purple-600", glow: "bg-purple-600", icon: "/assets/aqi-moods/Severe.png", description: "Serious health effects with prolonged exposure." },
-        { level: "Hazardous", range: "250.5+ µg/m³", color: "bg-slate-900", glow: "bg-slate-600", icon: "/assets/aqi-moods/Hazard.png", description: "Emergency conditions. Avoid all outdoor activity." },
+        { level: "Hazardous", range: "250.5+ µg/m³", color: "bg-purple-900", glow: "bg-slate-600", icon: "/assets/aqi-moods/Hazard.png", description: "Emergency conditions. Avoid all outdoor activity." },
     ],
     ozone: [
         { level: "Good", range: "0–54 ppb", color: "bg-emerald-500", glow: "bg-emerald-500", icon: "/assets/aqi-moods/Good.png", description: "Ozone levels are safe." },
@@ -189,7 +189,7 @@ const QUALITY_LEVELS_BY_TAB: Record<TabType, AirQualityLevel[]> = {
         { level: "Poor", range: "101-168 ppb", color: "bg-orange-500", glow: "bg-orange-500", icon: "/assets/aqi-moods/Poor.png", description: "Sensitive individuals may experience effects on the lungs and heart." },
         { level: "Unhealthy", range: "169-208 ppb", color: "bg-rose-500", glow: "bg-rose-500", icon: "/assets/aqi-moods/Unhealthy.png", description: "Lung irritation and reduced lung function possible." },
         { level: "Severe", range: "209-748 ppb", color: "bg-purple-600", glow: "bg-purple-600", icon: "/assets/aqi-moods/Severe.png", description: "Increased risk of respiratory damage." },
-        { level: "Hazardous", range: "749-1250+ ppb", color: "bg-slate-900", glow: "bg-slate-600", icon: "/assets/aqi-moods/Hazard.png", description: "Severe health effects for all populations." },
+        { level: "Hazardous", range: "749-1250+ ppb", color: "bg-purple-900", glow: "bg-slate-600", icon: "/assets/aqi-moods/Hazard.png", description: "Severe health effects for all populations." },
     ],
     co: [
         { level: "Good", range: "0–4.4 ppm", color: "bg-emerald-500", glow: "bg-emerald-500", icon: "/assets/aqi-moods/Good.png", description: "No immediate health risk." },
@@ -197,7 +197,7 @@ const QUALITY_LEVELS_BY_TAB: Record<TabType, AirQualityLevel[]> = {
         { level: "Poor", range: "9.5–12.4 ppb", color: "bg-orange-500", glow: "bg-orange-500", icon: "/assets/aqi-moods/Poor.png", description: "Prolonged exposure may cause mild headaches and fatigue." },
         { level: "Unhealthy", range: "12.5–15.4 ppm", color: "bg-rose-500", glow: "bg-rose-500", icon: "/assets/aqi-moods/Unhealthy.png", description: "Reduced oxygen delivery to organs." },
         { level: "Severe", range: "15.5-20.5 ppm", color: "bg-purple-600", glow: "bg-purple-600", icon: "/assets/aqi-moods/Severe.png", description: "Risk of heart and neurological issues." },
-        { level: "Hazardous", range: "20.6+ ppm", color: "bg-slate-900", glow: "bg-slate-600", icon: "/assets/aqi-moods/Hazard.png", description: "Potentially fatal exposure." },
+        { level: "Hazardous", range: "20.6+ ppm", color: "bg-purple-900", glow: "bg-slate-600", icon: "/assets/aqi-moods/Hazard.png", description: "Potentially fatal exposure." },
     ],
     so2: [
         { level: "Good", range: "0–35 ppb", color: "bg-emerald-500", glow: "bg-emerald-500", icon: "/assets/aqi-moods/Good.png", description: "No expected health effects." },
@@ -205,7 +205,7 @@ const QUALITY_LEVELS_BY_TAB: Record<TabType, AirQualityLevel[]> = {
         { level: "Poor", range: "76–185 ppb", color: "bg-orange-500", glow: "bg-orange-500", icon: "/assets/aqi-moods/Poor.png", description: "Increased likelihood of respiratory symptoms." },
         { level: "Unhealthy", range: "186–304 ppb", color: "bg-rose-500", glow: "bg-rose-500", icon: "/assets/aqi-moods/Unhealthy.png", description: "Breathing difficulty for vulnerable groups." },
         { level: "Severe", range: "305-400 ppb", color: "bg-purple-600", glow: "bg-purple-600", icon: "/assets/aqi-moods/Severe.png", description: "Significant respiratory symptoms." },
-        { level: "Hazardous", range: "401+ ppb", color: "bg-slate-900", glow: "bg-slate-600", icon: "/assets/aqi-moods/Hazard.png", description: "Severe respiratory distress." },
+        { level: "Hazardous", range: "401+ ppb", color: "bg-purple-900", glow: "bg-slate-600", icon: "/assets/aqi-moods/Hazard.png", description: "Severe respiratory distress." },
     ],
     no2: [
         { level: "Good", range: "0–53 ppb", color: "bg-emerald-500", glow: "bg-emerald-500", icon: "/assets/aqi-moods/Good.png", description: "Normal background levels." },
@@ -213,7 +213,7 @@ const QUALITY_LEVELS_BY_TAB: Record<TabType, AirQualityLevel[]> = {
         { level: "Poor", range: "101–360 ppb", color: "bg-orange-500", glow: "bg-orange-500", icon: "/assets/aqi-moods/Poor.png", description: "Increased risk of respiratory infections." },
         { level: "Unhealthy", range: "361–649 ppb", color: "bg-rose-500", glow: "bg-rose-500", icon: "/assets/aqi-moods/Unhealthy.png", description: "Increased asthma symptoms." },
         { level: "Severe", range: "650-700 ppb", color: "bg-purple-600", glow: "bg-purple-600", icon: "/assets/aqi-moods/Severe.png", description: "Significant respiratory inflammation." },
-        { level: "Hazardous", range: "701+ ppb", color: "bg-slate-900", glow: "bg-slate-600", icon: "/assets/aqi-moods/Hazard.png", description: "Emergency-level exposure." },
+        { level: "Hazardous", range: "701+ ppb", color: "bg-purple-900", glow: "bg-slate-600", icon: "/assets/aqi-moods/Hazard.png", description: "Emergency-level exposure." },
     ],
 };
 

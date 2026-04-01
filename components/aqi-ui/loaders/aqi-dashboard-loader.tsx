@@ -3,7 +3,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 export const AQIDashboardLoader = () => {
     return (
-        <div className="min-h-screen bg-background p-6 md:p-10">
+        <section className="min-h-screen bg-background p-6 md:p-10">
             {/* Nav/Header Spacer */}
             <div className="h-20 w-full mb-8" />
 
@@ -103,6 +103,6 @@ export const AQIDashboardLoader = () => {
                     ))}
                 </div>
             </div>
-        </div>
+        </section>
     )
 }

@@ -1,26 +1,27 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import {
   Droplets,
   Locate,
   Sun,
   Map as MapIcon,
 } from "lucide-react"
-import dynamic from "next/dynamic"
+import Link from "next/link"
 import Image from 'next/image'
-import { motion } from "framer-motion"
 import { format } from "date-fns"
+import dynamic from "next/dynamic"
+import { motion } from "framer-motion"
+import { useEffect, useState } from "react"
 
-import { Button } from "@/components/ui/button"
-import { getAQITheme, AQITheme, getAQIRecommendation } from "@/helpers/aqi-color-pallet"
-import { detectIpLocation, detectGpsLocation } from "@/store/location.actions"
-import { useLocationStore } from "@/store/location.store"
-import { AQIDashboardLoader } from "./loaders/aqi-dashboard-loader"
 import { cn } from "@/lib/utils"
 import { SparklesCore } from "../ui/sparkles"
-import Link from "next/link"
+import { Button } from "@/components/ui/button"
 import DashboardToggle from "../ui/DashboardToggle"
+import { useLocationStore } from "@/store/location.store"
+import { AQIDashboardLoader } from "./loaders/aqi-dashboard-loader"
+import { detectIpLocation, detectGpsLocation } from "@/store/location.actions"
+import { getAQITheme, AQITheme, getAQIRecommendation } from "@/helpers/aqi-color-pallet"
+
 
 const AQIMap = dynamic(() => import("./aqi-map"), { ssr: false })
 
@@ -37,7 +38,7 @@ const AirQualityImages: Record<string, string> = {
 export default function AQIDashboard() {
   const {
     location, state, country, loading, lastUpdated,
-    temp, humidity, wind, pm10, pm25, aqi, source, error
+    temp, humidity, aqi, source, error
   } = useLocationStore()
 
   const [view, setView] = useState<"aqi" | "temp">("aqi");
@@ -55,12 +56,12 @@ export default function AQIDashboard() {
   }, [aqi])
 
   if (loading && !lastUpdated) return <AQIDashboardLoader />
-  if (error) return <div className="min-h-screen flex items-center justify-center text-destructive font-bold">{error}</div>
+  if (error) return <section className="min-h-screen flex items-center justify-center text-destructive font-bold">{error}</section>
 
   return (
-    <div className="min-h-fit bg-background text-foreground selection:bg-primary/20">
+    <section className="min-h-fit bg-background text-foreground selection:bg-primary/20">
 
-      <main className="pt-28 pb-12 px-6 max-w-350 mx-auto space-y-12">
+      <main className="pt-28 pb-12 px-6 max-w-400 mx-auto space-y-12">
 
         {/* --- Hero Section --- */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -68,35 +69,37 @@ export default function AQIDashboard() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className={cn(
-              "lg:col-span-8 rounded-4xl p-8 md:p-12 border border-border/60 hover:shadow-lg flex flex-col justify-between min-h-112.5 relative transition-colors duration-700",
+              "lg:col-span-8 rounded-4xl p-8 md:p-12 border border-border/60 hover:shadow-lg flex flex-col justify-between relative transition-colors duration-700",
               `bg-linear-to-br from-${theme.bg}`
             )}
+            style={{ minHeight: "450px" }}
           >
             {/* Floating Mood Image Layer */}
             <motion.div
               key={theme.label}
               initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
-              className="absolute top-1/2 right-0 -translate-y-1/2 pointer-events-none z-0"
+              className="absolute top-[43%] right-2 md:right-10 -translate-y-1/2 pointer-events-none z-0"
             >
               <Image
                 src={AirQualityImages[theme.label] || AirQualityImages.Good}
                 alt={theme.label}
-                width={150}
-                height={150}
+                width={160}
+                height={160}
                 className="object-contain"
+                priority
               />
             </motion.div>
 
             <div className="relative z-10">
               <div className="flex items-center justify-between mb-8">
                 <span
-                  className="inline-flex items-center gap-2 px-4 py-1.5 text-white text-[10px] font-bold tracking-[0.2em] uppercase rounded-full shadow-lg"
+                  className="inline-flex items-center gap-2 px-4 py-1.5 text-white text-[10px] md:text-sm font-bold tracking-[0.2em] uppercase rounded-full shadow-lg"
                   style={{ backgroundColor: theme.color }}
                 >
                   <span className="relative flex h-3 w-3">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-600"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-green-600"></span>
                   </span>
                   LIVE STATUS • {location?.split(',')[0].toUpperCase() || 'LOCAL'}, {state ? `${state.toUpperCase()}, ` : ''}{country || 'CH'}
                 </span>
@@ -109,7 +112,7 @@ export default function AQIDashboard() {
                 </div>
               </div>
 
-              <h1 className="text-5xl md:text-6xl lg:text-8xl font-black tracking-tighter leading-[0.9] text-foreground max-w-2xl">
+              <h1 className="text-5xl md:text-6xl lg:text-8xl font-black tracking-tighter leading-none text-foreground max-w-2xl">
                 Your air quality is
                 <span className="ml-4 px-4 py-2 rounded-full" style={{ color: theme.color }}>
                   {theme.label}
@@ -190,13 +193,19 @@ export default function AQIDashboard() {
 
             <div className="flex flex-col md:flex-row items-start md:items-end justify-between relative z-10 gap-6 mt-12">
               <div className="flex flex-col">
-                <span className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">CURRENT AQI</span>
+                <span className="text-[10px] md:text-sm font-bold tracking-widest uppercase text-muted-foreground">CURRENT AQI</span>
                 <span className="text-8xl md:text-9xl font-black -mt-4" style={{ color: theme.color }}>
                   {aqi || '--'}
                 </span>
-                <div className="flex items-center gap-1.5 mt-2 opacity-70">
-                  <div className="h-1.5 w-1.5 rounded-full bg-foreground/50" />
-                  <span className="text-[9px] font-bold uppercase tracking-tighter text-muted-foreground">Source: {source || 'Station Data'}</span>
+                <div className="flex items-start flex-col gap-1.5 mt-2 opacity-70">
+                  <div className="flex items-center justify-start gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-foreground/50" />
+                    <span className="text-[9px] md:text-xs font-bold uppercase tracking-tighter text-muted-foreground">Source: {source || 'Station Data'}</span>
+                  </div>
+                  <div className="flex items-center justify-start gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-foreground/50" />
+                    <span className="text-[9px] md:text-xs font-bold uppercase tracking-tighter text-muted-foreground">Powered by: {'A2mation'}</span>
+                  </div>
                 </div>
               </div>
 
@@ -238,8 +247,8 @@ export default function AQIDashboard() {
               background="transparent"
               minSize={0.6}
               maxSize={1.8}
-              particleDensity={aqi ? aqi * 0.5 : 20}
-              particleColor={theme.color}
+              particleDensity={10 * (aqi ? aqi : 1)}
+              particleColor="#000000"
             />
           </motion.div>
 
@@ -303,11 +312,24 @@ export default function AQIDashboard() {
                   </motion.div>
                 </div>
 
-                {/* Existing Bottom Station Card (Remains Same) */}
-                <div className="absolute bottom-3 left-3 right-3 z-1000">
-                  <div className="bg-background/95 backdrop-blur-sm p-3 rounded-xl border shadow-lg flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-lg bg-yellow-500/20 flex items-center justify-center font-bold text-yellow-600 text-xs">
-                      85
+                <div className="absolute bottom-3 left-3 right-3 z-10">
+                  <div
+                    className={cn(
+                      "backdrop-blur-sm p-3 rounded-xl border shadow-lg flex items-center gap-3",
+                      theme.card
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "h-8 w-8 rounded-lg flex items-center justify-center font-bold text-xs",
+                        theme.borderClass,
+                        theme.card
+                      )}
+                      style={{
+                        color: theme.color
+                      }}
+                    >
+                      {view == 'aqi' ? Math.round(aqi ?? 0) : Math.round(temp ?? 0)}
                     </div>
                     <div>
                       <p className="text-[10px] font-bold uppercase text-muted-foreground">
@@ -325,6 +347,6 @@ export default function AQIDashboard() {
         </section>
 
       </main>
-    </div>
+    </section>
   )
 }

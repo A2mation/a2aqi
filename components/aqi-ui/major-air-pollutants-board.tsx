@@ -1,24 +1,18 @@
 'use client'
 
-import React, { useEffect, useMemo, useState } from "react"
-import { AlertCircle, ArrowUpRight, Wind, Activity } from "lucide-react"
+import { useEffect, useMemo, useState } from "react"
+import { Activity } from "lucide-react"
 import Image from 'next/image'
 import { motion, AnimatePresence } from "framer-motion"
 
-import { Card } from "@/components/ui/card"
-import { AQITheme, getAQITheme } from "@/helpers/aqi-color-pallet"
-import { useLocationStore } from "@/store/location.store"
-import { PollutantType } from "@/helpers/pollutant-color-pallet"
 import { cn } from "@/lib/utils"
+import { Card } from "@/components/ui/card"
+import { useLocationStore } from "@/store/location.store"
+import { AQITheme, getAQITheme } from "@/helpers/aqi-color-pallet"
 
-// Helper for Tailwind shadow/glow colors based on hex
-const getGlowStyles = (color: string) => ({
-  boxShadow: `0 0 40px -10px ${color}33`,
-  borderTop: `1px solid ${color}44`
-})
 
 export default function AirQualityDashboard() {
-  const { aqi, pm10, pm25, so2, o3, co, no2, error } = useLocationStore();
+  const { aqi, pm10, pm25, so2, o3, co, no2, error, state } = useLocationStore();
   const [theme, setTheme] = useState<AQITheme>(getAQITheme(0))
 
   const pollutants = useMemo(() => [
@@ -41,7 +35,7 @@ export default function AirQualityDashboard() {
       <div className="max-w-7xl mx-auto">
 
         {/* --- Header Section --- */}
-        <header className="relative flex flex-col md:flex-row md:items-center justify-between mb-16 gap-8">
+        <header className="relative flex flex-col md:flex-row md:items-center justify-between mb-4 md:mb-16 gap-8">
           <div className="space-y-2">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -65,11 +59,41 @@ export default function AirQualityDashboard() {
 
           <div className="hidden md:flex items-center gap-8">
             <div className="text-right">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Global Status</p>
-              <p className="text-xl font-bold" style={{ color: theme.color }}>{theme.label}</p>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{state} Status</p>
+              <p className="text-xl text-center font-bold" style={{ color: theme.color }}>{theme.label}</p>
             </div>
             <div className="h-12 w-px bg-slate-200" />
-            <Image src="/assets/a2mation-logo.png" width={110} height={14} alt="A2Mation" className="opacity-80 hover:opacity-100 transition-opacity" />
+
+            <div className="flex items-center flex-col gap-3 group">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 transition-colors group-hover:text-muted-foreground">
+                Powered by
+              </span>
+              {/* <div className="h-4 w-px bg-border/60" aria-hidden="true" /> */}
+              <div className="relative flex items-center">
+                <Image
+                  src="/assets/a2mation-logo.png"
+                  width={110}
+                  height={14}
+                  alt="A2Mation"
+                  className="opacity-50 grayscale transition-all duration-500 group-hover:opacity-100 group-hover:grayscale-0"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex md:hidden items-center gap-1 group">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 transition-colors group-hover:text-muted-foreground">
+              Powered by
+            </span>
+            <div className="h-4 w-px bg-border/60" aria-hidden="true" />
+            <div className="relative flex items-center">
+              <Image
+                src="/assets/a2mation-logo.png"
+                width={70}
+                height={25}
+                alt="A2Mation"
+              />
+            </div>
           </div>
         </header>
 
@@ -77,7 +101,6 @@ export default function AirQualityDashboard() {
           <AnimatePresence>
             {pollutants.map((pollutant, index) => {
               const currentTheme = getAQITheme(pollutant.value ?? 0);
-              const isHigh = (pollutant.value ?? 0) > 100;
 
               return (
                 <motion.div
@@ -92,7 +115,6 @@ export default function AirQualityDashboard() {
                       "relative bg-white/70 backdrop-blur-md border border-white/40 rounded-[2.5rem] p-8 h-full transition-all duration-500 group",
                       `bg-linear-to-br from-${currentTheme.bg}`
                     )}
-                    // style={getGlowStyles(currentTheme.color)}
                   >
                     {/* Background Decorative Element */}
                     <div
@@ -118,7 +140,7 @@ export default function AirQualityDashboard() {
                         <div className="text-right">
                           <p
                             className="text-3xl font-black text-slate-800 leading-tight"
-                            // style={{ color: currentTheme.color }}
+                          // style={{ color: currentTheme.color }}
                           >{pollutant.formula}</p>
                         </div>
                       </div>
@@ -128,7 +150,7 @@ export default function AirQualityDashboard() {
                         <div>
                           <h3
                             className="text-md font-bold  uppercase tracking-widest mb-1 flex items-center gap-1.5"
-                            // style={{ color: currentTheme.color }}
+                          // style={{ color: currentTheme.color }}
                           >
                             <Activity className="w-3 h-3" />
                             {pollutant.name}
