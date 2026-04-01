@@ -31,6 +31,7 @@ const Searchbar = () => {
         queryFn: async () => {
             if (!debouncedQuery) return null
             const res = await http.get(`/api/aqi/search?q=${debouncedQuery}`)
+            
             return res.data as { states: Result[]; cities: Result[] }
         },
         enabled: debouncedQuery.length > 0,
@@ -80,7 +81,7 @@ const Searchbar = () => {
                     <div className="max-h-100 overflow-y-auto p-2 scrollbar-thin">
                         {isLoading ? (
                             <SkeletonLoader />
-                        ) : data && (data.states.length > 0 || data.cities.length > 0) ? (
+                        ) : data && (data.states || data.cities) &&(data.states.length > 0 || data.cities.length > 0) ? (
                             <ResultsList data={data} onSelect={() => setIsOpen(false)} />
                         ) : (
                             <div className="p-8 text-center">

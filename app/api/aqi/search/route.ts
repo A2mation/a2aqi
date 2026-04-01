@@ -39,7 +39,6 @@ export async function GET(req: Request) {
             },
             take: 10,
         })
-        console.log(cityResults[0].createdAt)
 
         const cityMap = new Map()
         for (const r of cityResults) {
@@ -89,12 +88,20 @@ export async function GET(req: Request) {
             }
         }
 
+        const finalCities = Array.from(cityMap.values());
+        const finalStates = Array.from(stateMap.values());
+
+        if (finalCities.length === 0 && finalStates.length === 0) {
+            return NextResponse.json({ message: "No results found", success: false }, { status: 404 });
+        }
+
         return NextResponse.json({
-            cities: Array.from(cityMap.values()),
-            states: Array.from(stateMap.values()),
+            cities: finalCities,
+            states: finalStates,
+        }, {
+            status: 200
         })
 
-        // return NextResponse.json(result)
 
     } catch (error) {
         return new NextResponse("INTERNAL SERVER ERROR", {
