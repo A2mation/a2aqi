@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Search, X, MapPin, Building2, Loader2, Command } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 import { http } from "@/lib/http"
@@ -19,9 +19,10 @@ type Result = {
 }
 
 const Searchbar = () => {
-    const [query, setQuery] = useState("")
-    const [isOpen, setIsOpen] = useState(false)
-    const containerRef = useRef<HTMLDivElement>(null)
+    const [query, setQuery] = useState("");
+    const [isOpen, setIsOpen] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
     const debouncedQuery = useDebounce(query, 400)
 
     useOutsideClick(containerRef, () => setIsOpen(false))
@@ -31,17 +32,31 @@ const Searchbar = () => {
         queryFn: async () => {
             if (!debouncedQuery) return null
             const res = await http.get(`/api/aqi/search?q=${debouncedQuery}`)
-            
+
             return res.data as { states: Result[]; cities: Result[] }
         },
         enabled: debouncedQuery.length > 0,
     })
 
+    useEffect(() => {
+        const down = (e: KeyboardEvent) => {
+            // Check for CMD+K (Mac) or CTRL+K (Windows/Linux)
+            if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+                e.preventDefault()
+                inputRef.current?.focus()
+                setIsOpen(true)
+            }
+        }
+
+        document.addEventListener("keydown", down)
+        return () => document.removeEventListener("keydown", down)
+    }, [])
+
     return (
         <div ref={containerRef} className="relative w-full max-w-md group">
             {/* Search Input Container */}
             <div className={cn(
-                "relative flex items-center transition-all duration-300 rounded-2xl border bg-background shadow-sm px-4",
+                "relative flex items-center transition-all duration-300 rounded-2xl border bg-background shadow-sm px-3 h-10",
                 isOpen ? "ring-2 ring-primary/20 border-primary shadow-md" : "border-border hover:border-muted-foreground/50"
             )}>
                 <Search className={cn(
@@ -50,6 +65,7 @@ const Searchbar = () => {
                 )} />
 
                 <input
+                    ref={inputRef}
                     value={query}
                     onFocus={() => setIsOpen(true)}
                     onChange={(e) => setQuery(e.target.value)}
@@ -81,7 +97,7 @@ const Searchbar = () => {
                     <div className="max-h-100 overflow-y-auto p-2 scrollbar-thin">
                         {isLoading ? (
                             <SkeletonLoader />
-                        ) : data && (data.states || data.cities) &&(data.states.length > 0 || data.cities.length > 0) ? (
+                        ) : data && (data.states || data.cities) && (data.states.length > 0 || data.cities.length > 0) ? (
                             <ResultsList data={data} onSelect={() => setIsOpen(false)} />
                         ) : (
                             <div className="p-8 text-center">
