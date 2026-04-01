@@ -2,6 +2,7 @@
 import React, { useEffect } from "react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 
 
@@ -49,7 +50,7 @@ export const MenuItem = ({
       <motion.p
         transition={{ duration: 0.3 }}
         className={cn(
-          "group flex flex-col gap-0.5 cursor-pointer text-lg md:text-xl font-bold text-black hover:opacity-[0.9] dark:text-white",
+          "group flex flex-col italic gap-0.5 cursor-pointer text-lg md:text-xl font-bold text-black hover:opacity-[0.9] dark:text-white",
           isScrolled ? "text-blue-400" : "text-black"
         )}
       >
@@ -113,29 +114,29 @@ export const ProductItem = ({
   src: string;
 }) => {
   return (
-    <a href={href} className="flex items-center space-x-2 bg-blue-200 hover:bg-blue-300 border border-blue-600  p-4 rounded-2xl">
+    <Link href={href} className="flex items-center  italic space-x-2 bg-blue-200 hover:bg-blue-300 border border-blue-600  p-4 rounded-2xl">
       <img
         src={src}
         alt={title}
         className="shrink-0 h-20 w-20 rounded-full shadow-2xl "
       />
       <div>
-        <h4 className="text-xl font-bold mb-1 text-black dark:text-white">
+        <h4 className="text-xl font-bold italic mb-1 text-black dark:text-white">
           {title}
         </h4>
         
       </div>
-    </a>
+    </Link>
   );
 };
 
 export const HoveredLink = ({ children, ...rest }: any) => {
   return (
-    <a
+    <Link
       {...rest}
       className="text-neutral-700 dark:text-neutral-200 hover:text-black "
     >
       {children}
-    </a>
+    </Link>
   );
 };

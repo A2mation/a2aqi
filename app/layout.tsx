@@ -121,6 +121,7 @@ export default function RootLayout({
     <html lang="en" className={poppins.variable}>
       <head>
         <link rel="icon" href="/favicon.png" sizes="32x32" type="image/png" />
+        <link rel="preload" href="/fonts/your-bold-font.woff2" as="font" type="font/woff2" crossOrigin="anonymous"></link>
       </head>
       <body className="font-poppins">
         <TanStackProvider>
