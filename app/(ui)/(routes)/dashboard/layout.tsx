@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { FloatingMarketingNav } from '@/components/FloatingMarketingNav'
+
 
 const DashboardLayout = async ({
     children
@@ -10,6 +12,7 @@ const DashboardLayout = async ({
             <div className='py-0.5 mt-20 px-2 md:px-0'>
                 {children}
             </div>
+            <FloatingMarketingNav />
         </>
 
     )

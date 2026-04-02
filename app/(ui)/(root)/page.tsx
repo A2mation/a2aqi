@@ -5,6 +5,7 @@ import { AirPollutionTable } from "@/components/aqi-ui/location-based-air-pollut
 import PopularCityCards from "@/components/aqi-ui/popular-city-aqi-table";
 import AirQualityIndexTable from "@/components/aqi-ui/air-quality-index-table";
 import { ClientLogosBanner } from "@/components/CientLogoBanner";
+import { FloatingMarketingNav } from "@/components/FloatingMarketingNav";
 
 
 export default function Home() {
@@ -28,6 +29,7 @@ export default function Home() {
       </section>
       <PopularCityCards />
       <ClientLogosBanner logos={logos} />
+      <FloatingMarketingNav />
     </>
   );
 }
