@@ -6,6 +6,7 @@ import NextTopLoader from "nextjs-toploader";
 import VisitCounter from "@/components/VisitCounter";
 import TanStackProvider from "@/providers/tanstack-provider";
 import "./globals.css";
+import { PromoBannerModal } from "@/components/modals/promo-banner-modal";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -121,7 +122,6 @@ export default function RootLayout({
     <html lang="en" className={poppins.variable}>
       <head>
         <link rel="icon" href="/favicon.png" sizes="32x32" type="image/png" />
-        <link rel="preload" href="/fonts/your-bold-font.woff2" as="font" type="font/woff2" crossOrigin="anonymous"></link>
       </head>
       <body className="font-poppins">
         <TanStackProvider>
@@ -134,6 +134,7 @@ export default function RootLayout({
 
           {children}
           <VisitCounter />
+          <PromoBannerModal />
           <Toaster position="top-center" reverseOrder={false} />
         </TanStackProvider>
       </body>
