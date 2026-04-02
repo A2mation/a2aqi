@@ -90,7 +90,7 @@ export function NavbarMain() {
 
 
             <div className="flex w-full flex-col gap-4">
-              <NavbarMiddleSection className="top-10" />
+              <NavbarMiddleSection onClick={() => setIsMobileMenuOpen(false)} className="top-10" />
 
               {pathname.startsWith('/blog') ? <>
                 <Button variant="secondary" className="text-base w-full cursor-pointer" onClick={() => router.push('/blogs/write')}> <PencilLine /> Write </Button>

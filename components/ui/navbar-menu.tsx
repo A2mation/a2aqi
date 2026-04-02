@@ -47,7 +47,7 @@ export const MenuItem = ({
 
   return (
     <div onMouseEnter={() => setActive(item)} className="relative ">
-      <motion.p
+      <motion.div
         transition={{ duration: 0.3 }}
         className={cn(
           "group flex flex-col italic gap-0.5 cursor-pointer text-lg md:text-xl font-bold text-black hover:opacity-[0.9] dark:text-white",
@@ -55,8 +55,13 @@ export const MenuItem = ({
         )}
       >
         {item}
-        <span className={`${isScrolled ? "bg-gray-700" : "bg-blue-500"} h-1 w-0 group-hover:w-full transition-all duration-300`} />
-      </motion.p>
+        <div
+          className={cn(
+            "h-0.5 w-0 group-hover:w-full transition-all duration-500 ease-out",
+            "bg-linear-to-r from-blue-500 via-cyan-400 to-emerald-500 shadow-[0_1px_8px_rgba(59,130,246,0.4)]"
+          )}
+        />
+      </motion.div>
       {active !== null && (
         <motion.div
           initial={{ opacity: 0, scale: 0.85, y: 10 }}
@@ -64,11 +69,11 @@ export const MenuItem = ({
           transition={transition}
         >
           {active === item && (
-            <div className="absolute top-[calc(100%_+_1.2rem)] md:top-[calc(100%_+_0.5rem)] z-50 left-[53%] transform -translate-x-1/2 pt-4">
+            <div className="absolute top-[calc(100%+1.2rem)] md:top-[calc(100%+0.5rem)] z-50 left-[53%] transform -translate-x-1/2 pt-4">
               <motion.div
                 transition={transition}
                 layoutId="active" // layoutId ensures smooth animation
-                className="bg-white dark:bg-black rounded-2xl backdrop-blur-sm overflow-hidden border border-black/[0.2] dark:border-white/[0.2] shadow-xl"
+                className="bg-white dark:bg-black rounded-2xl backdrop-blur-sm overflow-hidden border border-black/20 dark:border-white/20 shadow-xl"
               >
                 <motion.div
                   layout // layout ensures smooth animation
@@ -95,7 +100,7 @@ export const Menu = ({
   return (
     <nav
       onMouseLeave={() => setActive(null)} // resets the state
-      className="relative rounded-full md:w-1/2 flex flex-col md:flex-row mx-auto border border-transparent dark:bg-black dark:border-white/[0.2] bg-inherit shadow-input justify-start md:justify-center space-x-4 px-0 py-3 gap-0 md:gap-8"
+      className="relative rounded-full md:w-1/2 flex flex-col md:flex-row mx-auto border border-transparent dark:bg-black dark:border-white/20 bg-inherit shadow-input justify-start md:justify-center space-x-4 px-0 py-3 gap-0 md:gap-8"
     >
       {children}
     </nav>
@@ -107,14 +112,20 @@ export const ProductItem = ({
   // description,
   href,
   src,
+  onclick
 }: {
   title: string;
   // description: string;
   href: string;
   src: string;
+  onclick?: () => void
 }) => {
   return (
-    <Link href={href} className="flex items-center  italic space-x-2 bg-blue-200 hover:bg-blue-300 border border-blue-600  p-4 rounded-2xl">
+    <Link
+      href={href}
+      className="flex items-center italic space-x-2 bg-blue-200 hover:bg-blue-300 border border-blue-600  p-4 rounded-2xl"
+      onClick={onclick}
+    >
       <img
         src={src}
         alt={title}
@@ -124,7 +135,7 @@ export const ProductItem = ({
         <h4 className="text-xl font-bold italic mb-1 text-black dark:text-white">
           {title}
         </h4>
-        
+
       </div>
     </Link>
   );
