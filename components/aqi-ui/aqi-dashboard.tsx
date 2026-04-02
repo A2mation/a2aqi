@@ -63,6 +63,7 @@ export default function AQIDashboard() {
 
       <main className="pt-28 pb-12 px-6 max-w-400 mx-auto space-y-12">
 
+
         {/* --- Hero Section --- */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <motion.div
@@ -74,7 +75,23 @@ export default function AQIDashboard() {
             )}
             style={{ minHeight: "450px" }}
           >
-            {/* Floating Mood Image Layer */}
+            {/* Floating Mood Image Layer And India monuments Layer*/}
+            <motion.div
+              key={'india-image'}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 0.50, scale: 1 }}
+              className="absolute bottom-0 left-5 max-w-70 md:max-w-xl pointer-events-none z-0 -translate-y-[2%] "
+            >
+              <Image
+                src={`/assets/india.svg`}
+                alt="India Map Background"
+                width={580}
+                height={600}
+                className="object-contain grayscale contrast-50"
+                priority
+              />
+            </motion.div>
+
             <motion.div
               key={theme.label}
               initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
@@ -90,6 +107,7 @@ export default function AQIDashboard() {
                 priority
               />
             </motion.div>
+
 
             <div className="relative z-10">
               <div className="flex items-center justify-between mb-8">
@@ -277,7 +295,7 @@ export default function AQIDashboard() {
               <div className="relative grow rounded-2xl overflow-hidden border border-border/40 min-h-100">
                 <AQIMap view={view} />
 
-                <div className="absolute top-3 right-3 flex items-center gap-2.5 z-1000">
+                <div className="absolute top-3 right-3 flex items-center gap-2.5 z-10">
 
                   <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}

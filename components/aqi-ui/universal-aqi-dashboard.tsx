@@ -105,6 +105,21 @@ export function UniversalAQIDashboard({ data }: { data: { averages: AQIAverages 
 
                     <AnimatePresence mode="wait">
                         <motion.div
+                            key={'india-image'}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 0.50, scale: 1 }}
+                            className="absolute bottom-0 right-8 max-w-65 md:max-w-3xl pointer-events-none z-0 -translate-y-[2%] "
+                        >
+                            <Image
+                                src={`/assets/india.svg`}
+                                alt="India Map Background"
+                                width={700}
+                                height={600}
+                                className="object-contain grayscale contrast-50"
+                                priority
+                            />
+                        </motion.div>
+                        <motion.div
                             key={theme.label}
                             initial={{ opacity: 0, x: 50, scale: 0.9 }}
                             animate={{ opacity: 1, x: 0, scale: 1 }}

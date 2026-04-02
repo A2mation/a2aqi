@@ -28,7 +28,7 @@ export function AirQualityCard({ station }: AirQualityCardProps) {
     const store = useLocationStore();
     const router = useRouter();
 
-    const deviceId = station?.id || "69a384a57980632dd83cf696";
+    const deviceId = station?.id || "69b2b577f283d25789683e19";
 
     const { data: apiData, isLoading, isError } = useQuery({
         queryKey: ["pollutant-details", deviceId],
