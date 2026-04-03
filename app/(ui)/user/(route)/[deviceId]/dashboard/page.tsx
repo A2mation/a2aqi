@@ -137,6 +137,7 @@ export default function DashboardPage() {
                 )}
 
                 <div className="mt-4 md:mt-5 space-y-4 px-2">
+
                     <StatsCards />
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

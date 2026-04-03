@@ -1,8 +1,11 @@
 "use client"
 
-import { Calendar, CreditCard } from "lucide-react"
+import { useParams } from "next/navigation"
 import { Pie, PieChart, Label } from "recharts"
+import { useQuery } from "@tanstack/react-query"
 import { format, differenceInDays } from "date-fns"
+import { DeviceSubscription } from "@prisma/client"
+import { Calendar, CreditCard } from "lucide-react"
 
 import {
     Card,
@@ -15,11 +18,44 @@ import {
     ChartContainer,
     type ChartConfig,
 } from "@/components/ui/chart"
+import { http } from "@/lib/http"
+
+import { SubscriptionExpireWheelSkeleton } from "./loader/SubscriptionExpireWheelSkeleton"
+
+interface DeviceSub {
+    source: string,
+    data: DeviceSubscription,
+    success: boolean
+}
 
 export function SubscriptionExpireWheel() {
+    const {
+        deviceId
+    } = useParams();
     const today = new Date()
-    const expiryDate = new Date(2027, 2, 16)  // Here Month satrt from 0
 
+    const {
+        data: sub,
+        isLoading,
+    } = useQuery<DeviceSub>({
+        queryKey: ["user-subscriptions", deviceId],
+        queryFn: async () => {
+            const res = await http.get<DeviceSub>("/api/user/subscription/validate", {
+                params: {
+                    deviceId
+                }
+            });
+            return res.data;
+        },
+        enabled: !!deviceId,
+        staleTime: 1000 * 60 * 10
+    });
+
+    if (isLoading) return <SubscriptionExpireWheelSkeleton />;
+
+    if (!sub) return null;
+
+    const expiryDate = sub.data.endDate;
     const actualDaysLeft = differenceInDays(expiryDate, today)
     const daysRemaining = Math.max(0, Math.min(actualDaysLeft, 365))
 
@@ -33,7 +69,7 @@ export function SubscriptionExpireWheel() {
         elapsed: "#e2e8f0"  // Gray
     }
 
-    let activeColor = colors.good; 
+    let activeColor = colors.good;
 
     if (daysRemaining <= 20) {
         activeColor = colors.critical;
@@ -42,7 +78,7 @@ export function SubscriptionExpireWheel() {
     }
 
     const chartData = [
-        { status: "active", count: daysRemaining, fill: activeColor }, 
+        { status: "active", count: daysRemaining, fill: activeColor },
         { status: "elapsed", count: elapsedDays, fill: colors.elapsed },
     ]
 
