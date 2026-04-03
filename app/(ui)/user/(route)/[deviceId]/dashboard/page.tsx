@@ -61,8 +61,13 @@ export default function DashboardPage() {
             const res = await http.get<Device[]>("/api/user/device")
             sidebarState.badge = res.data.length;
             setDevices(res.data);
+            const foundDevice = res.data.find((d) => d.id === deviceId);
+            if (foundDevice?.assignedAt) {
+                setCurrentDeviceAssignDate(new Date(foundDevice.assignedAt));
+            }
             return res.data;
         },
+        staleTime: 1000 * 60
     })
 
 

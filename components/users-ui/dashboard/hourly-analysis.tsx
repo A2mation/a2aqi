@@ -21,7 +21,7 @@ import { http } from '@/lib/http';
 import { TIME_SLOTS } from '@/utils/timeSlots';
 import { cn } from '@/lib/utils';
 import { getAQIColor, getAQITextColor } from '@/helpers/aqi-color-pallet';
-import ChartLoader from '@/components/ui/chart-loading';
+import { HourlyAnalysisSkeleton } from './loader/HourlyAnalysisLoader';
 
 const formatDateLabel = (date: Date) =>
     date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -206,7 +206,7 @@ export function HourlyAnalysis({ currentDeviceAssignDate }: {
             </div>
 
             {isPending ? (
-                <ChartLoader />
+                <HourlyAnalysisSkeleton />
             ) : error ? (
                 <p className="text-sm text-red-500">Failed to load data</p>
             ) : (
