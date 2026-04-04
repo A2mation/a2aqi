@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronUp, ChevronDown, MapPin, Wind, Thermometer, Droplets, Info, SearchX } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { getAQIColor, getAQIStatus } from "@/helpers/aqi-color-pallet";
-import { http } from "@/lib/http";
-import { useLocationStore } from "@/store/location.store";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ChevronUp, ChevronDown, MapPin, Thermometer, Droplets, Info, SearchX } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
+
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { NearbyCities, useLocationStore } from "@/store/location.store";
+import { getAQIColor, getAQIStatus } from "@/helpers/aqi-color-pallet";
+
 
 interface AQILocation {
     id: string;
@@ -26,33 +26,28 @@ interface AQILocation {
 type SortKey = keyof AQILocation;
 type SortOrder = "asc" | "desc";
 
-export function AirPollutionTable() {
-    const { lat, lng } = useLocationStore();
+export default function AirPollutionTable() {
     const [sortKey, setSortKey] = useState<SortKey>("aqi");
     const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
 
-    const { data: markers, isLoading, error } = useQuery<AQILocation[]>({
-        queryKey: ["nearby-aqi", lat, lng],
-        queryFn: async ({ signal }) => {
-            if (lat == null || lng == null) return [];
-            const res = await http.get(`/api/location/nearby-cities?lat=${lat}&lon=${lng}`, { signal });
+    const {
+        nearbyCities,
+        loading: isLoading,
+        error
+    } = useLocationStore();
 
-            return res.data.map((city: any) => ({
-                id: city.id || city.location || city.name,
-                name: city.location || city.name,
-                lat: city.lat,
-                lng: city.lng,
-                aqi: city.aqi ?? 0,
-                temp: city.temperature ?? 0,
-                status: getAQIStatus(city.aqi ?? 0),
-                humidity: city.humidity ?? 0,
-                pm25: city.pm25 ?? 0,
-                source: city.source ?? "CPCB",
-            }));
-        },
-        enabled: !!lat && !!lng,
-        staleTime: 1000 * 60 * 5,
-    });
+    const markers: AQILocation[] = nearbyCities.map((city: NearbyCities) => ({
+        id: city.id || city.location || Math.random().toString(),
+        name: city.location,
+        lat: city.lat,
+        lng: city.lng,
+        aqi: city.aqi ?? 0,
+        temp: city.temperature ?? city.temperature ?? 0,
+        status: getAQIStatus(city.aqi ?? 0),
+        humidity: city.humidity ?? 0,
+        pm25: city.pm25 ?? 0,
+        source: city.source ?? "CPCB",
+    }));
 
     const handleSort = (key: SortKey) => {
         if (sortKey === key) {
@@ -219,7 +214,7 @@ function Th({ label, icon, sortKey, activeKey, order, onClick }: any) {
     );
 }
 
-function TableSkeleton({ rows }: { rows: number }) {
+export function TableSkeleton({ rows }: { rows: number }) {
     return (
         <>
             {Array.from({ length: rows }).map((_, i) => (

@@ -12,40 +12,51 @@ const IP_APIS = [
 ]
 
 export const detectIpLocation = async () => {
-    const setState = useLocationStore.getState().setState
-    setState({ loading: true, error: undefined })
+    const setState = useLocationStore.getState().setState;
+
+    setState({ loading: true, error: undefined });
 
     for (const url of IP_APIS) {
         try {
-            const { data } = await http.get(url)
+            const { data } = await http.get(url);
 
-            const lat = data.lat || data.latitude
-            const lng = data.lng || data.longitude
+            const { nearest, popularCities, nearbyCities } = data;
+            console.log(data)
 
+            if (nearest) {
+                const lat = nearest.lat || nearest.latitude;
+                const lng = nearest.lng || nearest.longitude;
 
-            if (lat && lng) {
                 setState({
                     lat,
                     lng,
-                    location: data.location,
-                    city: data.city,
-                    state: data.state,
-                    country: data.country,
-                    pm10: data.pm10,
-                    pm25: data.pm25,
-                    aqi: data.aqi,
-                    no2: data.no2,
-                    o3: data.o3,
-                    temp: data.temperature,
-                    humidity: data.humidity,
-                    wind: data.wind,
-                    co: data.co,
-                    so2: data.so2,
-                    source: data.source || "CPCB",
+                    location: nearest.location,
+                    city: nearest.city,
+                    state: nearest.state,
+                    country: nearest.country,
+                    pm10: nearest.pm10,
+                    pm25: nearest.pm25,
+                    aqi: nearest.aqi,
+                    no2: nearest.no2,
+                    o3: nearest.o3,
+                    temp: nearest.temperature || nearest.temp,
+                    humidity: nearest.humidity,
+                    wind: nearest.wind,
+                    co: nearest.co,
+                    so2: nearest.so2,
+                    source: nearest.source || "CPCB",
+
+                    // Update the collection fields
+                    popularCities: popularCities || [],
+                    nearbyCities: nearbyCities || [],
+
                     loading: false,
                     lastUpdated: new Date(),
-                })
-                return
+                });
+
+                return;
+            } else {
+                setState({ loading: false, error: "No location data found" });
             }
         } catch (error) {
             logLocationError(url, error);
@@ -78,35 +89,44 @@ export const detectGpsLocation = () => {
                     const lat = pos.coords.latitude
                     const lng = pos.coords.longitude
 
-                    const { data } = await http.get("/api/location", {
+                    const response = await http.get("/api/location", {
                         params: { lat, lng },
                     })
 
-                    const actualLocation = await http.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                    const { nearest, popularCities, nearbyCities } = response.data;
 
-                    // console.log(actualLocation.data)
+                    const actualLocation = await http.get(
+                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+                    )
 
-                    setState({
-                        lat,
-                        lng,
-                        location: actualLocation.data.display_name ? actualLocation.data.display_name : data.location,
-                        city: data.city,
-                        state: data.state,
-                        country: data.country,
-                        pm10: data.pm10,
-                        pm25: data.pm25,
-                        aqi: data.aqi,
-                        no2: data.no2,
-                        o3: data.o3,
-                        temp: data.temperature,
-                        humidity: data.humidity,
-                        wind: data.wind,
-                        co: data.co,
-                        so2: data.so2,
-                        source: data.source || "CPCB",
-                        loading: false,
-                        lastUpdated: new Date(),
-                    })
+                    if (nearest) {
+                        setState({
+                            lat,
+                            lng,
+                            location: actualLocation.data.display_name || nearest.location,
+
+                            city: nearest.city,
+                            state: nearest.state,
+                            country: nearest.country,
+                            pm10: nearest.pm10,
+                            pm25: nearest.pm25,
+                            aqi: nearest.aqi,
+                            no2: nearest.no2,
+                            o3: nearest.o3,
+                            temp: nearest.temperature || nearest.temp,
+                            humidity: nearest.humidity,
+                            wind: nearest.wind,
+                            co: nearest.co,
+                            so2: nearest.so2,
+                            source: nearest.source || "CPCB",
+
+                            popularCities: popularCities || [],
+                            nearbyCities: nearbyCities || [],
+
+                            loading: false,
+                            lastUpdated: new Date(),
+                        })
+                    }
 
                     resolve()
                 } catch (error) {

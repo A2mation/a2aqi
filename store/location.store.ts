@@ -1,6 +1,29 @@
 "use client"
 
-import { create } from "zustand"
+import { create } from "zustand";
+import { AQISource } from "@prisma/client";
+
+export interface PopularCities {
+    location: string;
+    aqi: number;
+    humidity: number | null;
+    temperature: number | null;
+    measuredAt: Date;
+}
+
+export interface NearbyCities {
+    distanceKm: number;
+    lat: number;
+    lng: number;
+    location: string;
+    source: AQISource;
+    aqi: number;
+    pm25: number | null;
+    pm10: number | null;
+    humidity: number | null;
+    id: string;
+    temperature: number | null;
+}
 
 export type LocationState = {
     lat: number | null
@@ -22,7 +45,10 @@ export type LocationState = {
     co: number | null,
     so2: number | null,
     wind: number | null,
-    lastUpdated: Date | null,  
+    lastUpdated: Date | null,
+
+    popularCities: PopularCities[]
+    nearbyCities: NearbyCities[]
 
     setState: (data: Partial<LocationState>) => void
 }
@@ -48,6 +74,9 @@ export const useLocationStore = create<LocationState>((set) => ({
     wind: null,
     error: null,
     lastUpdated: null,
+
+    popularCities: [],
+    nearbyCities: [],
 
     setState: (data) => set((state) => ({ ...state, ...data })),
 }))

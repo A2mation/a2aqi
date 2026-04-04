@@ -217,8 +217,8 @@ export default function AQIDashboard() {
                 </span>
                 <div className="flex items-start flex-col gap-1.5 mt-2 opacity-70">
                   <div className="flex items-center justify-start gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-foreground/50" />
-                    <span className="text-[9px] md:text-xs font-bold uppercase tracking-tighter text-muted-foreground">Source: {source || 'Station Data'}</span>
+                    <div className="h-1.5 w-1.5 rounded-full bg-foreground" />
+                    <span className="text-[9px] md:text-xs font-bold uppercase text-foreground">Source: Real-Time Data collected from {source==='WAQI' ? 'CPCB' : 'A2AQI' } Sensor</span>
                   </div>
                   <div className="flex items-center justify-start gap-2">
                     <div className="h-1.5 w-1.5 rounded-full bg-foreground/50" />

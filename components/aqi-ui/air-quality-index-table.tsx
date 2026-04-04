@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Info, ArrowRight, ShieldCheck } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 type TabType = "aqi" | "pm" | "ozone" | "co" | "so2" | "no2";
 
@@ -154,10 +155,13 @@ const AirQualityIndexTable = () => {
                             <h4 className="text-3xl font-bold text-white leading-tight">
                                 Live your healthiest life with real-time monitoring.
                             </h4>
-                            <button className="w-full py-4 bg-white text-slate-900 font-bold rounded-2xl hover:bg-blue-600 hover:text-white transition-all flex items-center justify-center gap-2 group/btn shadow-xl">
+                            <Link
+                                href={'/products'}
+                                className="w-full py-4 bg-white text-slate-900 font-bold rounded-2xl hover:bg-blue-600 hover:text-white transition-all flex items-center justify-center gap-2 group/btn shadow-xl"
+                            >
                                 Discover More
                                 <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                            </button>
+                            </Link>
                         </div>
                     </div>
                 </aside>

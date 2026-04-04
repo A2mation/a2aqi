@@ -2,20 +2,13 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
-import { Thermometer, Droplets, Wind, RefreshCw } from "lucide-react";
+import { Thermometer, Droplets, Wind } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { http } from "@/lib/http";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useLocationStore } from "@/store/location.store";
 
-type CityAQI = {
-    location: string;
-    aqi: number;
-    temperature: number | null;
-    humidity: number | null;
-};
 
 const landmarks: Record<string, string> = {
     Ahmedabad: "/assets/city-icons/ahmedabad.png",
@@ -37,16 +30,13 @@ const AQI_CONFIG = (aqi: number) => {
 };
 
 export default function PopularCityCards() {
-    const { data: cities, isLoading, isError, refetch, isFetching } = useQuery({
-        queryKey: ["popular-cities-aqi"],
-        queryFn: async () => {
-            const res = await http.get("/api/aqi/popular-city-aqi");
-            return res.data as CityAQI[];
-        },
-        refetchInterval: 60000 * 10,
-    });
+    const {
+        popularCities: cities,
+        loading: isLoading,
+        error: isError
+    } = useLocationStore();
 
-    if (isLoading) return <LoadingGrid />;
+    if (isLoading) return <PopularCityLoadingGrid />;
 
     if (isError) return (
         <div className="flex flex-col items-center justify-center p-20 text-center">
@@ -55,7 +45,7 @@ export default function PopularCityCards() {
             </div>
             <h3 className="text-xl font-bold text-slate-900">Failed to fetch air quality data</h3>
             <p className="text-slate-500 mb-6">Please check your connection and try again.</p>
-            <button onClick={() => refetch()} className="px-6 py-2 bg-slate-900 text-white rounded-full font-medium transition-transform hover:scale-105 active:scale-95">
+            <button onClick={() => window.location.reload()} className="px-6 py-2 bg-slate-900 text-white rounded-full font-medium transition-transform hover:scale-105 active:scale-95">
                 Retry Load
             </button>
         </div>
@@ -88,14 +78,6 @@ export default function PopularCityCards() {
                             India’s <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-indigo-600">Metro Hubs</span>
                         </motion.h1>
                     </div>
-
-                    <button
-                        onClick={() => refetch()}
-                        className="flex items-center gap-2 text-slate-500 hover:text-blue-600 transition-colors font-medium text-sm bg-white px-4 py-2 rounded-full border border-slate-200 shadow-sm group"
-                    >
-                        <RefreshCw className={cn("w-4 h-4 group-active:rotate-180 transition-transform duration-500", isFetching && "animate-spin")} />
-                        {isFetching ? "Syncing..." : "Update Live Data"}
-                    </button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -201,7 +183,7 @@ export default function PopularCityCards() {
     );
 }
 
-function LoadingGrid() {
+export function PopularCityLoadingGrid() {
     return (
         <div className="max-w-7xl mx-auto p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[...Array(8)].map((_, i) => (

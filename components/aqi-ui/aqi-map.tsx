@@ -4,12 +4,9 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 
-import { http } from "@/lib/http";
 import { useLocationStore } from "@/store/location.store";
-import { getAQIBgColor, getAQIStatus, getAQITheme } from "@/helpers/aqi-color-pallet";
+import { getAQIBgColor, getAQITheme } from "@/helpers/aqi-color-pallet";
 import AQIMapLoader from "./loaders/aqi-map-loader";
 import { motion } from "motion/react";
 
@@ -33,14 +30,6 @@ const Tooltip = dynamic(
   { ssr: false }
 )
 
-type AQIMarker = {
-  id: string;
-  location: string;
-  lat: number;
-  lng: number;
-  aqi: number;
-  temp: number;
-};
 
 delete (L.Icon.Default.prototype as any)._getIconUrl
 L.Icon.Default.mergeOptions({
@@ -75,6 +64,9 @@ export default function AQIMap({ view }: { view: "aqi" | "temp" }) {
   const {
     lat,
     lng,
+    nearbyCities: markers,
+    loading,
+    error
   } = useLocationStore();
   const [mounted, setMounted] = useState(false)
 
@@ -82,33 +74,9 @@ export default function AQIMap({ view }: { view: "aqi" | "temp" }) {
     setMounted(true)
   }, []);
 
-  const { data: markers, isLoading, error } = useQuery<AQIMarker[]>({
-    queryKey: ["nearby-aqi", lat, lng],
-    queryFn: async () => {
-      if (lat == null || lng == null) return [];
-      const res = await http.get(`/api/location/nearby-cities?lat=${lat}&lon=${lng}`);
-
-
-      return res.data.map((city: any) => ({
-        id: city.id || city.name,
-        location: city.name,
-        lat: city.lat,
-        lng: city.lng,
-        aqi: city.aqi ?? 0,
-        temp: city.temperature,
-        status: getAQIStatus(city.aqi ?? 0),
-        name: city.location,
-        humidity: city.humidity ?? 0,
-        source: city.source ?? "CPCB",
-      }));
-    },
-    enabled: !!lat && !!lng,
-    staleTime: 1000 * 60 * 5,
-  });
-
   if (!mounted) return null;
 
-  if (isLoading) {
+  if (loading) {
     return (
       <AQIMapLoader />
     );
@@ -144,7 +112,7 @@ export default function AQIMap({ view }: { view: "aqi" | "temp" }) {
               <Marker
                 key={station.id}
                 position={[station.lat, station.lng]}
-                icon={aqiIcon(view === "aqi" ? station.aqi : Math.round(station.temp as any))}
+                icon={aqiIcon(view === "aqi" ? station.aqi : station.temperature != null ? Math.round(station.temperature) : 0)}
               >
                 <Tooltip
                   direction="top"
@@ -205,7 +173,7 @@ export default function AQIMap({ view }: { view: "aqi" | "temp" }) {
                             <div className="mt-2 w-full h-1 bg-white/5 rounded-full overflow-hidden">
                               <motion.div
                                 initial={{ width: 0 }}
-                                animate={{ width: `${Math.min((station.temp as any / 50) * 100, 100)}%` }}
+                                animate={{ width: `${Math.min((station.temperature as any / 50) * 100, 100)}%` }}
                                 className="h-full rounded-full"
                                 style={{ backgroundColor: stationTheme.color }}
                               />
@@ -221,7 +189,7 @@ export default function AQIMap({ view }: { view: "aqi" | "temp" }) {
                               </div>
                               <div className="flex items-baseline gap-0.5">
                                 <span className="text-2xl font-black italic tracking-tighter" style={{ color: stationTheme.color }}>
-                                  {Math.round(station.temp as any)}
+                                  {station.temperature !== null ? `${Math.round(station.temperature)}°C` : "--"}
                                 </span>
                                 <span className="text-xs font-bold text-muted-foreground/60">°C</span>
                               </div>
