@@ -57,22 +57,21 @@ export default function Home() {
 
   return (
     <main>
-      {/* Above the fold - Standard Import */}
+
       <AQIDashboard />
 
       <AirQualityDashboard />
       <AQIGraph />
 
-      {/* Logic to keep hidden on small screens */}
-      <section className="hidden md:block">
-        <AirPollutionTable />
-      </section>
+
+      <AirPollutionTable />
 
       <AirQualityIndexTable />
       <PopularCityCards />
 
       <ClientLogosBanner logos={logos} />
       <FloatingMarketingNav />
+      
     </main>
   );
 }
