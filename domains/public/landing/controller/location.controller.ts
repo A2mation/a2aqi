@@ -80,12 +80,15 @@ export class LocationController {
 
         const popularCities = await this.PollutantMajorCitiesServiceObj.majorCitiesPollutantData();
         const nearbyCities = await this.NearByCitiesObj.nearbyCitiesService(lat, lng);
-        
+        const graphData = nearest.curr.source == 'WAQI'
+            ? await this.HistoryhObj.getAqiHistoryFromExternalSource(nearest.curr.lat, nearest.curr.lng)
+            : await this.HistoryhObj.getAqiHistoryFromInternalSource(nearest.curr.id, new Date().toString());
 
         await redis.set(CACHE_KEY, JSON.stringify({
             nearest: nearest.curr,
             popularCities: popularCities,
             nearbyCities: nearbyCities,
+            graphData,
             success: true
         }), "EX", this.CACHE_TTL);
 
@@ -93,6 +96,7 @@ export class LocationController {
             nearest: nearest.curr,
             popularCities: popularCities,
             nearbyCities: nearbyCities,
+            graphData,
             success: true
         });
     }

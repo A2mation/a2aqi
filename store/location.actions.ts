@@ -20,7 +20,7 @@ export const detectIpLocation = async () => {
         try {
             const { data } = await http.get(url);
 
-            const { nearest, popularCities, nearbyCities } = data;
+            const { nearest, popularCities, nearbyCities, graphData } = data;
             console.log(data)
 
             if (nearest) {
@@ -49,6 +49,7 @@ export const detectIpLocation = async () => {
                     // Update the collection fields
                     popularCities: popularCities || [],
                     nearbyCities: nearbyCities || [],
+                    graphData: graphData || [],
 
                     loading: false,
                     lastUpdated: new Date(),
@@ -93,7 +94,7 @@ export const detectGpsLocation = () => {
                         params: { lat, lng },
                     })
 
-                    const { nearest, popularCities, nearbyCities } = response.data;
+                    const { nearest, popularCities, nearbyCities, graphData } = response.data;
 
                     const actualLocation = await http.get(
                         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
@@ -122,6 +123,7 @@ export const detectGpsLocation = () => {
 
                             popularCities: popularCities || [],
                             nearbyCities: nearbyCities || [],
+                            graphData: graphData || [],
 
                             loading: false,
                             lastUpdated: new Date(),

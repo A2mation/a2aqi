@@ -49,8 +49,16 @@ export type LocationState = {
 
     popularCities: PopularCities[]
     nearbyCities: NearbyCities[]
+    graphData: GraphData[]
 
     setState: (data: Partial<LocationState>) => void
+}
+
+export interface GraphData {
+    id: string;
+    aqi: number;
+    temperature: number | null;
+    createdAt: Date;
 }
 
 export const useLocationStore = create<LocationState>((set) => ({
@@ -77,6 +85,7 @@ export const useLocationStore = create<LocationState>((set) => ({
 
     popularCities: [],
     nearbyCities: [],
+    graphData: [],
 
     setState: (data) => set((state) => ({ ...state, ...data })),
 }))
