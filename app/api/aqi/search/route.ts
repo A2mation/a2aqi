@@ -35,9 +35,6 @@ export async function GET(req: Request) {
                 state: true,
                 country: true,
                 aqi: true,
-                temperature: true,
-                lat: true,
-                lng: true,
                 createdAt: true
             },
             take: 10,
@@ -52,9 +49,6 @@ export async function GET(req: Request) {
                     state: r.state,
                     country: r.country,
                     aqi: r.aqi,
-                    temp: r.temperature,
-                    lat: r.lat,
-                    lng: r.lng
                 })
             }
         }
@@ -76,9 +70,6 @@ export async function GET(req: Request) {
                 city: true,
                 country: true,
                 aqi: true,
-                temperature: true,
-                lat: true,
-                lng: true,
             },
             take: 10,
         })
@@ -93,9 +84,6 @@ export async function GET(req: Request) {
                     city: r.city,
                     country: r.country,
                     aqi: r.aqi,
-                    temp: r.temperature,
-                    lat: r.lat,
-                    lng: r.lng
                 })
             }
         }

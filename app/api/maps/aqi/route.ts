@@ -28,6 +28,7 @@ export async function GET(req: Request) {
             lat: true,
             lng: true,
             aqi: true,
+            temperature: true
         },
         take: 500,
     });
@@ -43,6 +44,7 @@ export async function GET(req: Request) {
         select: {
             id: true,
             aqi: true,
+            temperature: true,
             device: {
                 select: {
                     id: true,
@@ -62,7 +64,7 @@ export async function GET(req: Request) {
         lat: r.lat,
         lng: r.lng,
         aqi: r.aqi,
-        
+        temperature: r.temperature
     }));
 
     return new Response(JSON.stringify(response), {
