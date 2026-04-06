@@ -66,7 +66,7 @@ const aqiIcon = (value: number) => {
                     border-[2.5px] border-white
                     transition-all duration-200 group-hover:scale-110 group-hover:-translate-y-1">
           
-          <span class="drop-shadow-sm">${value}</span>
+          <span class="drop-shadow-sm">${Math.round(value)}</span>
 
           <div class="absolute -bottom-1.25 left-1/2 -translate-x-1/2 
                       w-3 h-3 ${bgColor} rotate-45 
@@ -84,6 +84,7 @@ export type StationData = {
   lat: number;
   lng: number;
   aqi: number;
+  temperature: number;
 }
 
 export default function Map({
@@ -97,6 +98,7 @@ export default function Map({
   const [selectedStation, setSelectedStation] = useState<StationData | null>(null);
   const [bounds, setBounds] = useState<any>(null);
   const [targetCoords, setTargetCoords] = useState<[number, number] | null>(null);
+  const [parameter, setParameter] = useState("aqi");
 
   const { data: markers = [],
     isPending,
@@ -147,7 +149,7 @@ export default function Map({
           <Marker
             key={station.id}
             position={[station.lat, station.lng]}
-            icon={aqiIcon(station.aqi)}
+            icon={aqiIcon( parameter == 'aqi' ? station.aqi : station.temperature)}
             eventHandlers={{ click: () => setSelectedStation(station) }}
           />
         ))) : <div className="absolute top-20 left-1/2 -translate-x-1/2 z-1000 pointer-events-none">
@@ -164,6 +166,8 @@ export default function Map({
       <div className="absolute top-20 md:top-25 right-0 md:right-6 z-50 w-full max-w-120 px-4 md:px-0">
         <MapSearchBar
           onLocationSelect={(lat, lng) => setTargetCoords([lat, lng])}
+          parameter={parameter}
+          setParameter={setParameter}
         />
       </div>
 

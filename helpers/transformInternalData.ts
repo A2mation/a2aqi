@@ -7,7 +7,8 @@ export const transformInternalData = (records: any[]) => {
       id: data.device.id || String(data.id),
       lat: Number(data.device?.lat || data.lat),
       lng: Number(data.device?.lng || data.lng),
-      aqi: Number(data.aqi),
+      aqi: Math.round(Number(data.aqi)),
+      temperature: Math.round(Number(data.temperature))
     };
   });
 };

@@ -32,9 +32,11 @@ type Result = {
 
 interface MapSearchBarProps {
     onLocationSelect: (lat: number, lng: number) => void;
+    setParameter: (parameter: string) => void;
+    parameter: string
 }
 
-const MapSearchBar = ({ onLocationSelect }: MapSearchBarProps) => {
+const MapSearchBar = ({ onLocationSelect, parameter, setParameter }: MapSearchBarProps) => {
     const [query, setQuery] = useState("");
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -112,7 +114,10 @@ const MapSearchBar = ({ onLocationSelect }: MapSearchBarProps) => {
             <Separator orientation="vertical" className="h-6 mx-1 bg-slate-200" />
 
             <div className="min-w-40">
-                <Select defaultValue="aqi">
+                <Select
+                    value={parameter}
+                    onValueChange={(value) => setParameter(value)}
+                >
                     <SelectTrigger className="h-11 border-none flex items-center w-full bg-transparent shadow-none focus:ring-0 focus:ring-offset-0 hover:bg-slate-100/50 rounded-xl transition-colors font-bold text-slate-600 gap-2 px-3">
                         <SelectValue placeholder="Parameter" />
                     </SelectTrigger>
