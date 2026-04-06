@@ -1,13 +1,14 @@
 "use client"
 
+import Link from "next/link"
+import { useQuery } from "@tanstack/react-query"
 import { useState, useRef, useEffect } from "react"
 import { Search, X, MapPin, Building2, Loader2, Command } from "lucide-react"
-import { useQuery } from "@tanstack/react-query"
-import { http } from "@/lib/http"
-import { getAQIBgColor } from "@/helpers/aqi-color-pallet"
+
 import { cn } from "@/lib/utils"
-import Link from "next/link"
+import { http } from "@/lib/http"
 import { useDebounce } from "@/hooks/use-debounce"
+import { getAQIBgColor } from "@/helpers/aqi-color-pallet"
 import { useOutsideClick } from "@/hooks/use-outside-click"
 
 type Result = {
@@ -40,7 +41,6 @@ const Searchbar = () => {
 
     useEffect(() => {
         const down = (e: KeyboardEvent) => {
-            // Check for CMD+K (Mac) or CTRL+K (Windows/Linux)
             if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
                 e.preventDefault()
                 inputRef.current?.focus()
