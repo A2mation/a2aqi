@@ -473,3 +473,31 @@ body {
   background-size: 200% auto;
   animation: aurora-text-move 3s linear infinite;
 }
+
+
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a;
+  /* slate-900 */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #374151;
+  /* gray-700 */
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #4b5563;
+  /* gray-600 */
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #374151 #0f172a;
+}
