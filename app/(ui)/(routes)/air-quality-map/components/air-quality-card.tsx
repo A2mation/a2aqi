@@ -1,7 +1,6 @@
 "use client";
 
 import Image from 'next/image';
-import "@/styles/graph-scrollbar.css";
 import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";

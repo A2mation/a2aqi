@@ -3,11 +3,8 @@
 import { useEffect, useState } from "react"
 import dynamic from "next/dynamic"
 
-import { http } from "@/lib/http";
-import { detectIpLocation } from "@/store/location.actions";
 import { useLocationStore } from "@/store/location.store"
-import { getAQIStatus } from "@/helpers/aqi-color-pallet";
-import { useQuery } from "@tanstack/react-query";
+import { detectIpLocation } from "@/store/location.actions";
 
 export type AQIMarker = {
     id: string;
@@ -15,13 +12,12 @@ export type AQIMarker = {
     lat: number;
     lng: number;
     aqi: number;
-    status: string;      // Add this
+    status: string;
     pm25: number;
     pm10: number;
-    temp: number;        // Add this
-    humidity: number;    // Add this
-    source: string;      // Add this
-    // If you plan to use these later, add them as optional:
+    temp: number;
+    humidity: number;
+    source: string;
     o3?: number;
     no2?: number;
     so2?: number;

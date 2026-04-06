@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMap, useMapEvents } from "react-leaflet";
 
 import { http } from "@/lib/http";
+import MapSearchBar from "./map-search-bar";
 import { AirQualityCard } from "./air-quality-card";
 import { getAQIBgColor } from "@/helpers/aqi-color-pallet";
 
@@ -34,6 +35,21 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
 
+
+function MapFlyController({ center }: { center: [number, number] | null }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (center) {
+      map.flyTo(center, 12, {
+        duration: 3,
+        easeLinearity: 0.25,
+      });
+    }
+  }, [center, map]);
+
+  return null;
+}
 
 const aqiIcon = (value: number) => {
   const bgColor = getAQIBgColor(value);
@@ -80,6 +96,7 @@ export default function Map({
   const [mounted, setMounted] = useState(false);
   const [selectedStation, setSelectedStation] = useState<StationData | null>(null);
   const [bounds, setBounds] = useState<any>(null);
+  const [targetCoords, setTargetCoords] = useState<[number, number] | null>(null);
 
   const { data: markers = [],
     isPending,
@@ -141,9 +158,16 @@ export default function Map({
             <ZoomOutButton />
           </div>
         </div>}
+        <MapFlyController center={targetCoords} />
       </MapContainer>
 
-      <div className="fixed inset-x-0 bottom-0 z-100 h-[45vh] md:h-auto md:absolute md:top-24 md:left-6 md:w-95 md:bottom-auto">
+      <div className="absolute top-20 md:top-25 right-0 md:right-6 z-50 w-full max-w-120 px-4 md:px-0">
+        <MapSearchBar
+          onLocationSelect={(lat, lng) => setTargetCoords([lat, lng])}
+        />
+      </div>
+
+      <div className="fixed inset-x-0 bottom-0 z-10 h-[45vh] md:h-auto md:absolute md:top-24 md:left-6 md:w-95 md:bottom-auto">
         <AirQualityCard station={selectedStation} />
       </div>
 
