@@ -91,6 +91,7 @@ export const transformInternalForNearbyLocationsData = (records: any[], state: s
       lat: Number(data.device?.lat || data.lat),
       lng: Number(data.device?.lng || data.lng),
       
+      street : data.street ? data.street : '',
       aqi: Number(Number(data.aqi).toFixed(2)),
       pm25: data.pm25 ? Number(Number(data.pm25).toFixed(2)) : null,
       pm10: data.pm10 ? Number(Number(data.pm10).toFixed(2)) : null,
