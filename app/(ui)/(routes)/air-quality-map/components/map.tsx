@@ -12,6 +12,7 @@ import { http } from "@/lib/http";
 import MapSearchBar from "./map-search-bar";
 import { AirQualityCard } from "./air-quality-card";
 import { getAQIBgColor } from "@/helpers/aqi-color-pallet";
+import { getTemperatureValue } from "@/helpers/temperature-color-pallet";
 
 
 const MapContainer = dynamic(
@@ -51,8 +52,8 @@ function MapFlyController({ center }: { center: [number, number] | null }) {
   return null;
 }
 
-const aqiIcon = (value: number) => {
-  const bgColor = getAQIBgColor(value);
+const aqiIcon = (value: number, parameter: string) => {
+  const bgColor = parameter === 'aqi' ? getAQIBgColor(value) : getTemperatureValue(value, "color");
 
   return L.divIcon({
     className: "bg-transparent",
@@ -149,7 +150,7 @@ export default function Map({
           <Marker
             key={station.id}
             position={[station.lat, station.lng]}
-            icon={aqiIcon( parameter == 'aqi' ? station.aqi : station.temperature)}
+            icon={aqiIcon(parameter == 'aqi' ? station.aqi : station.temperature, parameter)}
             eventHandlers={{ click: () => setSelectedStation(station) }}
           />
         ))) : <div className="absolute top-20 left-1/2 -translate-x-1/2 z-1000 pointer-events-none">

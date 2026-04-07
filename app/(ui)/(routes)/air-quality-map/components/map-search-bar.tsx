@@ -52,7 +52,7 @@ const MapSearchBar = ({ onLocationSelect, parameter, setParameter }: MapSearchBa
             const res = await http.get(`/api/aqi/search?q=${debouncedQuery}`);
             return res.data as { states: Result[]; cities: Result[] };
         },
-        enabled: debouncedQuery.length > 0,
+        enabled: debouncedQuery.length > 0 && query.length > 2,
     });
 
     useEffect(() => {

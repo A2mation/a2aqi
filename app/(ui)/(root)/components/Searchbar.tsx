@@ -36,7 +36,7 @@ const Searchbar = () => {
 
             return res.data as { states: Result[]; cities: Result[] }
         },
-        enabled: debouncedQuery.length > 0,
+        enabled: debouncedQuery.length > 0 && query.length > 2,
     })
 
     useEffect(() => {

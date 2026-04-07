@@ -210,7 +210,7 @@ export function AirQualityCard({ station }: AirQualityCardProps) {
                     <div className="h-32 w-full bg-zinc-50/50 rounded-2xl p-2 border border-zinc-100/50">
 
                         <Graph data={apiData?.history || []} isLoading={isLoading} />
-                        <Graph />
+                        
                     </div>
                     <p className="text-[10px] text-zinc-300 text-center font-bold uppercase tracking-tighter pt-2">
                         Sensor Sync: {current?.measuredAt ? new Date(current.measuredAt).toLocaleTimeString() : 'Updating...'}
