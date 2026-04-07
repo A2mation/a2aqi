@@ -56,7 +56,7 @@ export async function GET(req: Request) {
                                 temperature: waqi.data.iaqi?.t?.v,
                                 humidity: waqi.data.iaqi?.h?.v,
                                 measuredAt: new Date(waqi.data.time.iso),
-
+                                street: city.street,
                                 lat: city.lat,
                                 lng: city.lng,
                                 location: city.name,
@@ -70,17 +70,17 @@ export async function GET(req: Request) {
 
                         results.push({ city: city.name, status: "ok" });
                     } catch (err) {
-                        console.error(city.name, err);
+                        // console.error(city.name, err);
                         results.push({ city: city.name, status: "failed" });
                     }
                 })
             );
         }
 
-        console.log("🔥 Popular cities cron completed", {
-            processed: results.length,
-            success: results.filter(r => r.status === "ok").length,
-        });
+        // console.log("🔥 Popular cities cron completed", {
+        //     processed: results.length,
+        //     success: results.filter(r => r.status === "ok").length,
+        // });
 
         return NextResponse.json({
             success: true,

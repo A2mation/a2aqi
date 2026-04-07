@@ -5,7 +5,7 @@ import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Activity, Info, TrendingUp, ChevronDown, AlertCircle, Wind, Building2 } from "lucide-react";
+import { MapPin, Activity, Info, TrendingUp, AlertCircle, Wind } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import {
@@ -61,9 +61,9 @@ export function AirQualityCard({ station }: AirQualityCardProps) {
 
     const displayData = useMemo(() => {
         const allPollutants = [
-            { id: "aqi", label: "AQI", value: current?.aqi, unit: "", max: 500 },
-            { id: "pm10", label: "PM 10", value: current?.pm10, unit: "μg/m³", max: 200 },
-            { id: "pm25", label: "PM 2.5", value: current?.pm25, unit: "μg/m³", max: 150 },
+            { id: "aqi", label: "AQI", value: current?.aqi, unit: "", max: 1000 },
+            { id: "pm10", label: "PM 10", value: current?.pm10, unit: "μg/m³", max: 1000 },
+            { id: "pm25", label: "PM 2.5", value: current?.pm25, unit: "μg/m³", max: 1000 },
             { id: "so2", label: "SO₂", value: current?.so2, unit: "ppb", max: 100 },
             { id: "no2", label: "NO₂", value: current?.no2, unit: "ppb", max: 100 },
             { id: "co2", label: "CO₂", value: current?.co2, unit: "ppm", max: 2000 },
@@ -122,10 +122,10 @@ export function AirQualityCard({ station }: AirQualityCardProps) {
     return (
         <Card className="w-full max-w-105 h-full md:h-[88dvh] bg-white text-zinc-900 border-none shadow-[0_-10px_40px_rgba(0,0,0,0.08)] flex flex-col overflow-hidden rounded-t-[2.5rem] md:rounded-[2.5rem]">
 
-            <div className="flex flex-col items-center pt-4 pb-2 cursor-grab active:cursor-grabbing">
-                <span className="text-[11px] font-bold text-zinc-300 uppercase flex items-center gap-1 tracking-widest">
-                    Scroll Down <ChevronDown className="w-3.5 h-3.5 text-zinc-300" />
-                </span>
+            <div className="flex flex-col items-center pt-4 pb-1 cursor-grab active:cursor-grabbing">
+                <p className="text-[11px] text-zinc-300 text-center font-bold uppercase pt-2">
+                    Sensor Sync: {current?.measuredAt ? new Date(current.measuredAt).toLocaleTimeString() : 'Updating...'}
+                </p>
             </div>
 
             <CardContent className="flex-1 overflow-y-auto custom-scroll px-7 pb-8 space-y-7">
@@ -210,11 +210,8 @@ export function AirQualityCard({ station }: AirQualityCardProps) {
                     <div className="h-32 w-full bg-zinc-50/50 rounded-2xl p-2 border border-zinc-100/50">
 
                         <Graph data={apiData?.history || []} isLoading={isLoading} />
-                        
+
                     </div>
-                    <p className="text-[10px] text-zinc-300 text-center font-bold uppercase tracking-tighter pt-2">
-                        Sensor Sync: {current?.measuredAt ? new Date(current.measuredAt).toLocaleTimeString() : 'Updating...'}
-                    </p>
                 </div>
             </CardContent>
         </Card>
