@@ -320,6 +320,7 @@ model AQIReading {
   // Location
   lat      Float
   lng      Float
+  street   String?
   location String
   city     String
   state    String
