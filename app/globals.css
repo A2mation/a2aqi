@@ -492,12 +492,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #4b5563;
+  background-color: #e6e6e6;
   /* gray-600 */
 }
 
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #374151 #0f172a;
+  scrollbar-color: #919397 #e7e7e9;
 }
