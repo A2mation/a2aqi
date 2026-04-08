@@ -5,6 +5,11 @@ export async function authenticateSensor(serialNo: string, apiKey: string) {
     // console.time("db");
     const device = await prisma.device.findUnique({
         where: { serialNo: serialNo },
+        select:{
+            id: true,
+            isActive: true,
+            apiKey: true,
+        }
     });
     // console.timeEnd("db");
     // console.log(device)
