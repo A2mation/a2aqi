@@ -15,11 +15,9 @@ import {
 import Image from 'next/image'
 import { motion, AnimatePresence } from "framer-motion"
 
-import { Button } from "@/components/ui/button"
 import { AQITheme, getAQITheme } from "@/helpers/aqi-color-pallet"
 import { cn } from "@/lib/utils"
 import { SparklesCore } from "../ui/sparkles"
-import { ShareDialog } from "@/components/Share-Button"
 import DynamicPagination from "../Pagination-Dynamic"
 import { formatTime } from "@/helpers/time"
 import { formatPlaceName } from "@/helpers/format-place-name"
@@ -33,6 +31,7 @@ interface AQIAverages {
     pm25: number | null
     temperature: number | null
     humidity: number | null
+    street?: string
     city?: string
     state?: string
     country: string
@@ -81,6 +80,7 @@ export function UniversalAQIDashboard({ data }: { data: { averages: AQIAverages 
                                     slugify(averages.country),
                                     averages.state && slugify(averages.state),
                                     averages.city && slugify(averages.city),
+                                    averages.street&& slugify(averages.street)
                                 ].filter((item): item is string => !!item)}
                             />
                         </div>
@@ -153,7 +153,7 @@ export function UniversalAQIDashboard({ data }: { data: { averages: AQIAverages 
 
                         {/* Title Section */}
                         <h1 className="text-6xl md:text-8xl font-black tracking-tight leading-[0.85] text-foreground mb-6">
-                            {formatPlaceName(averages.city ?? averages.state ?? averages.country)}'s air is{' '}
+                            {formatPlaceName(averages.street ?? averages.city ?? averages.state ?? averages.country)}'s air is{' '}
                             <span style={{ color: theme.color }} className="block md:inline italic">{theme.label}<span className="text-black">.</span></span>
                         </h1>
 
