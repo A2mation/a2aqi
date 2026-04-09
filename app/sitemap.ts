@@ -95,6 +95,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // -------------------------
     const countrySet = new Set<string>();
     const stateSet = new Set<string>();
+    const streetSet = new Set<string>();
 
     cities.forEach(city => {
         countrySet.add(slugify(city.country));
@@ -122,7 +123,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     });
 
     // -------------------------
-    // CITY ROUTES
+    // CITY & STREET ROUTES
     // -------------------------
     cities.forEach(city => {
         urls.push({
@@ -131,9 +132,26 @@ export default function sitemap(): MetadataRoute.Sitemap {
             )}/${slugify(city.state)}/${slugify(city.name)}`,
             lastModified: new Date(),
             changeFrequency: "hourly",
-            priority: 1.0,
+            priority:  0.8,
         });
+
+        const streetSlug = slugify(city.street);
+        if (!streetSlug) return;
+
+        const streetPath = `${slugify(city.country)}/${slugify(city.state)}/${slugify(city.name)}/${streetSlug}`;
+
+        if (!streetSet.has(streetPath)) {
+            streetSet.add(streetPath);
+
+            urls.push({
+                url: `${BASE_URL}/dashboard/${streetPath}`,
+                lastModified: new Date(),
+                changeFrequency: "hourly",
+                priority: 1.0,
+            });
+        }
     });
+
 
     return urls;
 }
