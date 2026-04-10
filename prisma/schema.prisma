@@ -324,7 +324,7 @@ model AQIReading {
   location String
   city     String
   state    String
-  country  String @default("India")
+  country  String  @default("India")
 
   // Pollution Data
   aqi  Int
@@ -606,6 +606,22 @@ model DailyAggregateReading {
   // @@unique([deviceId, dayStart], name: "deviceId_dayStart")
   @@index([dayStart])
   @@index([deviceId, dayStart])
+}
+
+model SearchBasedLocation {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name String
+  slug String @unique
+
+  coordinates Json
+
+  city    String?
+  state   String?
+  country String? @default("India")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Calibration {
