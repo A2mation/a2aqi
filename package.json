@@ -44,7 +44,7 @@
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.9.1",
     "@upstash/redis": "^1.36.0",
-    "axios": "^1.13.5",
+    "axios": "^1.15.0",
     "bcryptjs": "^3.0.3",
     "bullmq": "^5.68.0",
     "class-variance-authority": "^0.7.1",
