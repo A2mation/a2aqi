@@ -4,6 +4,53 @@ import { SearchBy } from "../dto/search.dto";
 export class SearchRepo {
 
     /**
+     * Searches for nearby cities within a geographic bounding box defined by
+     * a central latitude/longitude and delta values.
+     *
+     * @param latNum - The latitude of the center point (in decimal degrees).
+     * @param lonNum - The longitude of the center point (in decimal degrees).
+     * @param latDelta - The latitude span (distance north/south) from the center point.
+     *                   This defines how far to search vertically.
+     * @param lngDelta - The longitude span (distance east/west) from the center point.
+     *                   This defines how far to search horizontally.
+     *
+     * @returns A promise that resolves with a list of nearby cities (format depends on implementation).
+     *
+     * @example
+     * // Search for cities around a location with a 0.5° radius
+     * await SearchNearbyCitiesByLatLng(22.5726, 88.3639, 0.5, 0.5);
+     *
+     * @remarks
+     * - The search area is typically a rectangular bounding box:
+     *   latitude range:  latNum ± latDelta
+     *   longitude range: lonNum ± lngDelta
+     * - Ensure delta values are appropriate for the desired search radius.
+     * - Larger delta values will return more results but may impact performance.
+     */
+    async SearchNearbyCitiesByLatLng(latNum: number, lonNum: number, latDelta: number, lngDelta: number) {
+        return await prisma.aQIReading.findMany({
+            where: {
+                lat: { gte: latNum - latDelta, lte: latNum + latDelta },
+                lng: { gte: lonNum - lngDelta, lte: lonNum + lngDelta },
+            },
+            select: {
+                id: true,
+                location: true,
+                aqi: true,
+                pm25: true,
+                pm10: true,
+                temperature: true,
+                humidity: true,
+                lat: true,
+                lng: true,
+                source: true
+            },
+            orderBy: { createdAt: "asc" },
+            take: 5,
+        });
+    }
+
+    /**
      * Searches AQI readings using a query and field filter within today's date range.
      *
      * @param q              search keyword

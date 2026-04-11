@@ -91,10 +91,16 @@ export async function getLocationsFromQueryThroughMapbox(
         return data.features.map((place: any) => {
             const context = place.context || [];
 
-            // Corrected syntax: removed extra '(' in find calls
-            const city = place.place_type.includes("place")
+            const district = context.find((c: any) =>
+                c.id.includes("district")
+            )?.text;
+
+            const placeCity = place.place_type.includes("place")
                 ? place.text
                 : context.find((c: any) => c.id.includes("place"))?.text;
+
+            // Use district if available, otherwise fallback to city
+            const city = district || placeCity;
 
             const state = context.find((c: any) => c.id.includes("region"))?.text;
 
