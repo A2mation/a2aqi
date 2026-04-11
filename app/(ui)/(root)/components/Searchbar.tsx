@@ -142,7 +142,7 @@ const ResultsList = ({ data, onSelect }: { data: any, onSelect: () => void }) =>
                                 const href = key === 'states'
                                     ? `/dashboard/${slugify(item.country)}/${slugify(item.state)}`
                                     : key == 'streets'
-                                        ? `/dashboard/${slugify(item.country)}/${slugify(item.state)}/${slugify(item.city)}/${slugify(item.street)}`
+                                        ? `/dashboard/${slugify(item.country)}/${slugify(item.state)}/${slugify(item.city)}/${slugify(item?.street?.split(',').slice(0,1).join(''))}`
                                         : `/dashboard/${slugify(item.country)}/${slugify(item.state)}/${slugify(item.city)}`
 
                                 return (

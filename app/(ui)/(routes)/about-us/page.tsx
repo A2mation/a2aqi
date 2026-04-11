@@ -1,7 +1,10 @@
-import React from 'react'
+
+import Cta from './components/Cta'
 import { GlobeDemo } from './components/GlobeDemo'
 import IntroSection from './components/IntroSection'
 import MissonVision from './components/MissonVision'
+import StatsBar from './components/StatsBar'
+import Teams from './components/Teams'
 
 const AboutUsPage = () => {
     return (
@@ -9,16 +12,20 @@ const AboutUsPage = () => {
             <section className=''>
                 <GlobeDemo />
             </section>
-            <section className='bg-blue-100 my-20'>
+
+            <section className='bg-blue-50 py-24 my-20 rounded-t-[3rem] relative z-10'>
                 <IntroSection />
             </section>
-            <section className='max-w-7xl mx-auto flex items-center justify-center flex-col md:flex-row gap-10 mb-10'>
-                <MissonVision />
-            </section>
+
+            <MissonVision />
+
+            <StatsBar />
+
+            {/* <Teams /> */}
+
+            <Cta />
         </>
     )
 }
 
 export default AboutUsPage
-
-

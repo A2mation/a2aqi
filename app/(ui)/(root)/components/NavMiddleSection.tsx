@@ -1,9 +1,9 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { HoveredLink, Menu, MenuItem, ProductItem } from "@/components/ui/navbar-menu";
+import { Menu, MenuItem, ProductItem } from "@/components/ui/navbar-menu";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 
 export function NavbarMiddleSection({
   className,
@@ -117,14 +117,30 @@ export function NavbarMiddleSection({
           </div>
         </MenuItem>
 
+        <Link
+          href={"/about-us"}
+          className={cn(
+            "group flex flex-col italic gap-0.5 cursor-pointer text-lg md:text-xl font-bold  dark:text-white",
+            isScrolled ? "text-black" : "text-black"
+          )}
+          onClick={onClick}
+        >
+            <div className="flex flex-row gap-1">
+              <span>
+                About
+              </span>
+              <span>
+                Us
+              </span>
+            </div>
+          <div
+            className={cn(
+              "h-0.5 w-0 group-hover:w-full transition-all duration-500 ease-out",
+              "bg-linear-to-r from-blue-500 via-cyan-400 to-emerald-500 shadow-[0_1px_8px_rgba(59,130,246,0.4)]"
+            )}
+          />
+        </Link>
 
-        <MenuItem setActive={setActive} active={active} item="Resources">
-          <div className="flex flex-col space-y-4 text-sm">
-            <HoveredLink onClick={onClick} href="/company">Company</HoveredLink>
-            <HoveredLink onClick={onClick} href="/contact-us">Contact us</HoveredLink>
-            <HoveredLink onClick={onClick} href="/about-us">About us</HoveredLink>
-          </div>
-        </MenuItem>
       </Menu>
     </div>
   );
