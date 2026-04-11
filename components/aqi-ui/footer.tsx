@@ -1,7 +1,6 @@
-import { Mail, MapPin } from "lucide-react"
+import { Mail, MapPin, ArrowUpRight, Instagram, Twitter, Linkedin, Youtube, Facebook } from "lucide-react"
 import Link from "next/link"
 import ViewStats from "../ViewStats"
-
 
 const ROLES = [
     { label: "Administrator", href: "/admin/sign-in" },
@@ -12,106 +11,101 @@ const ROLES = [
 
 export function Footer() {
     return (
-        <footer className=" px-6 py-12 md:px-12 lg:px-16">
-            <div className="mx-auto w-full">
-                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-5 bg-gray-50 p-10 rounded-xl">
-                    {/* Logo and Tagline Section */}
-                    <div className="lg:col-span-1 max-h-screen flex items-center ">
-                        <div className="rounded-2xl bg-linear-to-br from-blue-50 to-purple-50 p-8">
-                            <div className="flex items-center justify-center">
-                                <img
-                                    src={"/favicon.png"}
+        <footer className="relative bg-inherit pt-24 pb-12 px-6 md:px-12 lg:px-16 border-t border-gray-100">
+            <div className="mx-auto max-w-7xl">
+                <div className="grid gap-12 lg:grid-cols-12">
 
-                                    alt={"LOGO"}
-                                    width={200}
-                                    height={100}
-                                // className="aspect-2/1"
+                    {/* Brand Section - Span 4 columns */}
+                    <div className="lg:col-span-4 space-y-8">
+                        <div className="inline-block relative">
+                            <div className="absolute -inset-1 rounded-2xl bg-linear-to-r from-blue-600 to-purple-600 opacity-10 blur-lg"></div>
+                            <div className="relative rounded-2xl bg-white border border-gray-100 p-6 shadow-sm">
+                                <img
+                                    src="/favicon.png"
+                                    alt="LOGO"
+                                    width={140}
+                                    height={70}
+                                    className="mb-4 object-contain"
                                 />
+                                <p className="text-sm leading-relaxed text-gray-500 max-w-xs">
+                                    Precision tracking for a healthier world. Providing real-time Air Quality and Weather insights across the globe.
+                                </p>
                             </div>
-                            <p className="text-center text-lg leading-relaxed text-blue-600">
-                                Real-time Air quality and Weather data around the world
-                            </p>
+                        </div>
+
+                        <div className="space-y-4">
+                            <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400">Newsletter</h4>
+                            <div className="flex max-w-sm items-center gap-2 rounded-full border border-gray-200 p-1 pl-4 focus-within:border-blue-400 transition-all">
+                                <input type="email" placeholder="Your email..." className="w-full bg-transparent text-sm outline-none" />
+                                <button className="rounded-full bg-gray-900 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-600 transition-colors">
+                                    Join
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    {/* About AQI Column */}
-                    <div>
-                        <h3 className="mb-4 text-base font-bold uppercase tracking-widest text-muted-foreground">About A2AQI</h3>
-                        <ul className="space-y-3">
-                            <li>
-                                <Link href="/about-us" className="block rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600">
-                                    About Us
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/contact-us" className="block rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600">
-                                    Contact Us
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="#" className="block rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600">
-                                    AQI Monitor
-                                </Link>
-                            </li>
+                    {/* Links Grid - Span 5 columns */}
+                    <div className="lg:col-span-5 grid grid-cols-2 md:grid-cols-3 gap-8">
+                        <div className="space-y-6">
+                            <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900">Company</h3>
+                            <ul className="space-y-4">
+                                {["Company", "About Us", "Contact Us"].map((item) => (
+                                    <li key={item}>
+                                        <Link href={`/${item.toLowerCase().replace(" ", "-")}`} className="group flex items-center text-sm text-gray-500 hover:text-blue-600 transition-colors">
+                                            {item}
+                                            <ArrowUpRight className="ml-1 h-3 w-3 opacity-0 -translate-y-1 translate-x-1 group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0 transition-all" />
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
 
-                        </ul>
-                    </div>
-
-                    {/* Air Quality Column */}
-                    <div>
-                        <h3 className="mb-4 text-base font-bold uppercase tracking-widest text-muted-foreground">Air Quality</h3>
-                        <ul className="space-y-3">
-
-                            <li>
-                                <Link href="/air-quality-map" className="block rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600">
-                                    AQI Map
-                                </Link>
-                            </li>
-
-                        </ul>
-                    </div>
-
-                    {/* Access Management Column */}
-                    <div>
-                        <h3 className="mb-4 text-base font-bold uppercase tracking-widest text-muted-foreground">
-                            Access Management
-                        </h3>
-                        <ul className="space-y-1">
-                            {ROLES.map((role) => (
-                                <li key={role.label}>
-                                    <Link
-                                        href={role.href}
-                                        className="block rounded-md px-2 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600"
-                                    >
-                                        {role.label}
+                        <div className="space-y-6">
+                            <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900">Product</h3>
+                            <ul className="space-y-4">
+                                <li>
+                                    <Link href="/products" className="group flex items-center text-sm text-gray-500 hover:text-blue-600 transition-colors">
+                                        AQI Monitor
                                     </Link>
                                 </li>
-                            ))}
-                        </ul>
+                                <li>
+                                    <Link href="/air-quality-map" className="group flex items-center text-sm text-gray-500 hover:text-blue-600 transition-colors">
+                                        AQI Map
+                                    </Link>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div className="space-y-6">
+                            <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900">Access</h3>
+                            <ul className="space-y-4">
+                                {ROLES.map((role) => (
+                                    <li key={role.label}>
+                                        <Link href={role.href} className="text-sm text-gray-500 hover:text-blue-600 transition-colors">
+                                            {role.label}
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
                     </div>
 
-                    {/* Location Column */}
-                    <div className="">
-                        <h3 className="mb-4 text-base font-bold uppercase tracking-widest text-muted-foreground">Location</h3>
-                        <div className="space-y-4">
-                            <Link
-                                href="#"
-                                className="inline-flex items-center gap-2 text-lg font-medium text-blue-600 hover:text-blue-700"
-                            >
-                                Support Desk
-                                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-xs text-white">
-                                    ?
-                                </span>
-                            </Link>
-                            <div className="flex items-start gap-2 text-lg text-gray-900">
-                                <Mail className="mt-0.5 h-5 w-5  text-gray-600" />
-                                <span>a2mationsolution@gmail.com
-                                </span>
-                            </div>
-                            <div className="flex items-start gap-2 text-lg text-gray-900">
-                                <MapPin className="mt-0.5 h-8 w-8  text-gray-600" />
-                                <span>
-                                    129/1, Sodla Tank Road, North 24 Parganas, West Bengal, Kolkata- 743133
+                    {/* Contact Section - Span 3 columns */}
+                    <div className="lg:col-span-3 space-y-6">
+                        <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900">Get in Touch</h3>
+                        <div className="space-y-5">
+                            <a href="mailto:a2mationsolution@gmail.com" className="flex items-center gap-3 group">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-50 group-hover:bg-blue-50 transition-colors">
+                                    <Mail className="h-5 w-5 text-gray-400 group-hover:text-blue-600" />
+                                </div>
+                                <span className="text-sm font-medium text-gray-600">a2mationsolution@gmail.com</span>
+                            </a>
+                            <div className="flex items-start gap-3 group">
+                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gray-50 group-hover:bg-blue-50 transition-colors">
+                                    <MapPin className="h-5 w-5 text-gray-400 group-hover:text-blue-600" />
+                                </div>
+                                <span className="text-sm leading-relaxed text-gray-600">
+                                    129/1, Sodla Tank Road, North 24 Parganas, Kolkata- 743133
                                 </span>
                             </div>
                         </div>
@@ -119,54 +113,30 @@ export function Footer() {
                     </div>
                 </div>
 
-                {/* Social Media Section */}
-                <div className="mt-12 flex items-center justify-end gap-4">
-                    <span className="text-lg text-gray-600">Find us on:</span>
-                    <div className="flex items-center gap-3">
-                        <Link href="#" className="text-gray-600 hover:text-gray-900" aria-label="Instagram">
-                            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-                            </svg>
-                        </Link>
-                        <Link href="#" className="text-gray-600 hover:text-gray-900" aria-label="Twitter">
-                            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                            </svg>
-                        </Link>
-                        <Link href="#" className="text-gray-600 hover:text-gray-900" aria-label="LinkedIn">
-                            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                            </svg>
-                        </Link>
-                        <Link href="#" className="text-gray-600 hover:text-gray-900" aria-label="YouTube">
-                            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                            </svg>
-                        </Link>
-                        <Link href="#" className="text-gray-600 hover:text-gray-900" aria-label="Facebook">
-                            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647z" />
-                            </svg>
-                        </Link>
+                {/* Bottom Bar */}
+                <div className="mt-20 border-t border-gray-100 pt-10">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div className="flex items-center gap-6">
+                            {[
+                                { Icon: Instagram, label: "Instagram" },
+                                { Icon: Twitter, label: "Twitter" },
+                                { Icon: Linkedin, label: "LinkedIn" },
+                                { Icon: Youtube, label: "YouTube" },
+                                { Icon: Facebook, label: "Facebook" }
+                            ].map(({ Icon, label }) => (
+                                <Link key={label} href="#" className="text-gray-400 hover:text-blue-600 transition-colors" aria-label={label}>
+                                    <Icon className="h-5 w-5" />
+                                </Link>
+                            ))}
+                        </div>
+
+                        <div className="flex flex-wrap justify-center gap-x-8 gap-y-2 text-[13px] font-medium text-gray-400">
+                            <Link href="#" className="hover:text-gray-900">Privacy</Link>
+                            <Link href="#" className="hover:text-gray-900">Terms</Link>
+                            <Link href="#" className="hover:text-gray-900">Shipping</Link>
+                            <span className="text-gray-300">© 2026 A2AQI Inc.</span>
+                        </div>
                     </div>
-
-                </div>
-
-                {/* Bottom Legal Links */}
-                <div className="mt-8 flex flex-wrap items-center justify-end gap-4 border-t border-gray-200 pt-8 text-lg text-gray-600">
-                    <Link href="#" className="hover:text-gray-900">
-                        Terms & Conditions
-                    </Link>
-                    <Link href="#" className="hover:text-gray-900">
-                        Privacy Policy
-                    </Link>
-                    <Link href="#" className="hover:text-gray-900">
-                        Shipping Policy
-                    </Link>
-                    <Link href="#" className="hover:text-gray-900">
-                        Return Refund Policy
-                    </Link>
-                    <span className="ml-auto">© 2026 AQI, All rights reserved</span>
                 </div>
             </div>
         </footer>
