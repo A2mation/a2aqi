@@ -11,6 +11,8 @@ import { useDebounce } from "@/hooks/use-debounce"
 import { getAQIBgColor } from "@/helpers/aqi-color-pallet"
 import { useOutsideClick } from "@/hooks/use-outside-click"
 import { SearchResult } from "@/domains/public/search/dto/search.dto"
+import { useLocationStore } from "@/store/location.store"
+import { detectIpLocation } from "@/store/location.actions"
 
 
 
@@ -20,21 +22,36 @@ const Searchbar = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const debouncedQuery = useDebounce(query, 400);
+    const {
+        lat, lng
+    } = useLocationStore();
 
+
+    useEffect(() => {
+        if (lat === null || lng === null) {
+            detectIpLocation();
+        }
+    }, [lat, lng]);
+
+    
     useOutsideClick(containerRef, () => setIsOpen(false))
 
     const { data, isLoading } = useQuery({
-        queryKey: ["search", debouncedQuery],
+        queryKey: ["search", debouncedQuery, lat, lng],
         queryFn: async () => {
             if (!debouncedQuery) return null
-            const res = await http.get(`/api/aqi/search?q=${debouncedQuery}`)
-            const { streets, cities, states }: {
-                streets: SearchResult[], cities: SearchResult[], states: SearchResult[]
+
+            const res = await http.get(`/api/aqi/search`, {
+                params: { q: debouncedQuery, lat, lng }
+            });
+
+            const { streets }: {
+                streets: SearchResult[]
             } = res.data;
 
-            return { streets, cities, states };
+            return { streets };
         },
-        enabled: debouncedQuery.length > 2,
+        enabled: debouncedQuery.length > 2 && !!lat && !!lng,
         staleTime: 1000 * 60,
         placeholderData: (previousData) => previousData,
     })
@@ -98,7 +115,7 @@ const Searchbar = () => {
                     <div className="max-h-100 overflow-y-auto p-2 scrollbar-thin">
                         {isLoading ? (
                             <SkeletonLoader />
-                        ) : (data?.states?.length || data?.cities?.length || data?.streets?.length) ? (
+                        ) : (data?.streets?.length) ? (
                             <ResultsList data={data} onSelect={() => setIsOpen(false)} />
                         ) : (
                             <div className="p-8 text-center">
@@ -136,14 +153,10 @@ const ResultsList = ({ data, onSelect }: { data: any, onSelect: () => void }) =>
                         <div className="space-y-1">
                             {items.map((item: SearchResult) => {
 
-                                const displayName = key === 'streets' ? item.street : key === 'city' ? item.city : item.state;
+                                
+                                const href = 
+                                        `/dashboard/${slugify(item.country)}/${slugify(item.state)}/${slugify(item.city)}/${slugify(item.slug)}`
 
-                                // Determine the URL structure based on depth
-                                const href = key === 'states'
-                                    ? `/dashboard/${slugify(item.country)}/${slugify(item.state)}`
-                                    : key == 'streets'
-                                        ? `/dashboard/${slugify(item.country)}/${slugify(item.state)}/${slugify(item.city)}/${slugify(item?.street?.split(',').slice(0,1).join(''))}`
-                                        : `/dashboard/${slugify(item.country)}/${slugify(item.state)}/${slugify(item.city)}`
 
                                 return (
                                     <Link
@@ -154,7 +167,7 @@ const ResultsList = ({ data, onSelect }: { data: any, onSelect: () => void }) =>
                                     >
                                         <div className="flex flex-col">
                                             <span className="text-sm font-bold text-foreground group-hover/item:text-primary transition-colors">
-                                                {displayName}
+                                                {item.street?.split(',').slice(0,2).join(',')}
                                             </span>
                                             <span className="text-[11px] text-muted-foreground">
                                                 {/* Show hierarchy in subtitle */}
