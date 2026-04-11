@@ -1,17 +1,8 @@
-import { http } from "@/lib/http"
-import { redis } from "@/lib/redis"
 import { NextRequest, NextResponse } from "next/server"
 
-import { fetchAqiByCoordinates } from "@/services/air-quality/fetchAqiByCoordinates"
-import { getNearbyCitiesCacheKey } from "@/helpers/cashKeys"
-import { rateLimit } from "@/helpers/rateLimiter"
 import { prisma } from "@/lib/prisma"
-import { normalizeCachedCities } from "@/helpers/normalizeCachedCities"
 import { haversine } from "@/helpers/haversine"
-
-
-const CACHE_TTL = 60 * 60 // 1 hour
-
+import { rateLimit } from "@/helpers/rateLimiter"
 
 
 function getClientIp(req: NextRequest): string {
