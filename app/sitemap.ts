@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
+
 import { cities } from "@/data/popullar-cities";
+import { prisma } from "@/lib/prisma";
 
 const BASE_URL = "https://www.a2aqi.com";
 
@@ -11,7 +13,7 @@ function slugify(value: string) {
         .replace(/[^a-z0-9-]/g, "");
 }
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const urls: MetadataRoute.Sitemap = [];
 
     // -------------------------
@@ -91,67 +93,76 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })
 
     // -------------------------
-    // DEDUPLICATE COUNTRY & STATE
+    // DEDUPLICATE SETS
     // -------------------------
     const countrySet = new Set<string>();
     const stateSet = new Set<string>();
+    const citySet = new Set<string>();
     const streetSet = new Set<string>();
 
-    cities.forEach(city => {
-        countrySet.add(slugify(city.country));
-        stateSet.add(
-            `${slugify(city.country)}/${slugify(city.state)}`
-        );
-    });
-
-    countrySet.forEach(country => {
-        urls.push({
-            url: `${BASE_URL}/dashboard/${country}`,
-            lastModified: new Date(),
-            changeFrequency: "hourly",
-            priority: 0.9,
-        });
-    });
-
-    stateSet.forEach(statePath => {
-        urls.push({
-            url: `${BASE_URL}/dashboard/${statePath}`,
-            lastModified: new Date(),
-            changeFrequency: "hourly",
-            priority: 0.9,
-        });
-    });
-
-    // -------------------------
-    // CITY & STREET ROUTES
-    // -------------------------
-    cities.forEach(city => {
-        urls.push({
-            url: `${BASE_URL}/dashboard/${slugify(
-                city.country
-            )}/${slugify(city.state)}/${slugify(city.name)}`,
-            lastModified: new Date(),
-            changeFrequency: "hourly",
-            priority:  0.8,
-        });
-
-        const streetSlug = slugify(city.street);
-        if (!streetSlug) return;
-
-        const streetPath = `${slugify(city.country)}/${slugify(city.state)}/${slugify(city.name)}/${streetSlug}`;
-
-        if (!streetSet.has(streetPath)) {
-            streetSet.add(streetPath);
-
-            urls.push({
-                url: `${BASE_URL}/dashboard/${streetPath}`,
-                lastModified: new Date(),
-                changeFrequency: "hourly",
-                priority: 1.0,
-            });
+    const dbLocations = await prisma.searchBasedLocation.findMany({
+        select: {
+            slug: true,  
+            city: true,
+            state: true,
+            country: true,
+            updatedAt: true
         }
     });
 
+    dbLocations.forEach(loc => {
+        const co = slugify(loc.country || "India");
+        const st = slugify(loc.state || '');
+        const ct = slugify(loc.city || '');
+        const streetSlug = loc.slug;
+
+        if (co) countrySet.add(co);
+        if (co && st) stateSet.add(`${co}/${st}`);
+        if (co && st && ct) citySet.add(`${co}/${st}/${ct}`);
+
+        if (co && st && ct && streetSlug) {
+            streetSet.add(`${co}/${st}/${ct}/${streetSlug}`);
+        }
+    });
+
+    cities.forEach(city => {
+        const co = slugify(city.country);
+        const st = slugify(city.state);
+        const ct = slugify(city.name);
+        const street = slugify(city.street);
+
+        countrySet.add(co);
+        stateSet.add(`${co}/${st}`);
+        citySet.add(`${co}/${st}/${ct}`);
+        if (street) {
+            streetSet.add(`${co}/${st}/${ct}/${street}`);
+        }
+    });
+
+    // -------------------------
+    // GENERATE FINAL URLS
+    // -------------------------
+
+    // Countries (Priority 0.9)
+    countrySet.forEach(path => {
+        urls.push({ url: `${BASE_URL}/dashboard/${path}`, lastModified: new Date(), changeFrequency: "hourly", priority: 0.9 });
+    });
+
+    // States (Priority 0.9)
+    stateSet.forEach(path => {
+        urls.push({ url: `${BASE_URL}/dashboard/${path}`, lastModified: new Date(), changeFrequency: "hourly", priority: 0.9 });
+    });
+
+    // Cities (Priority 0.8)
+    citySet.forEach(path => {
+        urls.push({ url: `${BASE_URL}/dashboard/${path}`, lastModified: new Date(), changeFrequency: "hourly", priority: 0.8 });
+    });
+
+    // Streets / Dynamic Locations (Priority 1.0)
+    streetSet.forEach(path => {
+        urls.push({ url: `${BASE_URL}/dashboard/${path}`, lastModified: new Date(), changeFrequency: "hourly", priority: 1.0 });
+    });
+    
 
     return urls;
 }
