@@ -21,7 +21,6 @@ export const detectIpLocation = async () => {
             const { data } = await http.get(url);
 
             const { nearest, popularCities, nearbyCities, graphData } = data;
-            console.log(data)
 
             if (nearest) {
                 const lat = nearest.lat || nearest.latitude;
