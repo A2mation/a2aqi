@@ -23,6 +23,8 @@ export class SearchController {
         try {
             const { searchParams } = new URL(req.url);
             const q = searchParams.get("q")?.trim();
+            const lat = searchParams.get("lat")?.trim();
+            const lng = searchParams.get("lng")?.trim();
 
             if (!q || q.length < 2) {
                 return NextResponse.json({
@@ -33,11 +35,33 @@ export class SearchController {
                 });
             }
 
-            const results = await this.searchServiceOBJ.SearchService(q);
+            if (!lat && !lng) {
+                // For map search I user original Databases Locations
+                const results = await this.searchServiceOBJ.SearchSericeForMap(q);
+
+                const isEmpty =
+                    results.cities.length === 0 &&
+                    results.states.length === 0 &&
+                    results.streets.length === 0;
+
+                if (isEmpty) {
+                    return NextResponse.json(
+                        { success: false, message: "No results found" },
+                        { status: 404 }
+                    );
+                }
+
+                return NextResponse.json({
+                    success: true,
+                    ...results
+                }, { status: 200 });
+
+            }
+
+            // Using Map box for reaching more cities
+            const results = await this.searchServiceOBJ.SearchService(q, Number(lat), Number(lng));
 
             const isEmpty =
-                results.cities.length === 0 &&
-                results.states.length === 0 &&
                 results.streets.length === 0;
 
             if (isEmpty) {
@@ -81,8 +105,18 @@ export class SearchController {
 
             const country = searchParams.get("country")?.trim()
             const state = searchParams.get("state")?.trim().replace("-", " ");
-            const city = searchParams.get("city")?.trim().replace("-", " ");
-            const street = searchParams.get("street")?.trim().replace("-", " ");
+
+            const rawCity = searchParams.get("city");
+            const city = rawCity
+                ?.trim()
+                .toLowerCase()
+                .replace(/-/g, " ")                 // replace all dashes with space
+                .replace(/(\d+)([a-zA-Z]+)/, "$1 $2"); // split number + text
+
+            const rawstreet = searchParams.get("street")?.trim().replace("-", " ");
+            const street = rawstreet
+
+
 
             if (!country || !state || !city || !street) {
                 return new NextResponse("Country not found", {
