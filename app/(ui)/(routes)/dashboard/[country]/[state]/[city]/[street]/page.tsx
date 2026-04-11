@@ -39,7 +39,7 @@ const StreetPage = ({
         isError,
         error
     } = useQuery({
-        queryKey: ['aqi', country, state, city],
+        queryKey: ['aqi', country, state, city, street],
         queryFn: async () => {
             try {
                 const res = await http.get<AQIData>('/api/aqi/street', {
@@ -58,7 +58,7 @@ const StreetPage = ({
                 throw new Error('Failed to fetch AQI data');
             }
         },
-        enabled: !!country && !!state && !!city,
+        enabled: !!country && !!state && !!city && !!street,
         staleTime: 1000 * 60 * 5, // 5 mins cache
         retry: 1,
     });
