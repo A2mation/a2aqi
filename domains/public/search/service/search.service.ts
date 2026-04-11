@@ -63,7 +63,7 @@ export class SearchService {
                 country: loc.country,
                 state: loc.state,
                 city: loc.city,
-                // Clean up street name (first two parts of address)
+                slug: loc.slug,
                 street: loc.name.split(',').slice(0, 2).join(','),
                 aqi: Math.round(fallbackAqi),
                 lat: eLat,
@@ -232,7 +232,7 @@ export class SearchService {
                 pm25: candidates[0].pm25,
                 temperature: candidates[0].temperature,
                 humidity: candidates[0].humidity,
-                street: street,
+                street: loc.slug,
                 city: city,
                 state: state,
                 country: country

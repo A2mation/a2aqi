@@ -113,9 +113,8 @@ export class SearchController {
                 .replace(/-/g, " ")                 // replace all dashes with space
                 .replace(/(\d+)([a-zA-Z]+)/, "$1 $2"); // split number + text
 
-            const rawstreet = searchParams.get("street")?.trim().replace("-", " ");
+            const rawstreet = searchParams.get("street")?.trim();
             const street = rawstreet
-
 
 
             if (!country || !state || !city || !street) {
@@ -162,7 +161,12 @@ export class SearchController {
 
             const country = searchParams.get("country")?.trim()
             const state = searchParams.get("state")?.trim().replace("-", " ");
-            const city = searchParams.get("city")?.trim().replace("-", " ");
+            const rawCity = searchParams.get("city");
+            const city = rawCity
+                ?.trim()
+                .toLowerCase()
+                .replace(/-/g, " ")                 // replace all dashes with space
+                .replace(/(\d+)([a-zA-Z]+)/, "$1 $2"); // split number + text
 
             if (!country || !state || !city) {
                 return new NextResponse("Country not found", {
