@@ -18,8 +18,8 @@ export function PromoBannerModal() {
     const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
-        const showTimer = setTimeout(() => setIsOpen(true), 4000);
-        const hideTimer = setTimeout(() => setIsOpen(false), 18000);
+        const showTimer = setTimeout(() => setIsOpen(true), 25000);
+        const hideTimer = setTimeout(() => setIsOpen(false), 30000);
         return () => {
             clearTimeout(showTimer);
             clearTimeout(hideTimer);
