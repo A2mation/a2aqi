@@ -87,7 +87,35 @@ export class LocationService {
         if (!location) {
             throw new Error(`Location with slug "${slug}" not found.`);
         }
-        return location;
+        return {
+            name: location.name,
+            slug: location.slug,
+            coordinates: location.coordinates as LocationSchema["coordinates"],
+            city: location.city || undefined,
+            state: location.state || undefined,
+            country: location.country || "India"
+        };
+    }
+
+
+    /**
+     * Get a specific location by its City
+     */
+    async getLocationDetailsbyCity(city: string) {
+
+        const location = await this.repo.getByCity(city);
+        if (!location) {
+            throw new Error(`Location with slug "${city}" not found.`);
+        }
+
+        return {
+            name: location.name,
+            slug: location.slug,
+            coordinates: location.coordinates as LocationSchema["coordinates"],
+            city: location.city || undefined,
+            state: location.state || undefined,
+            country: location.country || "India"
+        };
     }
 
     /**

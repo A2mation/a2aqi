@@ -33,6 +33,20 @@ export class LocationRepo {
     }
 
     /**
+    * Get a single location by its city
+    */
+    async getByCity(city: string) {
+        return await prisma.searchBasedLocation.findFirst({
+            where: {
+                city: {
+                    equals: city,
+                    mode: "insensitive"
+                }
+            },
+        });
+    }
+
+    /**
      * Create a new location entry
      */
     async create(data: Prisma.SearchBasedLocationCreateInput) {
