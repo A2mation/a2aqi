@@ -1,3 +1,4 @@
+import { getTodayWindow } from "@/helpers/time";
 import { transformInternalData } from "@/helpers/transformInternalData";
 import { prisma } from "@/lib/prisma";
 
@@ -6,18 +7,40 @@ export const dynamic = "force-dynamic";
 
 
 export async function GET(req: Request) {
+
+    const { startOfToday, endOfToday } = getTodayWindow();
+
+
     const readings = await prisma.aQIReading.findMany({
+        where: {
+            createdAt: {
+                gte: startOfToday,
+                lte: endOfToday
+            }
+        },
         orderBy: { measuredAt: "desc" },
-        select:{
+        select: {
             id: true,
             lat: true,
             lng: true,
             aqi: true,
             temperature: true
         },
+        take: 500,
     });
 
     const c = await prisma.latestSensorReading.findMany({
+        where: {
+            device: {
+                latestSensorReadings: {
+                    updatedAt: {
+                        gte: startOfToday,
+                        lte: endOfToday
+                    }
+                }
+            }
+        },
+        take: 10,
         select: {
             id: true,
             aqi: true,
