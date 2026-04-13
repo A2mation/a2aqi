@@ -33,7 +33,7 @@ const Searchbar = () => {
         }
     }, [lat, lng]);
 
-    
+
     useOutsideClick(containerRef, () => setIsOpen(false))
 
     const { data, isLoading } = useQuery({
@@ -42,7 +42,7 @@ const Searchbar = () => {
             if (!debouncedQuery) return null
 
             const res = await http.get(`/api/aqi/search`, {
-                params: { q: debouncedQuery, lat, lng }
+                params: { q: debouncedQuery, lat, lng, flag: true }
             });
 
             const { streets }: {
@@ -51,7 +51,7 @@ const Searchbar = () => {
 
             return { streets };
         },
-        enabled: debouncedQuery.length > 2 && !!lat && !!lng,
+        enabled: debouncedQuery.length > 2,
         staleTime: 1000 * 60,
         placeholderData: (previousData) => previousData,
     })
@@ -151,23 +151,23 @@ const ResultsList = ({ data, onSelect }: { data: any, onSelect: () => void }) =>
                         </div>
 
                         <div className="space-y-1">
-                            {items.map((item: SearchResult) => {
+                            {items.map((item: SearchResult, index: number) => {
 
-                                
-                                const href = 
-                                        `/dashboard/${slugify(item.country)}/${slugify(item.state)}/${slugify(item.city)}/${slugify(item.slug)}`
+
+                                const href =
+                                    `/dashboard/${slugify(item.country)}/${slugify(item.state)}/${slugify(item.city)}/${slugify(item.slug)}`
 
 
                                 return (
                                     <Link
-                                        key={item.id}
+                                        key={`${item.id}-${index}`}
                                         onClick={onSelect}
                                         href={href}
                                         className="flex items-center justify-between group/item p-3 rounded-xl hover:bg-primary/5 transition-all duration-200"
                                     >
                                         <div className="flex flex-col">
                                             <span className="text-sm font-bold text-foreground group-hover/item:text-primary transition-colors">
-                                                {item.street?.split(',').slice(0,2).join(',')}
+                                                {item.street?.split(',').slice(0, 2).join(',')}
                                             </span>
                                             <span className="text-[11px] text-muted-foreground">
                                                 {/* Show hierarchy in subtitle */}

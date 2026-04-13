@@ -32,8 +32,8 @@ export class SearchService {
      */
     async SearchService(
         q: string,
-        lat: number,
-        lng: number
+        lat?: number,
+        lng?: number
     ) {
         const streetMap = new Map()
 
@@ -76,12 +76,14 @@ export class SearchService {
 
         const finalStreets = Array.from(streetMap.values()) as SearchResult[];
 
-        // sort by distance
-        finalStreets.sort((a, b) => {
-            const distanceA = haversine(lat, lng, a.lat, a.lng);
-            const distanceB = haversine(lat, lng, b.lat, b.lng);
-            return distanceA - distanceB;
-        });
+        if (lat && lng) {
+            // sort by distance
+            finalStreets.sort((a, b) => {
+                const distanceA = haversine(lat, lng, a.lat, a.lng);
+                const distanceB = haversine(lat, lng, b.lat, b.lng);
+                return distanceA - distanceB;
+            });
+        }
 
         return {
             streets: finalStreets,
@@ -275,9 +277,9 @@ export class SearchService {
 
         const streets = await this.searchRepoOBJ.SearchByCity(city, state, country, startOfToday, endOfToday);
         if (streets._count._all === 0) {
-            
+
             const loc = await this.locationServiceOBJ.getLocationDetailsbyCity(city);
-        
+
             if (!loc.coordinates) {
                 return
             }

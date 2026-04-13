@@ -25,6 +25,7 @@ export class SearchController {
             const q = searchParams.get("q")?.trim();
             const lat = searchParams.get("lat")?.trim();
             const lng = searchParams.get("lng")?.trim();
+            const flag = searchParams.get("flag")?.trim();
 
             if (!q || q.length < 2) {
                 return NextResponse.json({
@@ -35,7 +36,7 @@ export class SearchController {
                 });
             }
 
-            if (!lat && !lng) {
+            if (!flag) {
                 // For map search I user original Databases Locations
                 const results = await this.searchServiceOBJ.SearchSericeForMap(q);
 
