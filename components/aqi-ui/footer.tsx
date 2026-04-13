@@ -1,5 +1,9 @@
-import { Mail, MapPin, ArrowUpRight, Instagram, Twitter, Linkedin, Youtube, Facebook } from "lucide-react"
+'use client'
+
+import { useEffect, useState } from "react";
 import Link from "next/link"
+import { Mail, MapPin, ArrowUpRight, Instagram, Twitter, Linkedin, Youtube, Facebook } from "lucide-react"
+
 import ViewStats from "../ViewStats"
 
 const ROLES = [
@@ -10,6 +14,16 @@ const ROLES = [
 ];
 
 export function Footer() {
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    if (!isMounted) {
+        return null;
+    }
+
     return (
         <footer className="relative bg-inherit pt-24 pb-12 px-6 md:px-12 lg:px-16 border-t border-gray-100">
             <div className="mx-auto max-w-7xl">

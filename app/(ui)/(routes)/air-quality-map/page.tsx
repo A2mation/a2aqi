@@ -24,7 +24,14 @@ export type AQIMarker = {
     co?: number;
 };
 
-const Map = dynamic(() => import("./components/map"), { ssr: false })
+const MapSkeleton = () => (
+    <div className="h-[calc(100vh-100px)] mt-20 w-full animate-pulse rounded-xl bg-slate-200 dark:bg-slate-800" />
+);
+
+const Map = dynamic(() => import("./components/map"), {
+    ssr: false,
+    loading: () => <MapSkeleton />
+});
 
 const AirQualityPage = () => {
     const [mounted, setMounted] = useState(false)
@@ -43,7 +50,13 @@ const AirQualityPage = () => {
         initLocation()
     }, [lat, lng])
 
-    if (!mounted) return null
+    if (!mounted) return (
+        <>
+            <div className="min-h-screen p-8">
+                <MapSkeleton />
+            </div>
+        </>
+    )
 
     return (
         <>

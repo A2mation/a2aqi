@@ -116,7 +116,7 @@ export default function Map({ lat, lng }: { lat: number | null; lng: number | nu
       </MapContainer>
 
       {/* Overlays */}
-      <div className="absolute top-20 right-0 md:right-6 z-50 w-full max-w-80 md:max-w-150 px-4">
+      <div className="absolute top-20 right-0 md:right-6 z-40 w-full max-w-80 md:max-w-150 px-4">
         <MapSearchBar parameter={parameter} setParameter={setParameter} onLocationSelect={(lat, lng) => setTargetCoords([lat, lng])} />
       </div>
 
