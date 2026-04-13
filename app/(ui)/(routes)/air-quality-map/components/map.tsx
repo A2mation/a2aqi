@@ -97,7 +97,6 @@ export default function Map({
 }) {
   const [mounted, setMounted] = useState(false);
   const [selectedStation, setSelectedStation] = useState<StationData | null>(null);
-  const [bounds, setBounds] = useState<any>(null);
   const [targetCoords, setTargetCoords] = useState<[number, number] | null>(null);
   const [parameter, setParameter] = useState("aqi");
 
@@ -106,17 +105,13 @@ export default function Map({
     isFetching,
     isError
   } = useQuery({
-    queryKey: ["map-aqi-bounds", bounds],
+    queryKey: ["map-aqi-bounds"],
     queryFn: async ({ signal }) => {
       const res = await http.get("/api/maps/aqi", {
-        params: bounds,
         signal
       });
       return res.data;
     },
-    enabled: !!bounds,
-
-    placeholderData: (previousData) => previousData,
 
     staleTime: 30000,
   });
@@ -143,8 +138,11 @@ export default function Map({
         zoom={8}
         className="h-full w-full z-0"
       >
-        <MapEvents onBoundsChange={setBounds} />
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        {/* <MapEvents onBoundsChange={setBounds} /> */}
+        <TileLayer
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        />
 
         {markers && markers.length > 0 ? (markers.map((station: StationData) => (
           <Marker

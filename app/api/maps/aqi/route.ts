@@ -6,22 +6,7 @@ export const dynamic = "force-dynamic";
 
 
 export async function GET(req: Request) {
-    const { searchParams } = new URL(req.url);
-
-    const north = Number(searchParams.get("north"));
-    const south = Number(searchParams.get("south"));
-    const east = Number(searchParams.get("east"));
-    const west = Number(searchParams.get("west"));
-
-    if ([north, south, east, west].some(isNaN)) {
-        return new Response("Invalid bounds", { status: 400 });
-    }
-
     const readings = await prisma.aQIReading.findMany({
-        where: {
-            lat: { gte: south, lte: north },
-            lng: { gte: west, lte: east },
-        },
         orderBy: { measuredAt: "desc" },
         select:{
             id: true,
@@ -30,17 +15,9 @@ export async function GET(req: Request) {
             aqi: true,
             temperature: true
         },
-        take: 500,
     });
 
     const c = await prisma.latestSensorReading.findMany({
-        where: {
-            device: {
-                lat: { gte: south, lte: north },
-                lng: { gte: west, lte: east },
-            }
-        },
-        take: 10,
         select: {
             id: true,
             aqi: true,
