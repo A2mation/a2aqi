@@ -44,7 +44,11 @@ export class LocationController {
             }
         } else {
 
-            const { data } = await http.get(PROVIDERS[0].url(ip))
+            const { data, status } = await http.get(PROVIDERS[0].url(ip))
+
+            if (status === 429) {
+                return new NextResponse("Too many requests", { status: 429 })
+            }
 
             const location = PROVIDERS[0].normalize(data)
 
@@ -111,8 +115,8 @@ const PROVIDERS = [
         normalize: (d: any) =>
             d?.latitude && d?.longitude
                 ? {
-                    lat: d.latitude.toFixed(2),
-                    lng: d.longitude.toFixed(2),
+                    lat: d.latitude.toFixed(4),
+                    lng: d.longitude.toFixed(4),
                     city: d.city,
                     state: d.region,
                     country: d.country_name,
