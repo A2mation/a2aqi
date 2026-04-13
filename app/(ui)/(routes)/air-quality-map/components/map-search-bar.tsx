@@ -68,7 +68,9 @@ const MapSearchBar = ({ onLocationSelect, parameter, setParameter }: MapSearchBa
 
     return (
         <div className="flex items-center h-14 w-full bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-200/60 p-1.5 transition-all hover:shadow-[0_8px_40px_rgb(0,0,0,0.16)]">
-            <div ref={containerRef} className="relative flex-1 flex items-center">
+
+            {/* SEARCH: Hidden on Mobile, Flex on Desktop */}
+            <div ref={containerRef} className="hidden md:flex relative flex-1 items-center">
                 <Search className="absolute left-3 w-4 h-4 text-muted-foreground" />
                 <Input
                     ref={inputRef}
@@ -88,7 +90,7 @@ const MapSearchBar = ({ onLocationSelect, parameter, setParameter }: MapSearchBa
                     )}
                 </div>
 
-                {/* DROPDOWN FOR RESULTS */}
+                {/* RESULTS DROPDOWN */}
                 {isOpen && query.length > 0 && (
                     <div className="absolute z-50 top-full left-0 right-0 mt-3 w-full overflow-hidden rounded-2xl border bg-background/95 backdrop-blur-xl shadow-2xl animate-in fade-in zoom-in-95 duration-200">
                         <div className="max-h-80 overflow-y-auto p-2">
@@ -100,7 +102,7 @@ const MapSearchBar = ({ onLocationSelect, parameter, setParameter }: MapSearchBa
                                     onSelect={(item) => {
                                         setIsOpen(false);
                                         setQuery(item.name);
-                                        onLocationSelect(item.lat, item.lng); // FLY TO TRIGGER
+                                        onLocationSelect(item.lat, item.lng);
                                     }}
                                 />
                             ) : (
@@ -111,27 +113,34 @@ const MapSearchBar = ({ onLocationSelect, parameter, setParameter }: MapSearchBa
                 )}
             </div>
 
-            <Separator orientation="vertical" className="h-6 mx-1 bg-slate-200" />
+            {/* SEPARATOR: Hidden on Mobile */}
+            <Separator orientation="vertical" className="hidden md:block h-6 mx-1 bg-slate-200" />
 
-            <div className="min-w-40">
+            {/* SELECTOR: Styled for Mobile (Full width/Centered) vs Desktop */}
+            <div className="flex-1 md:flex-none md:min-w-40">
                 <Select
                     value={parameter}
                     onValueChange={(value) => setParameter(value)}
                 >
-                    <SelectTrigger className="h-11 border-none flex items-center w-full bg-transparent shadow-none focus:ring-0 focus:ring-offset-0 hover:bg-slate-100/50 rounded-xl transition-colors font-bold text-slate-600 gap-2 px-3">
-                        <SelectValue placeholder="Parameter" />
+                    <SelectTrigger
+                        className="h-11 border-none flex items-center justify-center md:justify-start w-full bg-transparent shadow-none focus:ring-0 focus:ring-offset-0 hover:bg-slate-100/50 rounded-xl transition-all font-bold text-slate-700 gap-3 px-4"
+                    >
+                        {/* Mobile optimization: Centered text and slightly larger font on small screens */}
+                        <div className="flex items-center gap-2 text-sm md:text-xs uppercase tracking-wider">
+                            <SelectValue placeholder="Select Parameter" />
+                        </div>
                     </SelectTrigger>
 
-                    <SelectContent className="rounded-2xl border-slate-200/60 shadow-2xl backdrop-blur-xl bg-white/95 min-w-30">
+                    <SelectContent className="rounded-2xl border-slate-200/60 shadow-2xl backdrop-blur-xl bg-white/95 w-full">
                         <SelectItem
                             value="aqi"
                             className="rounded-lg focus:bg-blue-50 focus:text-blue-600 cursor-pointer transition-colors m-1"
                         >
-                            <div className="flex items-center gap-2.5 py-1">
-                                <div className="p-1.5 bg-blue-100 rounded-md">
-                                    <Wind className="w-3.5 h-3.5 text-blue-600" />
+                            <div className="flex items-center gap-3 py-1.5">
+                                <div className="p-2 bg-blue-100 rounded-lg">
+                                    <Wind className="w-4 h-4 text-blue-600" />
                                 </div>
-                                <span className="font-semibold text-xs tracking-wide">AQI</span>
+                                <span className="font-bold text-sm">Air Quality (AQI)</span>
                             </div>
                         </SelectItem>
 
@@ -139,11 +148,11 @@ const MapSearchBar = ({ onLocationSelect, parameter, setParameter }: MapSearchBa
                             value="pm25"
                             className="rounded-lg focus:bg-orange-50 focus:text-orange-600 cursor-pointer transition-colors m-1"
                         >
-                            <div className="flex items-center gap-2.5 py-1">
-                                <div className="p-1.5 bg-orange-100 rounded-md">
-                                    <Thermometer className="w-3.5 h-3.5 text-orange-600" />
+                            <div className="flex items-center gap-3 py-1.5">
+                                <div className="p-2 bg-orange-100 rounded-lg">
+                                    <Thermometer className="w-4 h-4 text-orange-600" />
                                 </div>
-                                <span className="font-semibold text-xs tracking-wide">TEMP</span>
+                                <span className="font-bold text-sm">Temperature</span>
                             </div>
                         </SelectItem>
                     </SelectContent>

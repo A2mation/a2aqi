@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import dynamic from "next/dynamic"
 
 import { useLocationStore } from "@/store/location.store"
-import { detectIpLocation } from "@/store/location.actions";
+import { detectGpsLocation, detectIpLocation } from "@/store/location.actions";
 
 export type AQIMarker = {
     id: string;
@@ -35,9 +35,12 @@ const AirQualityPage = () => {
 
     useEffect(() => {
         setMounted(true)
-        if (lat == null && lng == null) {
-            detectIpLocation();
+        const initLocation = async () => {
+            if (lat == null || lng == null) {
+                try { await detectGpsLocation() } catch { await detectIpLocation() }
+            }
         }
+        initLocation()
     }, [lat, lng])
 
     if (!mounted) return null

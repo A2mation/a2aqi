@@ -12,7 +12,7 @@ import { getAQIBgColor } from "@/helpers/aqi-color-pallet"
 import { useOutsideClick } from "@/hooks/use-outside-click"
 import { SearchResult } from "@/domains/public/search/dto/search.dto"
 import { useLocationStore } from "@/store/location.store"
-import { detectIpLocation } from "@/store/location.actions"
+import { detectGpsLocation, detectIpLocation } from "@/store/location.actions"
 
 
 
@@ -25,11 +25,11 @@ const Searchbar = () => {
     const {
         lat, lng
     } = useLocationStore();
-
+    // console.log(debouncedQuery)
 
     useEffect(() => {
         if (lat === null || lng === null) {
-            detectIpLocation();
+            detectGpsLocation();
         }
     }, [lat, lng]);
 

@@ -5,7 +5,7 @@ import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Activity, Info, TrendingUp, AlertCircle, Wind } from "lucide-react";
+import { MapPin, Activity, Info, TrendingUp, AlertCircle, Wind, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import {
@@ -21,13 +21,14 @@ import { http } from "@/lib/http";
 
 type AirQualityCardProps = {
     station: StationData | null;
+    onCloseAction?: () => void;
 };
 
-export function AirQualityCard({ station }: AirQualityCardProps) {
+export function AirQualityCard({ station, onCloseAction }: AirQualityCardProps) {
     const store = useLocationStore();
     const router = useRouter();
 
-    const deviceId = station?.id || "69b2b577f283d25789683e19";
+    const deviceId = station?.id;
 
     const { data: apiData, isLoading, isError } = useQuery({
         queryKey: ["pollutant-details", deviceId],
@@ -81,7 +82,7 @@ export function AirQualityCard({ station }: AirQualityCardProps) {
             { id: "humidity", label: "Humidity", value: current?.humidity, unit: "%", max: 100 },
         ];
 
-        // REMOVE NULLS: Filter only fields that have a value
+        // Filter only fields that have a value
         const activePollutants = allPollutants.filter(p => p.value !== null && p.value !== undefined);
 
         return {
@@ -98,7 +99,7 @@ export function AirQualityCard({ station }: AirQualityCardProps) {
         return <AirQualityCardSkeleton />;
     }
 
-    // 2. Handle Error State
+    // Handle Error State
     if (isError) {
         return (
             <Card className="w-full max-w-105 p-10 flex flex-col items-center justify-center text-center space-y-4 rounded-[2.5rem] bg-white border-none shadow-xl">
@@ -121,6 +122,13 @@ export function AirQualityCard({ station }: AirQualityCardProps) {
 
     return (
         <Card className="w-full max-w-105 h-full md:h-[88dvh] bg-white text-zinc-900 border-none shadow-[0_-10px_40px_rgba(0,0,0,0.08)] flex flex-col overflow-hidden rounded-t-[2.5rem] md:rounded-[2.5rem]">
+
+            <button
+                onClick={onCloseAction}
+                className="absolute top-6 right-6 z-20 p-2 bg-zinc-100 hover:bg-zinc-200 rounded-full transition-colors group"
+            >
+                <X className="w-5 h-5 text-zinc-500 group-hover:text-zinc-800" />
+            </button>
 
             <div className="flex flex-col items-center pt-4 pb-1 cursor-grab active:cursor-grabbing">
                 <p className="text-[11px] text-zinc-300 text-center font-bold uppercase pt-2">
