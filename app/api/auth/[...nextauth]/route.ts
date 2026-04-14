@@ -32,14 +32,18 @@ export const authOptions: NextAuthOptions = {
                     if (!credentials?.email || !credentials?.password) return null;
 
                     const res = await http.post("api/admin/auth/sign-in", credentials);
-                    return res.data;
-                } catch (error) {
-                    console.error("Admin login failed:", error);
-                    return null;
+
+                    if (res.status === 200 && res.data) {
+                        return res.data;
+                    }
+
+                    throw new Error(res.data?.message || "Invalid email or password");
+                } catch (error: any) {
+                    throw new Error(error.response?.data?.message || error.message || "Authentication failed");
                 }
             },
-        }),    
-        
+        }),
+
 
         // 🖥️ Monitor
         Credentials({
@@ -51,10 +55,14 @@ export const authOptions: NextAuthOptions = {
                     if (!credentials?.email || !credentials?.password) return null;
 
                     const res = await http.post("api/monitor/auth", credentials);
-                    return res.data;
-                } catch (error) {
-                    console.error("Monitor login failed:", error);
-                    return null;
+
+                    if (res.status === 200 && res.data) {
+                        return res.data;
+                    }
+
+                    throw new Error(res.data?.message || "Invalid email or password");
+                } catch (error: any) {
+                    throw new Error(error.response?.data?.message || error.message || "Authentication failed");
                 }
             },
         }),
@@ -70,13 +78,18 @@ export const authOptions: NextAuthOptions = {
                     if (!credentials?.email || !credentials?.password) return null;
 
                     const res = await http.post("api/blog/auth/login", credentials);
-                    return res.data;
-                } catch (error) {
-                    console.error("Writer login failed:", error);
-                    return null;
-                }    
-            },    
-        }),    
+
+                    if (res.status === 200 && res.data) {
+                        return res.data;
+                    }
+
+                    throw new Error(res.data?.message || "Invalid email or password");
+
+                } catch (error: any) {
+                    throw new Error(error.response?.data?.message || error.message || "Authentication failed");
+                }
+            },
+        }),
 
 
         // 👤 USER
