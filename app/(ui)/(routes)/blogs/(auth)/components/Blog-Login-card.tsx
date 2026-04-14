@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form"
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useState } from "react";
 
 import { Button, buttonVariants } from "@/components/ui/button"
 import {
@@ -37,8 +38,6 @@ import {
     SignInValues,
     SignUpValues,
 } from "./schemas"
-import { http } from "@/lib/http";
-import { useState } from "react";
 
 export const BLOGPAGEAUTHTYPE = {
     SIGNUP: "SIGNUP",
@@ -95,13 +94,16 @@ export function BlogLoginCard({ title, desc, type }: Props) {
             });
 
             if (res?.error) {
-                toast.error(res.error, { id: toastId });
+                toast.error(res.error || "Failed to sign in", { id: toastId });
                 return;
             }
 
-            toast.success("Welcome back 👋", { id: toastId });
-            form.reset();
-            router.push("/blogs");
+            if (res?.ok) {
+                toast.success("Welcome back 👋", { id: toastId });
+                form.reset();
+                router.replace("/blogs");
+                router.refresh();
+            }
         } catch (error: any) {
             const message =
                 error?.response?.data?.message || "Something went wrong";

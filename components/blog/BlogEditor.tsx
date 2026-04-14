@@ -4,12 +4,12 @@ import {
     EditorContent,
     useEditor,
 } from "@tiptap/react"
-import { BubbleMenu } from "@tiptap/react/menus"
 import StarterKit from "@tiptap/starter-kit"
-import { Bold, Code2Icon, Italic, ListTodoIcon, LucideIcon, MessageSquarePlusIcon, Redo2Icon, RemoveFormattingIcon, SpellCheckIcon, UnderlineIcon, Undo2Icon } from "lucide-react"
+import { Bold, Code2Icon, Italic, LucideIcon, Redo2Icon, RemoveFormattingIcon, SpellCheckIcon, UnderlineIcon, Undo2Icon } from "lucide-react"
 import Image from '@tiptap/extension-image'
 import ImageResize from 'tiptap-extension-resize-image'
 import { FontSize, TextStyle } from "@tiptap/extension-text-style"
+import Underline from "@tiptap/extension-underline"
 
 import {
     ContextMenu,
@@ -36,11 +36,22 @@ const BlogEditor = ({ value, onChange }: BlogEditorProps) => {
     const editor = useEditor({
         immediatelyRender: false,
         extensions: [
-            StarterKit,
+            StarterKit.configure({
+                bulletList: {
+                    keepMarks: true,
+                    keepAttributes: false,
+                },
+                orderedList: {
+                    keepMarks: true,
+                    keepAttributes: false,
+                },
+            }),
             TextStyle,
             FontSize,
             Image,
             ImageResize,
+            Underline,
+            
         ],
         content: value,
         onUpdate({ editor }) {

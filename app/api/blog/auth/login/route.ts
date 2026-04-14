@@ -7,7 +7,6 @@ import { signToken } from "@/lib/jwt";
 export async function POST(req: Request) {
     try {
         const { email, password } = await req.json();
-        console.log(email, password)
 
         const writer = await prisma.contentWriter.findUnique({
             where: { email },
@@ -15,7 +14,7 @@ export async function POST(req: Request) {
 
         if (!writer) {
             return NextResponse.json(
-                { message: "Invalid credentials" },
+                { message: "Invalid Email Credentials" },
                 { status: 401 }
             );
         }
@@ -23,7 +22,7 @@ export async function POST(req: Request) {
         const isValid = await bcrypt.compare(password, writer.password);
         if (!isValid) {
             return NextResponse.json(
-                { message: "Invalid credentials" },
+                { message: "Invalid Password Credentials" },
                 { status: 401 }
             );
         }

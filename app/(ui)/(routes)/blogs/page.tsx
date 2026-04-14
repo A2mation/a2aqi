@@ -29,7 +29,7 @@ export default function BlogPage() {
             <Featured />
             <CategoryList />
 
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-[50px]">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-12.5">
                 <div className="md:col-span-4">
                     <BlogCardList page={page} cat={cat} />
                 </div>

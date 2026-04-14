@@ -21,6 +21,7 @@ export async function GET(
                 id: true,
                 title: true,
                 likedIds: true,
+                img: true,
                 desc: true,
                 likesCount: true,
                 createdAt: true,

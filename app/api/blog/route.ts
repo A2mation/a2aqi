@@ -5,6 +5,7 @@ import { ContentWriterStatus } from "@prisma/client";
 import { Category } from "@/store/category.store";
 import { getAuthSession } from "@/auth";
 import { BLOG_POST_PER_PAGE } from "@/constant/blog-per-page";
+import cloudinary from "@/lib/cloudinary";
 
 
 export async function GET(req: NextRequest) {
@@ -28,7 +29,7 @@ export async function GET(req: NextRequest) {
                 },
             }
             : {};
-        
+
 
         const [posts, total] = await prisma.$transaction([
             prisma.blogPost.findMany({
@@ -49,6 +50,9 @@ export async function GET(req: NextRequest) {
                         },
                     },
                 },
+                orderBy: {
+                    createdAt: 'desc'
+                }
             }),
 
             prisma.blogPost.count({ where }),
@@ -124,11 +128,15 @@ export async function POST(req: NextRequest) {
             );
         }
 
+        const uploadResponse = await cloudinary.uploader.upload(img, {
+            folder: 'blog_banner_images',
+        });
+
         const post = await prisma.blogPost.create({
             data: {
                 title,
                 desc: blog,
-                img,
+                img: uploadResponse.secure_url,
                 authorId: writer.id,
                 categories: {
                     create: categories.map((cat) => ({
