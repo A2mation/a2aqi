@@ -38,7 +38,7 @@ const AirQualityImages: Record<string, string> = {
 export default function AQIDashboard() {
   const {
     location, state, country, loading, lastUpdated,
-    temp, humidity, aqi, source, error
+    temp, humidity, aqi, source, error, lat, lng
   } = useLocationStore()
 
   const [view, setView] = useState<"aqi" | "temp">("aqi");
@@ -46,17 +46,23 @@ export default function AQIDashboard() {
 
   useEffect(() => {
     const initLocation = async () => {
-      try { await detectGpsLocation() } catch { await detectIpLocation() }
+      await detectIpLocation()
     }
     initLocation()
   }, [])
+
 
   useEffect(() => {
     if (typeof aqi === "number") setTheme(getAQITheme(aqi))
   }, [aqi])
 
-  if (loading && !lastUpdated) return <AQIDashboardLoader />
-  if (error) return <section className="min-h-screen flex items-center justify-center text-destructive font-bold">{error}</section>
+  if (loading && !lastUpdated || (lat == null || lng == null)) return <AQIDashboardLoader />;
+
+  if (error) return (
+    <section className="min-h-screen flex items-center justify-center text-destructive font-bold">
+      {error}
+    </section>
+  )
 
   return (
     <section className="min-h-fit bg-background text-foreground selection:bg-primary/20">
@@ -218,7 +224,7 @@ export default function AQIDashboard() {
                 <div className="flex items-start flex-col gap-1.5 mt-2 opacity-70">
                   <div className="flex items-center justify-start gap-2">
                     <div className="h-1.5 w-1.5 rounded-full bg-foreground" />
-                    <span className="text-[9px] md:text-xs font-bold uppercase text-foreground">Source: Real-Time Data collected from {source==='WAQI' ? 'CPCB' : 'A2AQI' } Sensor</span>
+                    <span className="text-[9px] md:text-xs font-bold uppercase text-foreground">Source: Real-Time Data collected from {source === 'WAQI' ? 'CPCB' : 'A2AQI'} Sensor</span>
                   </div>
                   <div className="flex items-center justify-start gap-2">
                     <div className="h-1.5 w-1.5 rounded-full bg-foreground/50" />

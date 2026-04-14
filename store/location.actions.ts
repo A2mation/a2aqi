@@ -22,6 +22,8 @@ export const detectIpLocation = async () => {
 
             const { nearest, popularCities, nearbyCities, graphData } = data;
 
+            console.log(popularCities, nearbyCities, graphData)
+
             if (nearest) {
                 const lat = nearest.lat || nearest.latitude;
                 const lng = nearest.lng || nearest.longitude;
@@ -53,6 +55,7 @@ export const detectIpLocation = async () => {
                     loading: false,
                     lastUpdated: new Date(),
                 });
+                console.log('data: IP')
 
                 return;
             } else {
@@ -76,10 +79,10 @@ export const detectGpsLocation = () => {
 
     return new Promise<void>((resolve, reject) => {
         if (!("geolocation" in navigator)) {
-            setState({ error: "Geolocation not supported", loading: false })
-            toast.error("Geolocation is not supported by your browser.")
-            reject("Geolocation not supported")
-            return
+            const msg = "Geolocation not supported";
+            setState({ error: msg, loading: false });
+            toast.error(msg);
+            return reject(msg);
         }
 
         navigator.geolocation.getCurrentPosition(
@@ -89,21 +92,23 @@ export const detectGpsLocation = () => {
                     const lat = pos.coords.latitude
                     const lng = pos.coords.longitude
 
-                    const response = await http.get("/api/location", {
-                        params: { lat, lng },
-                    })
+                    const [backendRes, geoRes] = await Promise.all([
+                        http.get("/api/location", { params: { lat, lng } }),
+                        http.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                    ]);
 
-                    const { nearest, popularCities, nearbyCities, graphData } = response.data;
+                    const { nearest, popularCities, nearbyCities, graphData } = backendRes.data;
 
-                    const actualLocation = await http.get(
-                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
-                    )
+                    // CRITICAL: If 'nearest' is missing, we must REJECT to trigger the fallback
+                    if (!nearest || !geoRes.data.display_name) {
+                        throw new Error("No air quality data available for this GPS coordinate.");
+                    }
 
                     if (nearest) {
                         setState({
                             lat,
                             lng,
-                            location: actualLocation.data.display_name || nearest.location,
+                            location: geoRes.data.display_name || nearest.location,
 
                             city: nearest.city,
                             state: nearest.state,
@@ -128,21 +133,22 @@ export const detectGpsLocation = () => {
                             lastUpdated: new Date(),
                         })
                     }
-
+                    console.log('data: GPS')
                     resolve()
                 } catch (error) {
                     setState({ error: "Backend fetch failed", loading: false })
                     toast.error("Failed to fetch location data from backend.")
                     reject(error)
                 } finally {
+                    resolve()
                     setState({ loading: false })
                 }
             },
             (err) => {
-                setState({ error: err.message, loading: false })
+                setState({ loading: false })
                 setState({ loading: false })
                 toast.error(`Please allow location access.`)
-                reject(err)
+                resolve()
             },
             {
                 enableHighAccuracy: true,

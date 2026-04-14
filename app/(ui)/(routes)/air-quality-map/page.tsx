@@ -43,12 +43,13 @@ const AirQualityPage = () => {
     useEffect(() => {
         setMounted(true)
         const initLocation = async () => {
-            if (lat == null || lng == null) {
-                try { await detectGpsLocation() } catch { await detectIpLocation() }
+            if (!lat || !lng) {
+                await detectIpLocation();
             }
-        }
-        initLocation()
-    }, [lat, lng])
+        };
+
+        initLocation();
+    }, [lat, lng]);
 
     if (!mounted) return (
         <>
