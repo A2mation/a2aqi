@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getAuthSession } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { ROLE } from "@/types/type";
 import { adminGuard } from "@/lib/adminAuth";
 import { handleAdminError } from "@/lib/handleRoleError";
 

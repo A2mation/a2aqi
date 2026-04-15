@@ -45,7 +45,7 @@ export async function GET(req: Request) {
         return NextResponse.json({
             users: users || [], 
             nextCursor
-        }).headers.set('Cache-Control', 'no-store, max-age=0');
+        });
 
     } catch (error) {
         console.error("User Fetch Error:", error);

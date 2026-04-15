@@ -1,3 +1,6 @@
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 import { format } from "date-fns";
 
 import { prisma } from "@/lib/prisma";
@@ -5,16 +8,16 @@ import { CouponClient } from './components/client';
 import { CouponColumn } from './components/columns';
 
 const CouponPage = async () => {
-   
+
     const coupons = await prisma.coupon.findMany({
         orderBy: {
             createdAt: "desc",
         },
     });
 
-   
+
     const formattedCoupons: CouponColumn[] = coupons.map((item) => {
-        
+
         const isExpired = new Date() > new Date(item.validUntil);
         const isFullyUsed = item.maxUsage ? item.usedCount >= item.maxUsage : false;
 
