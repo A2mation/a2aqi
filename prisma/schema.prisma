@@ -149,8 +149,13 @@ enum MonitorTag {
   PRIVATE
 }
 
+enum AdminRole {
+  ADMIN
+  MODERATOR
+}
+
 //////////////////////////////////////////////////////
-// USER & ADMIN & Monitor
+// USER & ADMIN & Monitor &  Moderataor
 //////////////////////////////////////////////////////
 
 model User {
@@ -210,11 +215,12 @@ model Address {
 }
 
 model Admin {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
   name      String
-  email     String   @unique
+  email     String    @unique
   password  String
-  createdAt DateTime @default(now())
+  role      AdminRole @default(MODERATOR)
+  createdAt DateTime  @default(now())
 
   calibrations Calibration[]
 }
