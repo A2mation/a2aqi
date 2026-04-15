@@ -6,6 +6,8 @@ import { adminGuard } from "@/lib/adminAuth";
 import { handleAdminError } from "@/lib/handleRoleError";
 import { MonitorDetailsFormSchema } from "@/lib/validation/MonitorDetails.schema";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function GET() {
     try {
@@ -27,7 +29,7 @@ export async function GET() {
             deviceCount: monitor._count.devices,
         }));
 
-        return NextResponse.json(formattedMonitors);
+        return NextResponse.json(formattedMonitors).headers.set('Cache-Control', 'no-store, max-age=0');
 
     } catch (error: any) {
         return handleAdminError(error);
@@ -95,7 +97,7 @@ export async function POST(request: Request) {
 
         const { password: _, ...monitorWithoutPassword } = newMonitor;
 
-        return NextResponse.json(monitorWithoutPassword, { status: 201 });
+        return NextResponse.json(monitorWithoutPassword, { status: 201 }).headers.set('Cache-Control', 'no-store, max-age=0');
 
     } catch (error: any) {
         return handleAdminError(error);

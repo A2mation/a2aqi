@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
+
 import { prisma } from "@/lib/prisma";
 import { adminGuard } from "@/lib/adminAuth";
 import { handleAdminError } from "@/lib/handleRoleError";
 import { withAuditContext } from "@/lib/withAuditContext";
-import { getAuditContext } from "@/lib/audit-context";
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 /**
  * GET: Fetch a single coupon by ID
@@ -28,7 +31,7 @@ export async function GET(
             return new NextResponse("Coupon not found", { status: 404 });
         }
 
-        return NextResponse.json(coupon);
+        return NextResponse.json(coupon).headers.set('Cache-Control', 'no-store, max-age=0');
     } catch (error) {
         return handleAdminError(error);
     }
@@ -96,7 +99,7 @@ export async function PATCH(
                     isActive: isActive ?? true,
                 },
             });
-            return NextResponse.json(updatedCoupon);
+            return NextResponse.json(updatedCoupon).headers.set('Cache-Control', 'no-store, max-age=0');
         })
 
     } catch (error) {
@@ -136,7 +139,7 @@ export async function DELETE(
                 });
             });
 
-            return new NextResponse("Coupon deleted successfully", { status: 200 });
+            return new NextResponse("Coupon deleted successfully", { status: 200 }).headers.set('Cache-Control', 'no-store, max-age=0');
         })
     } catch (error) {
         return handleAdminError(error);

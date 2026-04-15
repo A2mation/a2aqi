@@ -5,6 +5,9 @@ import { DeviceStatus } from "@prisma/client";
 import { adminGuard } from "@/lib/adminAuth";
 import { handleAdminError } from "@/lib/handleRoleError";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET(
     req: Request,
     params: {
@@ -32,7 +35,9 @@ export async function GET(
             return new NextResponse("Device not found", { status: 404 });
         }
 
-        return NextResponse.json(device);
+        const response = NextResponse.json(device);
+        response.headers.set('Cache-Control', 'no-store, max-age=0');
+        return response;
 
     } catch (error) {
         return handleAdminError(error);

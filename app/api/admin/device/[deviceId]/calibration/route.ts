@@ -6,6 +6,9 @@ import { redis } from "@/lib/redis";
 import { CalibrationStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET(req: Request,
     params: {
         params: Promise<{ deviceId: string }>
@@ -36,7 +39,7 @@ export async function GET(req: Request,
 
         const nextCursor = logs.length === limit ? logs[logs.length - 1].id : null;
 
-        return NextResponse.json({ items: logs, nextCursor });
+        return NextResponse.json({ items: logs, nextCursor }).headers.set('Cache-Control', 'no-store, max-age=0');
 
     } catch (error: any) {
         return handleAdminError(error);
@@ -129,7 +132,7 @@ export async function POST(req: Request,
                 calibrationId: calibration.id,
             },
             { status: 201 }
-        );
+        ).headers.set('Cache-Control', 'no-store, max-age=0');
 
     } catch (error) {
         return handleAdminError(error);

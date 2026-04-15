@@ -3,7 +3,10 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { adminGuard } from "@/lib/adminAuth";
 import { handleAdminError } from "@/lib/handleRoleError";
-import { ROLE } from "@/types/type";
+
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function GET() {
     try {
@@ -13,7 +16,9 @@ export async function GET() {
 
         const deviceModels = await prisma.deviceModel.findMany();
 
-        return NextResponse.json(deviceModels);
+        const response = NextResponse.json(deviceModels);
+        response.headers.set('Cache-Control', 'no-store, max-age=0');
+        return response;
 
 
     } catch (error: any) {

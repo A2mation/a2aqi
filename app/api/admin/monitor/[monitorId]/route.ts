@@ -6,6 +6,8 @@ import { adminGuard } from "@/lib/adminAuth";
 import { handleAdminError } from "@/lib/handleRoleError";
 import { MonitorDetailsFormSchema } from '@/lib/validation/MonitorDetails.schema';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function GET(
     req: Request,
@@ -41,7 +43,7 @@ export async function GET(
         return NextResponse.json({
             ...monitorData,
             deviceCount: monitor._count.devices
-        });
+        }).headers.set('Cache-Control', 'no-store, max-age=0');
 
     } catch (err: any) {
         return handleAdminError(err);
@@ -159,7 +161,7 @@ export async function DELETE(
 
         return new NextResponse("Monitor and associated assignments deleted successfully", {
             status: 200
-        });
+        }).headers.set('Cache-Control', 'no-store, max-age=0');
 
     } catch (err: any) {
         if (err.code === 'P2025') {

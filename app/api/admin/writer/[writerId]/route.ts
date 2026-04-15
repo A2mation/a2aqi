@@ -6,6 +6,9 @@ import { ROLE } from "@/types/type";
 import { prisma } from "@/lib/prisma"
 import { getAuthSession } from "@/auth";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function PATCH(
     req: Request,
     params: {

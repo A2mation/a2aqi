@@ -8,6 +8,9 @@ import { withAuditContext } from "@/lib/withAuditContext";
 import { cancelSubscription, refreshSubscriptionCache } from "@/domains/subscription/service/subscription.service";
 import { DeviceSubscriptionStatus } from "@prisma/client";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function POST(
     req: Request,
     params: {
@@ -102,7 +105,7 @@ export async function POST(
         return NextResponse.json({
             message: "Subscription processed successfully",
             data: subscription
-        });
+        }).headers.set('Cache-Control', 'no-store, max-age=0');
 
     } catch (error) {
         return handleAdminError(error);

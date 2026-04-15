@@ -4,6 +4,9 @@ import { prisma } from "@/lib/prisma"
 import { adminGuard } from "@/lib/adminAuth";
 import { handleAdminError } from "@/lib/handleRoleError";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET(
     req: Request,
     params: {
@@ -30,7 +33,7 @@ export async function GET(
             return new NextResponse("Pricing Plan not found", { status: 404 });
         }
 
-        return NextResponse.json(pricingPlan);
+        return NextResponse.json(pricingPlan).headers.set('Cache-Control', 'no-store, max-age=0');
 
     } catch (err: any) {
         return handleAdminError(err);

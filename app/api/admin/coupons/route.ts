@@ -4,6 +4,9 @@ import { adminGuard } from "@/lib/adminAuth";
 import { handleAdminError } from "@/lib/handleRoleError";
 import { withAuditContext } from "@/lib/withAuditContext";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET() {
     try {
         await adminGuard();
@@ -15,7 +18,7 @@ export async function GET() {
             }
         });
 
-        return NextResponse.json(coupons);
+        return NextResponse.json(coupons).headers.set('Cache-Control', 'no-store, max-age=0');
     } catch (error) {
         return handleAdminError(error);
     }
@@ -36,7 +39,7 @@ export async function POST(request: Request) {
             isActive
         } = body;
 
-        
+
         if (!code) {
             return new NextResponse("Coupon code is required", { status: 400 });
         }
@@ -49,7 +52,7 @@ export async function POST(request: Request) {
             return new NextResponse("Expiry date is required", { status: 400 });
         }
 
-       
+
         const existingCoupon = await prisma.coupon.findUnique({
             where: { code: code.toUpperCase() }
         });
@@ -78,7 +81,7 @@ export async function POST(request: Request) {
                 },
             });
 
-            return NextResponse.json(newCoupon, { status: 201 });
+            return NextResponse.json(newCoupon, { status: 201 }).headers.set('Cache-Control', 'no-store, max-age=0');
         })
 
 

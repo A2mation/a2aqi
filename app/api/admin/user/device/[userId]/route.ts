@@ -4,6 +4,9 @@ import { prisma } from "@/lib/prisma";
 import { adminGuard } from "@/lib/adminAuth";
 import { handleAdminError } from "@/lib/handleRoleError";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 
 export async function GET(
     req: Request,
@@ -32,7 +35,7 @@ export async function GET(
             }
         });
 
-        return NextResponse.json(devices);
+        return NextResponse.json(devices).headers.set('Cache-Control', 'no-store, max-age=0');
     } catch (error) {
         return handleAdminError(error);
     }
