@@ -38,7 +38,7 @@ export async function POST(req: Request) {
             id: admin.id,
             name: admin.name,
             email: admin.email,
-            role: "ADMIN",
+            role: admin.role,
             accessToken: token,
         });
 

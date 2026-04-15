@@ -18,7 +18,7 @@ export const ApiList = ({
 
     return (
         <>
-            <section className="flex flex-col gap-4">
+            <section className="hidden flex-col gap-4 md:flex">
                 <ApiAlert
                     title={"GET"}
                     description={`${baseUrl}/${entityName}`}
