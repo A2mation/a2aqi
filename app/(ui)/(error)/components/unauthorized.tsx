@@ -31,12 +31,17 @@ export function Unauthorized({
                 <div className="flex w-full flex-col gap-3 pt-4 sm:flex-row sm:justify-center">
                     <Button asChild variant="outline" className="w-full sm:w-auto bg-transparent">
                         <Link href={
-                            type === ROLE.ADMIN ? "/" : type === ROLE.WRITER ? '/blogs' : '/' 
+                            type === ROLE.ADMIN ? "/" : type === ROLE.WRITER ? '/blogs' : '/'
                         }>Go Home</Link>
                     </Button>
                     <Button asChild className="w-full sm:w-auto">
                         <Link href={
-                            type === ROLE.ADMIN ? "/admin/sign-in" : type === ROLE.WRITER ? '/blogs/sign-in' : type === ROLE.MONITOR ? '/monitor/sign-in' : '/user/sign-in'
+                            type ===
+                                ROLE.ADMIN ? "/admin/sign-in" :
+                                type === ROLE.WRITER ? '/blogs/sign-in' :
+                                    type === ROLE.MONITOR ? '/monitor/sign-in' :
+                                        type === ROLE.MODERATOR ? '/moderator/sign-in' :
+                                            '/user/sign-in'
                         }>Return to Login</Link>
                     </Button>
                 </div>

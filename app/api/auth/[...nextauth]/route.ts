@@ -55,7 +55,7 @@ export const authOptions: NextAuthOptions = {
                 try {
                     if (!credentials?.email || !credentials?.password) return null;
 
-                    const res = await http.post("api/moderator/auth/sign-in", credentials);
+                    const res = await http.post("api/moderators/auth", credentials);
 
                     if (res.status === 200 && res.data) {
                         return res.data;

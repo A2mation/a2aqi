@@ -49,7 +49,7 @@ const ModeratorLoginCard = () => {
         try {
             setLoading(true);
 
-            const res = await signIn("modarator", {
+            const res = await signIn("moderator", {
                 ...value,
                 redirect: false
             })
