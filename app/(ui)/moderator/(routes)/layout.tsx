@@ -2,6 +2,7 @@ import React from 'react'
 
 import { Footer } from '@/components/aqi-ui/footer'
 import AuthSessionProviders from '@/providers/auth-session-provider'
+import ModeratorHeader from '@/components/moderator/Header'
 
 const Layout = async ({
     children
@@ -12,9 +13,10 @@ const Layout = async ({
     return (
         <>
             <AuthSessionProviders>
+                <ModeratorHeader />
                 <section className='bg-background'>
                     {children}
-                    <Footer/>
+                    <Footer />
                 </section>
             </AuthSessionProviders>
         </>

@@ -1,4 +1,3 @@
-import React from 'react'
 import ModeratorLoginCard from './components/moderator-login-card'
 
 const ModeratorAuthPage
