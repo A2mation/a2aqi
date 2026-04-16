@@ -2,7 +2,8 @@ export enum ROLE {
     ADMIN = "ADMIN",
     WRITER = "WRITER",
     USER = "USER",
-    MONITOR = "MONITOR"
+    MONITOR = "MONITOR",
+    MODERATOR = "MODERATOR"
 }
 
 

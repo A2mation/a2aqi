@@ -18,3 +18,4 @@ export const handleAdminError = (err: any) => handleRoleError(err, ROLE.ADMIN);
 export const handleUserError = (err: any) => handleRoleError(err, ROLE.USER);
 export const handleWriterError = (err: any) => handleRoleError(err, ROLE.WRITER);
 export const handleMonitorError = (err: any) => handleRoleError(err, ROLE.MONITOR);
+export const handleModeratorError = (err: any) => handleRoleError(err, ROLE.MODERATOR);
