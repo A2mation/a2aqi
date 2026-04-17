@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { DeviceSubscriptionStatus } from "@prisma/client";
+import { DeviceSubscriptionStatus, SubscriptionDuration } from "@prisma/client";
 
 /**
  * Get subscription by deviceId
@@ -99,6 +99,38 @@ export async function cancelSubscription(deviceId: string) {
     });
 }
 
+
+export async function upsertActiveSubUser(deviceId: string, userId: string) {
+    const now = new Date();
+
+    const oneYearLater = new Date();
+    oneYearLater.setFullYear(now.getFullYear() + 1);
+
+    return prisma.deviceSubscription.upsert({
+        where: {
+            deviceId: deviceId,
+        },
+        update: {
+            userId: userId,
+            status: DeviceSubscriptionStatus.ACTIVE,
+            endDate: oneYearLater,
+            updatedAt: now,
+        },
+        create: {
+            deviceId: deviceId,
+            userId: userId,
+            startDate: now,
+            endDate: oneYearLater,
+            paidAmount: 0.0,
+            adminModified: false,
+            notes: 'USER FREE 1 YEAR SUB',
+            planType: SubscriptionDuration.TWELVE_MONTHS,
+            status: DeviceSubscriptionStatus.ACTIVE,
+            autoRenew: true,
+        },
+    });
+}
+
 /**
  * Admin override (extend / modify)
  */
@@ -166,8 +198,8 @@ export async function deleteByDevice(deviceId: string) {
  * Add ownership validation
  */
 export async function getDeviceOwner(deviceId: string) {
-  return prisma.deviceSubscription.findUnique({
-    where: { deviceId },
-    select: { userId: true },
-  });
+    return prisma.deviceSubscription.findUnique({
+        where: { deviceId },
+        select: { userId: true },
+    });
 }

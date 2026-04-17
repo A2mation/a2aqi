@@ -34,6 +34,20 @@ export async function getDeviceSubscription(deviceId: string) {
     return sub;
 }
 
+export async function upsertActiveSubUserService(deviceId: string, userId: string) {
+    const sub = await repo.upsertActiveSubUser(deviceId, userId);
+
+    const cached = await redis.get(subscriptionKey(deviceId));
+
+    if (cached) {
+        await redis.del(subscriptionKey(deviceId));
+    }
+
+    await cacheSubscription(sub);
+
+    return sub;
+}
+
 /**
  * Validate device subscription (MAIN FUNCTION)
  */
