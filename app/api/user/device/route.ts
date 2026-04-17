@@ -1,9 +1,15 @@
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 import { NextResponse } from "next/server"
+import { DeviceStatus, DeviceType } from "@prisma/client"
+
 import { prisma } from "@/lib/prisma"
 import { userGuard } from "@/lib/userAuth"
 import { handleUserError } from "@/lib/handleRoleError"
 import { deviceSchema } from "@/components/users-ui/edit/schema/schema"
-import { DeviceStatus, DeviceType } from "@prisma/client"
+import { withAuditContext } from "@/lib/withAuditContext"
+import { upsertActiveSubUserService } from "@/domains/subscription/service/subscription.service"
 
 export async function GET(req: Request) {
     try {
@@ -101,15 +107,6 @@ export async function PATCH(
             return new NextResponse("Device ID is required", { status: 400 });
         }
 
-        const user = await prisma.user.findUnique({
-            where: { id: sessionUser.id },
-            select: { id: true },
-        })
-
-        if (!user) {
-            throw new Error("Unauthorized");
-        }
-
         const validatedData = deviceSchema.parse(body);
 
         const device = await prisma.device.update({
@@ -129,8 +126,10 @@ export async function PATCH(
         });
 
         if (!device) {
-            throw new Error("Unauthorized");
+            return new NextResponse("Unauthorized", { status: 401 });
         }
+
+        
 
         return NextResponse.json(device);
     } catch (error: any) {

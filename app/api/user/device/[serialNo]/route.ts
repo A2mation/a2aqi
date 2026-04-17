@@ -1,10 +1,12 @@
-import { getAuthSession } from "@/auth";
-import { ROLE } from "@/types/type";
+
+import { DeviceStatus } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+
 import { prisma } from "@/lib/prisma"
 import { handleUserError } from "@/lib/handleRoleError";
+import { withAuditContext } from "@/lib/withAuditContext";
+import { upsertActiveSubUserService } from "@/domains/subscription/service/subscription.service";
 import { userGuard } from "@/lib/userAuth";
-import { DeviceStatus } from "@prisma/client";
 
 export async function GET(
     req: NextRequest,
@@ -22,6 +24,7 @@ export async function GET(
                 status: 404
             })
         }
+
         await userGuard();
 
 
@@ -115,6 +118,23 @@ export async function PATCH(
                 status: DeviceStatus.ASSIGNED,
                 assignedAt: new Date(),
             },
+        })
+
+        // Update Subscription
+        await withAuditContext({
+            ip: req.headers.get("x-forwarded-for") || "unknown",
+            route: "user-free-1year-device-subscription",
+            userId: user.id,
+            isAdmin: false,
+            role: "USER",
+        }, async () => {
+            const sub = await upsertActiveSubUserService(updatedDevice.id, user.id);
+
+            if (!sub) {
+                return NextResponse.json({
+                    error: 'Problem Occures in device Subscription',
+                })
+            }
         })
 
         // Return device id
