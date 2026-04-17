@@ -22,7 +22,7 @@ export const detectIpLocation = async () => {
 
             const { nearest, popularCities, nearbyCities, graphData } = data;
 
-            console.log(popularCities, nearbyCities, graphData)
+            // console.log(popularCities, nearbyCities, graphData)
 
             if (nearest) {
                 const lat = nearest.lat || nearest.latitude;
@@ -55,7 +55,7 @@ export const detectIpLocation = async () => {
                     loading: false,
                     lastUpdated: new Date(),
                 });
-                console.log('data: IP')
+                // console.log('data: IP')
 
                 return;
             } else {
@@ -133,7 +133,7 @@ export const detectGpsLocation = () => {
                             lastUpdated: new Date(),
                         })
                     }
-                    console.log('data: GPS')
+                    // console.log('data: GPS')
                     resolve()
                 } catch (error) {
                     setState({ error: "Backend fetch failed", loading: false })
