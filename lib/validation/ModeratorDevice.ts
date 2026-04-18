@@ -6,3 +6,6 @@ export const moderatordeviceSchema = z.object({
     model: z.string().min(1, "Please select a model."),
     apiKey: z.string().min(16, "API Key must be at least 16 characters."),
 });
+
+
+export type ModeratordeviceValues = z.infer<typeof moderatordeviceSchema>;

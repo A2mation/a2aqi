@@ -5,9 +5,12 @@ import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/prisma";
 import { handleModeratorError } from "@/lib/handleRoleError";
+import { moderatorGuard } from "@/lib/moderatorAuth";
 
 export async function GET(req: Request) {
     try {
+        await moderatorGuard();
+        
         const { searchParams } = new URL(req.url);
 
         const search = searchParams.get("search") || "";

@@ -1,6 +1,7 @@
 import { handleModeratorError } from "@/lib/handleRoleError";
 import { ModeratorDeviceService } from "../service/device.moderator.service";
 import { NextResponse } from "next/server";
+import { moderatorGuard } from "@/lib/moderatorAuth";
 
 export class ModeratorDeviceIdControler {
 
@@ -26,6 +27,8 @@ export class ModeratorDeviceIdControler {
                     status: 400
                 });
             }
+
+            await moderatorGuard();
 
             if (!startDate || typeof startDate !== "string") {
                 return NextResponse.json({

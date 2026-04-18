@@ -1,9 +1,12 @@
 'use client'
 
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import toast from "react-hot-toast"
 import { motion } from "framer-motion"
-import * as Icons from "lucide-react"
+import { useForm } from "react-hook-form"
+import { useRouter } from "next/navigation"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Cpu, Hash, Key, Loader2, ShieldCheck } from "lucide-react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -22,21 +25,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { moderatordeviceSchema } from '@/lib/validation/ModeratorDevice'
+import { moderatordeviceSchema, ModeratordeviceValues } from '@/lib/validation/ModeratorDevice'
 import { http } from "@/lib/http"
-import { useQuery } from "@tanstack/react-query"
 import { DeviceModel } from "@/types/devices"
 
+const form = useForm({
+  resolver: zodResolver(moderatordeviceSchema),
+  defaultValues: {
+    name: "",
+    serialNo: "",
+    model: "",
+    apiKey: "",
+  },
+});
+
 const RegisterDevicePage = () => {
-  const form = useForm({
-    resolver: zodResolver(moderatordeviceSchema),
-    defaultValues: {
-      name: "",
-      serialNo: "",
-      model: "",
-      apiKey: "",
-    },
-  })
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
 
   // Fetch dynamic models from your API
   const { data: models, isLoading: loadingModels } = useQuery<DeviceModel[]>({
@@ -45,9 +51,27 @@ const RegisterDevicePage = () => {
     staleTime: 1000 * 60 * 5 // 5 Mins
   });
 
-  function onSubmit(values: any) {
-    console.log(values)
-    // Mutation logic here...
+  // Mutation: For new Device Registration
+  const mutation = useMutation({
+    mutationFn: async (values: ModeratordeviceValues) => {
+      const { data } = await http.post('/api/moderators/devices/register-new-device', values);
+      return data;
+    },
+    onSuccess: () => {
+      form.reset();
+      queryClient.invalidateQueries({ queryKey: ['moderator-devices'] });
+      toast.success('Device Added Successfully');
+      router.push('/moderator');
+    },
+    onError: (error: any) => {
+      console.error('Registration failed:', error.message);
+      toast.error(error.message || 'Something Went Wrong');
+    }
+  });
+
+
+  function onSubmit(values: ModeratordeviceValues) {
+    mutation.mutate(values);
   }
 
   return (
@@ -60,12 +84,12 @@ const RegisterDevicePage = () => {
         <div className="p-8 bg-slate-900 text-white relative rounded-t-[30px]">
           <div className="relative z-10">
             <h1 className="text-2xl font-black tracking-tight flex items-center gap-3">
-              <Icons.Cpu className="text-blue-400" />
+              <Cpu className="text-blue-400" />
               Register New Device
             </h1>
             <p className="text-slate-400 text-sm mt-1">Connect your AQI hardware to the cloud network.</p>
           </div>
-          <Icons.ShieldCheck className="absolute -right-4 -bottom-4 text-white/5 w-32 h-32" />
+          <ShieldCheck className="absolute -right-4 -bottom-4 text-white/5 w-32 h-32" />
         </div>
 
         <Form {...form}>
@@ -80,7 +104,12 @@ const RegisterDevicePage = () => {
                   <FormItem>
                     <FormLabel className="text-xs font-black uppercase text-slate-500 tracking-widest">Device Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. Office_01" {...field} className="rounded-xl border-slate-200 focus:ring-blue-500" />
+                      <Input
+                        placeholder="e.g. Office_01"
+                        {...field}
+                        className="rounded-xl border-slate-200 focus:ring-blue-500"
+                        disabled={mutation.isPending || loadingModels}
+                      />
                     </FormControl>
                     <FormMessage className="text-[10px]" />
                   </FormItem>
@@ -97,13 +126,13 @@ const RegisterDevicePage = () => {
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
-                      disabled={loadingModels} 
+                      disabled={loadingModels || mutation.isPending}
                     >
                       <FormControl>
                         <SelectTrigger className="rounded-xl border-slate-200">
                           {loadingModels ? (
                             <div className="flex items-center gap-2">
-                              <Icons.Loader2 className="h-4 w-4 animate-spin text-blue-500" />
+                              <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
                               <span className="text-slate-400">Loading models...</span>
                             </div>
                           ) : (
@@ -137,8 +166,13 @@ const RegisterDevicePage = () => {
                   <FormLabel className="text-xs font-black uppercase text-slate-500 tracking-widest">Serial Number <span className="text-red-600">(CAPITAL LETTER)</span></FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Icons.Hash className="absolute left-3 top-2.5 text-slate-400" size={18} />
-                      <Input placeholder="SN-XXXX-XXXX" {...field} className="pl-10 rounded-xl border-slate-200" />
+                      <Hash className="absolute left-3 top-2.5 text-slate-400" size={18} />
+                      <Input
+                        placeholder="SN-XXXX-XXXX"
+                        {...field}
+                        className="pl-10 rounded-xl border-slate-200"
+                        disabled={mutation.isPending || loadingModels}
+                      />
                     </div>
                   </FormControl>
                   <FormMessage className="text-[10px]" />
@@ -155,8 +189,14 @@ const RegisterDevicePage = () => {
                   <FormLabel className="text-xs font-black uppercase text-slate-500 tracking-widest">Device API Key <span className="text-red-600">(CAPITAL LETTER)</span></FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Icons.Key className="absolute left-3 top-2.5 text-slate-400" size={18} />
-                      <Input type="password" placeholder="Enter security key" {...field} className="pl-10 rounded-xl border-slate-200" />
+                      <Key className="absolute left-3 top-2.5 text-slate-400" size={18} />
+                      <Input
+                        type="password"
+                        placeholder="Enter security key"
+                        {...field}
+                        className="pl-10 rounded-xl border-slate-200"
+                        disabled={mutation.isPending || loadingModels}
+                      />
                     </div>
                   </FormControl>
                   <FormMessage className="text-[10px]" />
@@ -167,6 +207,7 @@ const RegisterDevicePage = () => {
             <Button
               type="submit"
               className="w-full py-6 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-xl shadow-blue-100 transition-all active:scale-[0.98]"
+              disabled={mutation.isPending || loadingModels}
             >
               Confirm Registration
             </Button>

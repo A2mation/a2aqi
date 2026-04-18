@@ -106,7 +106,7 @@ export default function ModeratorDevicePage() {
               className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-indigo-600 rounded-lg text-sm font-bold text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all"
               onClick={() => {
                 loader.start();
-                router.push(`/moderator/register-device`);
+                router.push(`/moderator/register-new-device`);
                 loader.done();
               }}
             >

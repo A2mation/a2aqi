@@ -1,16 +1,17 @@
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/prisma";
 import { handleModeratorError } from "@/lib/handleRoleError";
-
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+import { moderatorGuard } from "@/lib/moderatorAuth";
 
 
 export async function GET() {
     try {
 
-        // await adminGuard();
+        await moderatorGuard();
 
 
         const deviceModels = await prisma.deviceModel.findMany({
