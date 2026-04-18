@@ -29,20 +29,20 @@ import { moderatordeviceSchema, ModeratordeviceValues } from '@/lib/validation/M
 import { http } from "@/lib/http"
 import { DeviceModel } from "@/types/devices"
 
-const form = useForm({
-  resolver: zodResolver(moderatordeviceSchema),
-  defaultValues: {
-    name: "",
-    serialNo: "",
-    model: "",
-    apiKey: "",
-  },
-});
 
 const RegisterDevicePage = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
-
+  
+  const form = useForm({
+    resolver: zodResolver(moderatordeviceSchema),
+    defaultValues: {
+      name: "",
+      serialNo: "",
+      model: "",
+      apiKey: "",
+    },
+  });
 
   // Fetch dynamic models from your API
   const { data: models, isLoading: loadingModels } = useQuery<DeviceModel[]>({
