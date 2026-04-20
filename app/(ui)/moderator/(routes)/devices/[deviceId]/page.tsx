@@ -1,49 +1,50 @@
-'use client'
+"use client";
 
-import { useParams } from 'next/navigation';
-import { useQuery } from "@tanstack/react-query"
-import React, { useEffect, useState } from 'react';
+import { useParams } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
-import { http } from '@/lib/http';
-import Header from './components/Header';
-import CustomDays from './components/CustomDays';
-import AdvancedDeviceChart from './components/AdvancedDeviceChart';
-import { AnalyticsResponse } from '@/types/monitors/monitor.analytics.type';
+import { http } from "@/lib/http";
+import Header from "./components/Header";
+import CustomDays from "./components/CustomDays";
+import AdvancedDeviceChart from "./components/AdvancedDeviceChart";
+import { AnalyticsResponse } from "@/types/monitors/monitor.analytics.type";
 import { Skeleton } from "@/components/ui/skeleton";
-import SyncIntrrrupted from '@/components/Error/Sync-Intrrrupted';
-
+import NoDataFound from "@/components/Error/No-data-Found";
 
 const MonitorDeviceAnalyticsPage: React.FC = () => {
   const { deviceId } = useParams();
   const [mounted, setMounted] = useState(false);
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toISOString().split("T")[0];
 
   const { data, isLoading, isError } = useQuery<AnalyticsResponse>({
     queryKey: ["deviceDetails-moderator", deviceId, today],
     queryFn: async () => {
       const response = await http.get(`/api/moderators/devices/${deviceId}`, {
-        params: { startDate: today }
+        params: { startDate: today },
       });
-      if (!response.data.success) {
+
+      console.log(response);
+      if (response.data.error || response.status !== 200) {
+        toast.error(response.data.error || "Something went wrong");
         throw new Error(response.data.message);
       }
       return response.data;
     },
     placeholderData: (previousData) => previousData,
-    staleTime: 40000
+    staleTime: 40000,
   });
 
   useEffect(() => {
     setMounted(true);
-  }, [])
+  }, []);
 
   if (!mounted) return null;
 
   if (isError) {
-    return (
-      <SyncIntrrrupted />
-    );
+    return <NoDataFound />;
   }
 
   return (
@@ -62,7 +63,6 @@ const MonitorDeviceAnalyticsPage: React.FC = () => {
                   hourlyData={data.hourly}
                   liveData={data.latestReading}
                 />
-
               </div>
 
               <CustomDays
@@ -125,6 +125,6 @@ const LoadingSkeleton = () => {
       </div>
     </div>
   );
-}
+};
 
 export default MonitorDeviceAnalyticsPage;

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   ChevronLeft,
@@ -10,30 +10,32 @@ import {
   MapPin,
   Activity,
   HardDrive,
-  Plus
-} from "lucide-react"
-import { useState } from "react"
-import { useQuery } from "@tanstack/react-query"
-import { useTopLoader } from "nextjs-toploader"
-import { useRouter } from "next/navigation"
+  Plus,
+} from "lucide-react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useTopLoader } from "nextjs-toploader";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
-import { cn } from "@/lib/utils"
-import { http } from "@/lib/http"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { http } from "@/lib/http";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import NoDataFound from "@/components/Error/No-data-Found";
 
 interface Device {
-  id: string
-  name: string | null
-  serialNo: string
-  isActive: boolean
-  type: "OUTDOOR" | "INDOOR"
-  status: "UNASSIGNED" | "ASSIGNED" | "MAINTENANCE"
-  location: string | null
-  lat: number | null
-  lng: number | null
-  createdAt: string
+  id: string;
+  name: string | null;
+  serialNo: string;
+  isActive: boolean;
+  type: "OUTDOOR" | "INDOOR";
+  status: "UNASSIGNED" | "ASSIGNED" | "MAINTENANCE";
+  location: string | null;
+  lat: number | null;
+  lng: number | null;
+  createdAt: string;
 }
 
 interface DevicesResponse {
@@ -41,38 +43,50 @@ interface DevicesResponse {
   totalCount: number;
 }
 
-const ITEMS_PER_PAGE = 7
+const ITEMS_PER_PAGE = 7;
 
 export default function ModeratorDevicePage() {
   const router = useRouter();
   const loader = useTopLoader();
-  const [currentPage, setCurrentPage] = useState(1)
-  const [searchQuery, setSearchQuery] = useState("")
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const { data, isLoading, isPlaceholderData } = useQuery<DevicesResponse>({
-    queryKey: ["moderator-devices", searchQuery, currentPage],
-    queryFn: async () => {
-      const response = await http.get(`/api/moderators/devices`, {
-        params: {
-          search: searchQuery,
-          page: currentPage,
-          limit: ITEMS_PER_PAGE,
-        },
-      });
-      return response.data;
-    },
-    placeholderData: (previousData) => previousData,
-    staleTime: 1000 * 60 * 2, // 2 minutes
-  });
+  const { data, isLoading, isPlaceholderData, isError } =
+    useQuery<DevicesResponse>({
+      queryKey: ["moderator-devices", searchQuery, currentPage],
+      queryFn: async () => {
+        const response = await http.get(`/api/moderators/devices`, {
+          params: {
+            search: searchQuery,
+            page: currentPage,
+            limit: ITEMS_PER_PAGE,
+          },
+        });
+
+        if (response.data.error || !response.data.success) {
+          toast.error(response.data.message);
+          throw new Error(response.data.message || "Something went wrong");
+        }
+        return response.data;
+      },
+      placeholderData: (previousData) => previousData,
+      staleTime: 1000 * 60 , // 1 minutes
+    });
 
   const devices = data?.devices || [];
   const totalCount = data?.totalCount || 0;
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
+  if (isError) {
+    return <NoDataFound />;
+  }
+
   return (
-    <div className={cn("min-h-screen flex flex-col bg-[#F8FAFC] dark:bg-[#020617]")}>
-
-
+    <div
+      className={cn(
+        "min-h-screen flex flex-col bg-[#F8FAFC] dark:bg-[#020617]",
+      )}
+    >
       <div className="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
         {/* Fleet Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
@@ -116,10 +130,14 @@ export default function ModeratorDevicePage() {
         </div>
 
         {/* Device Table */}
-        <div className={cn(
-          "border border-slate-200 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900/50 backdrop-blur-sm overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-none transition-all",
-          isPlaceholderData ? "opacity-50 pointer-events-none" : "opacity-100"
-        )}>
+        <div
+          className={cn(
+            "border border-slate-200 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900/50 backdrop-blur-sm overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-none transition-all",
+            isPlaceholderData
+              ? "opacity-50 pointer-events-none"
+              : "opacity-100",
+          )}
+        >
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -164,8 +182,18 @@ export default function ModeratorDevicePage() {
                         </div>
                       </td>
                       <td className="px-6 py-5">
-                        <Badge variant="outline" className="border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-bold text-[10px] uppercase">
-                          {device.type === "OUTDOOR" ? <Zap size={10} className="mr-1 text-amber-500" /> : <Activity size={10} className="mr-1 text-blue-500" />}
+                        <Badge
+                          variant="outline"
+                          className="border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-bold text-[10px] uppercase"
+                        >
+                          {device.type === "OUTDOOR" ? (
+                            <Zap size={10} className="mr-1 text-amber-500" />
+                          ) : (
+                            <Activity
+                              size={10}
+                              className="mr-1 text-blue-500"
+                            />
+                          )}
                           {device.type}
                         </Badge>
                       </td>
@@ -181,33 +209,52 @@ export default function ModeratorDevicePage() {
                         </div>
                       </td>
                       <td className="px-6 py-5">
-                        <Badge className={cn(
-                          "px-3 py-1.5 rounded-xl text-[10px] font-black tracking-widest uppercase border transition-all duration-500 cursor-default flex items-center gap-2 w-fit",
-                          "hover:-translate-y-0.5 hover:shadow-lg active:scale-95",
+                        <Badge
+                          className={cn(
+                            "px-3 py-1.5 rounded-xl text-[10px] font-black tracking-widest uppercase border transition-all duration-500 cursor-default flex items-center gap-2 w-fit",
+                            "hover:-translate-y-0.5 hover:shadow-lg active:scale-95",
 
-                          device.status === "ASSIGNED" ?
-                            "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-600 hover:text-white hover:shadow-emerald-200/50" :
-
-                            device.status === "MAINTENANCE" ?
-                              "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-500 hover:text-white hover:shadow-amber-200/50" :
-                              "bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-600 hover:text-white hover:shadow-rose-200/50"
-                        )}>
-                          <span className={cn(
-                            "w-1.5 h-1.5 rounded-full",
-                            device.status === "ASSIGNED" ? "bg-emerald-500 animate-pulse" :
-                              device.status === "MAINTENANCE" ? "bg-amber-500" : "bg-rose-500"
-                          )} />
+                            device.status === "ASSIGNED"
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-600 hover:text-white hover:shadow-emerald-200/50"
+                              : device.status === "MAINTENANCE"
+                                ? "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-500 hover:text-white hover:shadow-amber-200/50"
+                                : "bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-600 hover:text-white hover:shadow-rose-200/50",
+                          )}
+                        >
+                          <span
+                            className={cn(
+                              "w-1.5 h-1.5 rounded-full",
+                              device.status === "ASSIGNED"
+                                ? "bg-emerald-500 animate-pulse"
+                                : device.status === "MAINTENANCE"
+                                  ? "bg-amber-500"
+                                  : "bg-rose-500",
+                            )}
+                          />
 
                           {device.status}
                         </Badge>
                       </td>
                       <td className="px-6 py-5 text-right">
-                        <div className={cn(
-                          "inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold border",
-                          device.isActive ? "bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400" : "bg-red-50 text-red-700 border-red-100"
-                        )}>
-                          <div className={cn("h-1.5 w-1.5 rounded-full mr-2", device.isActive ? "bg-green-500 animate-pulse shadow-[0_0_8px_rgba(99,102,241,0.5)]" : "bg-red-500")} />
-                          {device.isActive ? "UPLINK STABLE" : "LINK DISCONNECTED"}
+                        <div
+                          className={cn(
+                            "inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold border",
+                            device.isActive
+                              ? "bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400"
+                              : "bg-red-50 text-red-700 border-red-100",
+                          )}
+                        >
+                          <div
+                            className={cn(
+                              "h-1.5 w-1.5 rounded-full mr-2",
+                              device.isActive
+                                ? "bg-green-500 animate-pulse shadow-[0_0_8px_rgba(99,102,241,0.5)]"
+                                : "bg-red-500",
+                            )}
+                          />
+                          {device.isActive
+                            ? "UPLINK STABLE"
+                            : "LINK DISCONNECTED"}
                         </div>
                       </td>
                     </tr>
@@ -216,8 +263,13 @@ export default function ModeratorDevicePage() {
                   <tr>
                     <td colSpan={5} className="px-6 py-20 text-center">
                       <div className="flex flex-col items-center gap-3 opacity-40">
-                        <ShieldAlert size={48} className="text-slate-300 dark:text-slate-700" />
-                        <p className="text-sm font-bold uppercase tracking-widest text-slate-400">No Hardware Detected</p>
+                        <ShieldAlert
+                          size={48}
+                          className="text-slate-300 dark:text-slate-700"
+                        />
+                        <p className="text-sm font-bold uppercase tracking-widest text-slate-400">
+                          No Hardware Detected
+                        </p>
                       </div>
                     </td>
                   </tr>
@@ -229,7 +281,10 @@ export default function ModeratorDevicePage() {
           {/* Reverted Pagination Footer */}
           <div className="flex items-center justify-between px-6 py-5 bg-slate-50/50 dark:bg-slate-900/80 border-t border-slate-200 dark:border-slate-800">
             <div className="flex items-center gap-2 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
-              Total Units: <span className="text-slate-900 dark:text-white ml-1">{totalCount}</span>
+              Total Units:{" "}
+              <span className="text-slate-900 dark:text-white ml-1">
+                {totalCount}
+              </span>
             </div>
 
             <div className="flex items-center gap-6">
@@ -241,7 +296,7 @@ export default function ModeratorDevicePage() {
                   variant="outline"
                   size="icon"
                   className="h-9 w-9 rounded-xl border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 transition-all"
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
                 >
                   <ChevronLeft className="h-4 w-4" />
@@ -250,7 +305,9 @@ export default function ModeratorDevicePage() {
                   variant="outline"
                   size="icon"
                   className="h-9 w-9 rounded-xl border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 transition-all"
-                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  onClick={() =>
+                    setCurrentPage((p) => Math.min(totalPages, p + 1))
+                  }
                   disabled={currentPage === totalPages || totalPages === 0}
                 >
                   <ChevronRight className="h-4 w-4" />
@@ -261,7 +318,7 @@ export default function ModeratorDevicePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 const TableSkeleton = () => (
@@ -277,10 +334,18 @@ const TableSkeleton = () => (
             </div>
           </div>
         </td>
-        <td className="px-6 py-5"><div className="h-6 w-16 bg-slate-200 dark:bg-slate-800 rounded-lg" /></td>
-        <td className="px-6 py-5"><div className="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded" /></td>
-        <td className="px-6 py-5"><div className="h-6 w-20 bg-slate-200 dark:bg-slate-800 rounded-lg" /></td>
-        <td className="px-6 py-5 text-right"><div className="inline-block h-6 w-24 bg-slate-200 dark:bg-slate-800 rounded-full" /></td>
+        <td className="px-6 py-5">
+          <div className="h-6 w-16 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+        </td>
+        <td className="px-6 py-5">
+          <div className="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded" />
+        </td>
+        <td className="px-6 py-5">
+          <div className="h-6 w-20 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+        </td>
+        <td className="px-6 py-5 text-right">
+          <div className="inline-block h-6 w-24 bg-slate-200 dark:bg-slate-800 rounded-full" />
+        </td>
       </tr>
     ))}
   </>
