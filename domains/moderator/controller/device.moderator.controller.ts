@@ -4,63 +4,78 @@ import { NextResponse } from "next/server";
 import { moderatorGuard } from "@/lib/moderatorAuth";
 
 export class ModeratorDeviceIdControler {
+  private obj = new ModeratorDeviceService();
 
-    private obj = new ModeratorDeviceService();
+  async deviceIdController(
+    req: Request,
+    params: {
+      params: Promise<{ deviceId: string }>;
+    },
+  ) {
+    try {
+      const deviceId = (await params.params).deviceId;
 
-    async deviceIdController(req: Request,
-        params: {
-            params: Promise<{ deviceId: string }>
-        }
-    ) {
-        try {
-            const deviceId = (await params.params).deviceId;
+      const { searchParams } = new URL(req.url);
+      const startDate = searchParams.get("startDate");
 
-            const { searchParams } = new URL(req.url);
-            const startDate = searchParams.get("startDate");
+      if (!deviceId || typeof deviceId !== "string") {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "deviceId is required",
+          },
+          {
+            status: 400,
+          },
+        );
+      }
 
+      await moderatorGuard();
 
-            if (!deviceId || typeof deviceId !== "string") {
-                return NextResponse.json({
-                    success: false,
-                    message: "deviceId is required",
-                }, {
-                    status: 400
-                });
-            }
+      if (!startDate || typeof startDate !== "string") {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "startDate is required (YYYY-MM-DD)",
+          },
+          {
+            status: 400,
+          },
+        );
+      }
 
-            await moderatorGuard();
+      const [data, device, last30Days, latestReading] = await Promise.all([
+        this.obj.getHeatmap(deviceId, startDate),
+        this.obj.getSingleDeviceDetails(deviceId),
+        this.obj.getDailyBasicDashboardStats(deviceId, {
+          type: "custom",
+          dateStr: startDate,
+          day: 30,
+        }),
+        this.obj.getLatestSensorData(deviceId),
+      ]);
 
-            if (!startDate || typeof startDate !== "string") {
-                return NextResponse.json({
-                    success: false,
-                    message: "startDate is required (YYYY-MM-DD)",
-                }, {
-                    status: 400
-                });
-            }
+      if (!latestReading) {
+        return NextResponse.json(
+          {
+            error: true,
+            message: "No Data Found",
+          },
+          {
+            status: 404,
+          },
+        );
+      }
 
-            const [data, device, last30Days, latestReading] = await Promise.all([
-                this.obj.getHeatmap(deviceId, startDate),
-                this.obj.getSingleDeviceDetails(deviceId),
-                this.obj.getDailyBasicDashboardStats(deviceId, {
-                    type: 'custom',
-                    dateStr: startDate,
-                    day: 30
-                }),
-                this.obj.getLatestSensorData(deviceId)
-            ]);
-
-            return NextResponse.json({
-                success: true,
-                device,
-                hourly: data.heatmap,
-                last30Days,
-                latestReading,
-            });
-        } catch (error) {
-            return handleModeratorError(error);
-        }
-
+      return NextResponse.json({
+        success: true,
+        device,
+        hourly: data.heatmap,
+        last30Days,
+        latestReading,
+      });
+    } catch (error) {
+      return handleModeratorError(error);
     }
-
+  }
 }
