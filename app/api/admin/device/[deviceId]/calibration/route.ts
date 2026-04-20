@@ -39,7 +39,7 @@ export async function GET(req: Request,
 
         const nextCursor = logs.length === limit ? logs[logs.length - 1].id : null;
 
-        return NextResponse.json({ items: logs, nextCursor }).headers.set('Cache-Control', 'no-store, max-age=0');
+        return NextResponse.json({ items: logs, nextCursor });
 
     } catch (error: any) {
         return handleAdminError(error);
@@ -132,7 +132,7 @@ export async function POST(req: Request,
                 calibrationId: calibration.id,
             },
             { status: 201 }
-        ).headers.set('Cache-Control', 'no-store, max-age=0');
+        );
 
     } catch (error) {
         return handleAdminError(error);

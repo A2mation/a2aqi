@@ -6,9 +6,8 @@ import { useParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import { Trash2, Plus, Settings2, History, Loader2 } from "lucide-react";
-import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 
-import { cn } from "@/lib/utils";
 import { http } from "@/lib/http";
 import { Input } from "@/components/ui/input";
 import { CalibrationLog } from "@/types/type";
@@ -93,7 +92,6 @@ export default function DynamicCalibrationPage() {
     }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
     const allLogs = data?.pages.flatMap((page) => page.items) || [];
-    console.log(allLogs)
 
     const mutation = useMutation({
         mutationFn: async (values: z.infer<typeof calibrationSchema>) => {

@@ -132,7 +132,7 @@ export default function ModeratorDevicePage() {
         {/* Device Table */}
         <div
           className={cn(
-            "border border-slate-200 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900/50 backdrop-blur-sm overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-none transition-all",
+            "border border-slate-200 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900/50 backdrop-blur-sm shadow-xl shadow-slate-200/50 dark:shadow-none transition-all",
             isPlaceholderData
               ? "opacity-50 pointer-events-none"
               : "opacity-100",
