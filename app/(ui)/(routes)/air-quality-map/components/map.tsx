@@ -14,9 +14,17 @@ import { AirQualityCard } from "./air-quality-card";
 import { getAQIBgColor } from "@/helpers/aqi-color-pallet";
 import { getTemperatureValue } from "@/helpers/temperature-color-pallet";
 
-const MapContainer = dynamic(() => import("react-leaflet").then((m) => m.MapContainer), { ssr: false });
-const TileLayer = dynamic(() => import("react-leaflet").then((m) => m.TileLayer), { ssr: false });
-const Marker = dynamic(() => import("react-leaflet").then((m) => m.Marker), { ssr: false });
+const MapContainer = dynamic(
+  () => import("react-leaflet").then((m) => m.MapContainer),
+  { ssr: false },
+);
+const TileLayer = dynamic(
+  () => import("react-leaflet").then((m) => m.TileLayer),
+  { ssr: false },
+);
+const Marker = dynamic(() => import("react-leaflet").then((m) => m.Marker), {
+  ssr: false,
+});
 
 export type StationData = {
   id: string;
@@ -24,7 +32,7 @@ export type StationData = {
   lng: number;
   aqi: number;
   temperature: number;
-}
+};
 
 function ZoomHandler({ onZoom }: { onZoom: (zoom: number) => void }) {
   const map = useMapEvents({
@@ -33,18 +41,18 @@ function ZoomHandler({ onZoom }: { onZoom: (zoom: number) => void }) {
   return null;
 }
 
-
 const createAqiIcon = (value: number, parameter: string, zoom: number) => {
-  const bgColor = parameter === 'aqi' ? getAQIBgColor(value) : getTemperatureValue(value, "color");
+  const bgColor =
+    parameter === "aqi"
+      ? getAQIBgColor(value)
+      : getTemperatureValue(value, "color");
 
   const showText = zoom >= 8;
 
-  // Sizing logic: 
-  // Zoom < 10: tiny dots 
-  // Zoom >= 10: larger circles 
-  const size = zoom < 8
-    ? Math.max(zoom * 1.1, 6)
-    : Math.min(zoom * 3.5, 45);
+  // Sizing logic:
+  // Zoom < 10: tiny dots
+  // Zoom >= 10: larger circles
+  const size = zoom < 8 ? Math.max(zoom * 1.1, 6) : Math.min(zoom * 3.5, 45);
 
   const blurAmount = zoom < 10 ? "blur-[3px]" : "blur-[2px]";
   const blurOpacity = zoom < 10 ? "opacity-60" : "opacity-40";
@@ -66,14 +74,28 @@ const createAqiIcon = (value: number, parameter: string, zoom: number) => {
   });
 };
 
-export default function Map({ lat, lng }: { lat: number | null; lng: number | null }) {
+export default function Map({
+  lat,
+  lng,
+}: {
+  lat: number | null;
+  lng: number | null;
+}) {
   const [mounted, setMounted] = useState(false);
   const [zoom, setZoom] = useState(8);
-  const [selectedStation, setSelectedStation] = useState<StationData | null>(null);
-  const [targetCoords, setTargetCoords] = useState<[number, number] | null>(null);
+  const [selectedStation, setSelectedStation] = useState<StationData | null>(
+    null,
+  );
+  const [targetCoords, setTargetCoords] = useState<[number, number] | null>(
+    null,
+  );
   const [parameter, setParameter] = useState("aqi");
 
-  const { data: markers = [], isPending, isFetching } = useQuery({
+  const {
+    data: markers = [],
+    isPending,
+    isFetching,
+  } = useQuery({
     queryKey: ["map-aqi-data"],
     queryFn: async () => {
       const res = await http.get("/api/maps/aqi");
@@ -82,7 +104,9 @@ export default function Map({ lat, lng }: { lat: number | null; lng: number | nu
     staleTime: 30000,
   });
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   if (!mounted || lat == null || lng == null) return null;
 
   return (
@@ -97,36 +121,47 @@ export default function Map({ lat, lng }: { lat: number | null; lng: number | nu
 
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-          attribution='&copy; CARTO'
+          attribution="&copy; CARTO"
         />
 
-        {markers?.map((station: any) => (
-          <Marker
-            key={`${station.id}-${zoom}-${parameter}`}
-            position={[station.lat, station.lng]}
-            icon={createAqiIcon(
-              parameter === 'aqi' ? station.aqi : station.temperature,
-              parameter,
-              zoom
-            )}
-            eventHandlers={{ click: () => setSelectedStation(station) }}
-          />
-        ))}
+        {markers?.map(
+          (station: StationData) =>
+            station.lat &&
+            station.lng && (
+              <Marker
+                key={`${station.id}-${zoom}-${parameter}`}
+                position={[station.lat, station.lng]}
+                icon={createAqiIcon(
+                  parameter === "aqi" ? station.aqi : station.temperature,
+                  parameter,
+                  zoom,
+                )}
+                eventHandlers={{ click: () => setSelectedStation(station) }}
+              />
+            ),
+        )}
         <MapFlyController center={targetCoords} />
       </MapContainer>
 
       {/* Overlays */}
       <div className="absolute top-20 right-0 md:right-6 z-40 w-full max-w-80 md:max-w-150 px-4">
-        <MapSearchBar parameter={parameter} setParameter={setParameter} onLocationSelect={(lat, lng) => setTargetCoords([lat, lng])} />
+        <MapSearchBar
+          parameter={parameter}
+          setParameter={setParameter}
+          onLocationSelect={(lat, lng) => setTargetCoords([lat, lng])}
+        />
       </div>
 
-      {
-        selectedStation && <>
+      {selectedStation && (
+        <>
           <div className="fixed inset-x-0 bottom-0 z-10 h-[45vh] md:h-auto md:absolute md:top-24 md:left-6 md:w-95 md:bottom-auto">
-            <AirQualityCard station={selectedStation} onCloseAction={() => setSelectedStation(null)} />
+            <AirQualityCard
+              station={selectedStation}
+              onCloseAction={() => setSelectedStation(null)}
+            />
           </div>
         </>
-      }
+      )}
 
       {(isPending || (isFetching && markers.length === 0)) && (
         <div className="absolute inset-0 z-1001 flex items-center justify-center bg-white/50 backdrop-blur-sm">
