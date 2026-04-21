@@ -35,6 +35,7 @@ const MonitorDeviceAnalyticsPage: React.FC = () => {
     },
     placeholderData: (previousData) => previousData,
     staleTime: 40000,
+    refetchInterval: 40000,
   });
 
   useEffect(() => {

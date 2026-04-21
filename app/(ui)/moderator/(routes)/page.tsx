@@ -70,7 +70,8 @@ export default function ModeratorDevicePage() {
         return response.data;
       },
       placeholderData: (previousData) => previousData,
-      staleTime: 1000 * 60 , // 1 minutes
+      staleTime: 1000 * 60, // 1 minutes
+      refetchInterval: 1000 * 60,
     });
 
   const devices = data?.devices || [];

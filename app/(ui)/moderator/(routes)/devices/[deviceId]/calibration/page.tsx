@@ -97,6 +97,8 @@ export default function DynamicCalibrationPage() {
       },
       initialPageParam: null,
       getNextPageParam: (lastPage) => lastPage.nextCursor,
+      staleTime: 1000 * 60, // 1 min
+      refetchInterval: 1000 * 60,
     });
 
   useEffect(() => {
