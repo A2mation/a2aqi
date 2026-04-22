@@ -1,11 +1,12 @@
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/prisma";
 import { adminGuard } from "@/lib/adminAuth";
 import { handleAdminError } from "@/lib/handleRoleError";
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
 
 export async function GET() {
     try {
@@ -14,9 +15,7 @@ export async function GET() {
 
         const device = await prisma.device.findMany();
 
-        const response = NextResponse.json(device);
-        response.headers.set('Cache-Control', 'no-store, max-age=0');
-        return response;
+        return  NextResponse.json(device);
 
     } catch (error) {
         return handleAdminError(error);
