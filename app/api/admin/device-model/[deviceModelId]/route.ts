@@ -1,11 +1,12 @@
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/prisma"
 import { adminGuard } from "@/lib/adminAuth";
 import { handleAdminError } from "@/lib/handleRoleError";
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
 
 export async function GET(
     req: Request,
@@ -33,9 +34,7 @@ export async function GET(
             return new NextResponse("Device Model not found", { status: 404 });
         }
 
-        const response = NextResponse.json(deviceModel);
-        response.headers.set('Cache-Control', 'no-store, max-age=0');
-        return response;
+        return NextResponse.json(deviceModel);
 
     } catch (err: any) {
         return handleAdminError(err);
@@ -63,7 +62,8 @@ export async function PATCH(
         const {
             name,
             description,
-            isActive
+            isActive,
+            parameters
         } = await req.json();
 
         const updatedDeviceModel = await prisma.deviceModel.update({
@@ -73,7 +73,8 @@ export async function PATCH(
             data: {
                 name,
                 description,
-                isActive
+                isActive,
+                parameters
             }
         })
 

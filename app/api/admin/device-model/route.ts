@@ -32,17 +32,22 @@ export async function POST(request: Request) {
         await adminGuard();
 
 
-        const { name, description, manufacturer } = await request.json();
+        const { name, description, manufacturer, parameters } = await request.json();
 
         if (!name) {
             return new NextResponse("Name and manufacturer are required", { status: 400 });
+        }
+
+        if (!parameters) {
+            return new NextResponse("Only 1 Parameter is required", { status: 400 });
         }
 
         const newDeviceModel = await prisma.deviceModel.create({
             data: {
                 name,
                 description,
-                manufacturer
+                manufacturer,
+                parameters
             },
         });
 
