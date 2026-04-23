@@ -18,7 +18,7 @@ const SingleDeviceModelPage = async ({
 
     const deviceModel = await prisma.deviceModel.findFirst({
         where: {
-            id: deviceModelId == 'new' ? '60530408203d565918dc80e7' : deviceModelId // dummy id for new device model
+            id: deviceModelId == 'new' ? '60530408203d565918dc80e7' : deviceModelId 
         },
         select: {
             id: true,
@@ -26,6 +26,7 @@ const SingleDeviceModelPage = async ({
             description: true,
             manufacturer: true,
             isActive: true,
+            parameters: true,
             createdAt: true,
         }
     });

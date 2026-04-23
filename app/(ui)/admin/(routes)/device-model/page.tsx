@@ -27,7 +27,7 @@ const DeviceModelPage = async () => {
 
     return (
         <section className='flex-col'>
-            <div className='flex-1 space-y-4 p-8 pt-6'>
+            <div className='flex-1 space-y-4 p-8 pt-6 animate-in fade-in slide-in-from-right-1'>
                 <DeviceModelClient data={formattedDeviceModel} />
             </div>
         </section>

@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 
 import { CellAction } from "./cell-action"
+import { Badge } from "@/components/ui/badge"
 
 
 export type DeviceModelColumn
@@ -32,6 +33,11 @@ export const columns: ColumnDef<DeviceModelColumn>[] = [
     {
         accessorKey: "isActive",
         header: "Status",
+        cell: ({ row }) => (
+            <Badge variant={row.original.isActive ? "success" : "destructive"}>
+                {row.original.isActive ? "Active" : "Disabled"}
+            </Badge>
+        )
     },
     {
         accessorKey: "createdAt",
