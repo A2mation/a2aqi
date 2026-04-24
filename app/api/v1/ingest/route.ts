@@ -37,7 +37,7 @@ export async function POST(req: Request) {
         }
 
         // Store raw + push queue job
-        const raw = await ingestSensorData(payload, device.id);
+        const raw = await ingestSensorData(payload, device.id, device);
 
         return NextResponse.json({
             message: "Raw saved and job queued",
