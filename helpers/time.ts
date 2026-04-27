@@ -49,6 +49,31 @@ export function getTodayWindow() {
 }
 
 
+export function getCustomdayWindow(date: string) {
+    const cusDate = new Date(date)
+
+    // Build IST midnight
+    const istOffsetMinutes = 5 * 60 + 30
+
+    const utcYear = cusDate.getUTCFullYear()
+    const utcMonth = cusDate.getUTCMonth()
+    const utcDate = cusDate.getUTCDate()
+
+    // Start: 00:00:01 IST
+    const startOfToday = new Date(
+        Date.UTC(utcYear, utcMonth, utcDate, 0, 0, 1)
+    )
+    startOfToday.setUTCMinutes(startOfToday.getUTCMinutes() - istOffsetMinutes)
+
+    // End: 23:59:59 IST
+    const endOfToday = new Date(
+        Date.UTC(utcYear, utcMonth, utcDate, 23, 59, 59, 999)
+    )
+    endOfToday.setUTCMinutes(endOfToday.getUTCMinutes() - istOffsetMinutes)
+
+    return { startOfToday, endOfToday }
+}
+
 
 export function adjustTemperature(baseTemp: number | null) {
     if (baseTemp === null) return null
