@@ -4,6 +4,7 @@ import {
     EditorContent,
     useEditor,
 } from "@tiptap/react"
+import toast from "react-hot-toast"
 import StarterKit from "@tiptap/starter-kit"
 import { Bold, Code2Icon, Italic, LucideIcon, Redo2Icon, RemoveFormattingIcon, SpellCheckIcon, UnderlineIcon, Undo2Icon } from "lucide-react"
 import Image from '@tiptap/extension-image'
@@ -22,6 +23,7 @@ import { useEditorStore } from "@/store/use-editor-store"
 import { ListButton } from "./tools/Listbutton"
 import { FontSizeButton } from "./tools/FontSizeButton"
 import { ImageButton } from "./tools/ImageButton"
+import { http } from "@/lib/http"
 
 interface BlogEditorProps {
     value: string
@@ -32,6 +34,30 @@ const BlogEditor = ({ value, onChange }: BlogEditorProps) => {
     const {
         setEditor,
     } = useEditorStore();
+
+    const uploadAndInsertImage = async (file: File, view: any) => {
+        const toastId = toast.loading("Uploading image...");
+
+        try {
+            const buffer = Buffer.from(await file.arrayBuffer());
+            const base64String = `data:${file.type};base64,${buffer.toString("base64")}`;
+
+            const res = await http.post("/api/blog/upload", {
+                image: base64String
+            });
+
+            const { url } = res.data;
+            const { schema } = view.state;
+            const node = schema.nodes.image.create({ src: url });
+            const transaction = view.state.tr.replaceSelectionWith(node);
+            view.dispatch(transaction);
+
+            toast.success("Image uploaded!", { id: toastId });
+        } catch (error) {
+            console.error("Upload failed:", error);
+            toast.error("Failed to upload image.", { id: toastId });
+        }
+    };
 
     const editor = useEditor({
         immediatelyRender: false,
@@ -51,7 +77,7 @@ const BlogEditor = ({ value, onChange }: BlogEditorProps) => {
             Image,
             ImageResize,
             Underline,
-            
+
         ],
         content: value,
         onUpdate({ editor }) {
@@ -84,6 +110,24 @@ const BlogEditor = ({ value, onChange }: BlogEditorProps) => {
             attributes: {
                 class:
                     "prose max-w-none min-h-[40dvh] p-4 focus:outline-none",
+            },
+            handleDrop: (view, event, slice, moved) => {
+                if (!moved && event.dataTransfer?.files.length) {
+                    const file = event.dataTransfer.files[0];
+                    if (file.type.startsWith("image/")) {
+                        uploadAndInsertImage(file, view);
+                        return true;
+                    }
+                }
+                return false;
+            },
+            handlePaste: (view, event) => {
+                const file = event.clipboardData?.files[0];
+                if (file && file.type.startsWith("image/")) {
+                    uploadAndInsertImage(file, view);
+                    return true;
+                }
+                return false;
             },
         },
     })
