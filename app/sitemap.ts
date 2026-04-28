@@ -102,7 +102,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const dbLocations = await prisma.searchBasedLocation.findMany({
         select: {
-            slug: true,  
+            slug: true,
             city: true,
             state: true,
             country: true,
@@ -162,7 +162,50 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     streetSet.forEach(path => {
         urls.push({ url: `${BASE_URL}/dashboard/${path}`, lastModified: new Date(), changeFrequency: "hourly", priority: 1.0 });
     });
-    
+
+
+    // -------------------------
+    // BLOGS
+    // -------------------------
+
+    urls.push({
+        url: `${BASE_URL}/blogs`,
+        lastModified: new Date(),
+        changeFrequency: "daily",
+        priority: 0.9,
+    });
+
+
+    const blogs = await prisma.blogPost.findMany({
+        select: {
+            id: true,
+            title: true,
+            updatedAt: true,
+            author: {
+                select: {
+                    username: true,
+                },
+            },
+        },
+    });
+
+    blogs.forEach((blog) => {
+        const titleSlug = blog.title
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "");
+        const authorSlug = blog.author.username;
+
+        const fullSlug = `${titleSlug}-${blog.id}`;
+
+        urls.push({
+            url: `${BASE_URL}/blogs/${authorSlug}/${fullSlug}`,
+            lastModified: blog.updatedAt || new Date(),
+            changeFrequency: "weekly",
+            priority: 0.7,
+        });
+    });
+
 
     return urls;
 }

@@ -118,7 +118,7 @@ const SingleBlogPage = ({
 
           {/* Article Card */}
           <main className="flex-1">
-            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-slate-100 dark:border-slate-800 overflow-hidden">
+            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-slate-100 dark:border-slate-800">
 
               <div className="px-8 py-6 border-b border-slate-50 dark:border-slate-800">
                 <Header
@@ -131,7 +131,7 @@ const SingleBlogPage = ({
                 />
               </div>
 
-              <div className="px-8 py-12 md:px-16 md:py-20">
+              <div className="px-8 py-1 md:px-16 md:pb-20 md:pt-1">
                 <article className="prose prose-lg prose-slate dark:prose-invert max-w-none 
                   prose-headings:tracking-tight prose-headings:font-bold 
                   prose-p:leading-relaxed prose-p:text-slate-600 dark:prose-p:text-slate-300
