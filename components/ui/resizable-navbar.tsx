@@ -237,7 +237,7 @@ export const NavbarLogo = () => {
 
     <Link
       href={"/"}
-      className="h-full pr-2"
+      className="h-full pr-2 transition-transform hover:scale-105 active:scale-95"
     >
       <Image
         src={"/favicon.png"}
