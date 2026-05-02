@@ -6,6 +6,7 @@ import toast from 'react-hot-toast'
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { motion, AnimatePresence } from "framer-motion"
+import imageCompression from 'browser-image-compression';
 
 import { Button } from "@/components/ui/button"
 import {
@@ -27,6 +28,8 @@ import {
     InputOTPSeparator,
 } from "@/components/ui/input-otp"
 import { vendorFormSchema } from '@/lib/validation/vendor/Vendor.registration.schema'
+import { convertToBase64 } from "@/utils/converters"
+import { http } from "@/lib/http"
 
 
 const VendorRegistrationPage = () => {
@@ -45,11 +48,42 @@ const VendorRegistrationPage = () => {
         },
     })
 
-    // Handle initial registration click
-    function onRegisterInitiate(values: z.infer<typeof vendorFormSchema>) {
-        console.log("Details captured:", values);
-        // Simulate sending OTP
-        setStep('otp');
+    async function onRegisterInitiate(values: z.infer<typeof vendorFormSchema>) {
+        const toastId = toast.loading('Processing registration...');
+        try {
+            const imageFile = values.gstCertificate[0];
+
+            const options = {
+                maxSizeMB: 1,
+                maxWidthOrHeight: 1920,
+                useWebWorker: true,
+            };
+
+
+            const compressedFile = await imageCompression(imageFile, options);
+
+            const base64String = await convertToBase64(compressedFile);
+
+            const finalPayload = {
+                ...values,
+                gstCertificate: base64String,
+            };
+
+            // console.log("Details captured with Base64:", finalPayload);
+            toast.loading('Sending details...', { id: toastId });
+            const res = await http.post('/api/vendor/auth/register', finalPayload);
+            if (res.data.error) {
+                throw new Error(res.data.message || 'Something Went Wrong.');
+            }
+
+            toast.success('Verification mail sent!', { id: toastId });
+            setStep('otp');
+
+        } catch (error) {
+            // console.error("Compression/Conversion error:", error);
+            const errorMessage = error instanceof Error ? error.message : 'Error occurred in file upload.';
+            toast.error(errorMessage, { id: toastId });
+        }
     }
 
     // Handle final OTP verification
