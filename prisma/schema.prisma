@@ -142,7 +142,7 @@ enum MonitorStatus {
   DELETED
 }
 
-enum VendorStatus {
+enum AdminStatus {
   ACTIVE
   INACTIVE
   BANNED
@@ -232,7 +232,8 @@ model Admin {
   address     String?
   password    String
 
-  role AdminRole @default(MODERATOR)
+  role   AdminRole   @default(MODERATOR)
+  status AdminStatus @default(PENDING)
 
   gstNumber      String?
   gstCertificate String?
