@@ -3,7 +3,7 @@
 import * as z from "zod";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { Eye, EyeOff, User } from "lucide-react";
+import { Eye, EyeOff, UserPlus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -74,7 +74,7 @@ export const VendorUserForm = () => {
                 <Heading
                     title="Register New User"
                     description="Create a new user account under your vendor profile"
-                    Icon={User}
+                    Icon={UserPlus}
                 />
             </div>
             <Separator />

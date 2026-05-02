@@ -10,11 +10,13 @@ const VendorLayout = async ({
 
     return (
         <>
-            <section>
-                <VendorNavbar />
-                {children}
-                <Footer />
+            <VendorNavbar />
+            <section className='bg-[#fafafa]/50'>
+                <div className='mx-auto max-w-7xl'>
+                    {children}
+                </div>
             </section >
+            <Footer />
         </>
     )
 }
