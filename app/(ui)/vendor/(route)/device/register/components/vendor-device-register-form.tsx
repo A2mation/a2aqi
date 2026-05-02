@@ -1,15 +1,13 @@
 "use client";
 
 import * as z from "zod";
+import { toast } from 'react-hot-toast';
 import { useForm } from "react-hook-form";
+import { ChevronsUpDown, Check } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { useParams, useRouter } from "next/navigation";
-import { ChevronsUpDown, Check } from "lucide-react";
-import { toast } from 'react-hot-toast';
 
-import { http } from "@/lib/http";
-import { Button } from "@/components/ui/button";
 import {
     Form,
     FormControl,
@@ -19,7 +17,6 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import {
     Select,
     SelectContent,
@@ -40,6 +37,9 @@ import {
     CommandItem,
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
+import { http } from "@/lib/http";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { DeviceStatus, vendorDeviceFormSchema } from "@/lib/validation/vendor/vendor.device.registration.schema";
 
 
@@ -53,11 +53,10 @@ export const DeviceForm = () => {
     const router = useRouter();
     const queryClient = useQueryClient();
 
-    const title = "Register device";
     const toastMessage = "Device registered.";
     const action = "Register";
 
-    // TODO: NEED to aDD the URLS
+    // TODO: NEED to add the URLS
     const { data: deviceModels = [] } = useQuery({
         queryKey: ["device-models"],
         queryFn: async () => {
@@ -80,7 +79,7 @@ export const DeviceForm = () => {
         }
     });
 
-    const form = useForm<DeviceFormValues>({
+    const form = useForm < DeviceFormValues > ({
         resolver: zodResolver(vendorDeviceFormSchema) as any,
         defaultValues: {
             name: "",
@@ -110,7 +109,7 @@ export const DeviceForm = () => {
     const onSubmit = (data: DeviceFormValues) => {
         saveDevice(data);
     };
-    console.log(deviceModels)
+
     return (
         <section className="mt-10">
             <Form {...form}>
