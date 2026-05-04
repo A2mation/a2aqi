@@ -11,7 +11,7 @@ export const sendMailWithOTP = {
 
         const [_, mailResponse] = await Promise.all([
             // Save to Redis (5 mins TTL)
-            redis.set(redisKey, '1', "EX", 300),
+            redis.set(redisKey, email, "EX", 300),
 
             // Send Email via Resend
             vendorRegistrationOtpSender(email, otpString)

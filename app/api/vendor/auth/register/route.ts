@@ -6,6 +6,7 @@ import cloudinary from "@/lib/cloudinary";
 import { vendorKey } from "@/constant/vendor.key";
 import { backendVendorSchema } from "@/lib/validation/vendor/Vendor.registration.schema";
 import { sendMailWithOTP } from "@/services/sendMailWithOTP";
+import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
     try {
@@ -46,9 +47,11 @@ export async function POST(req: Request) {
         const uploadResponse = await cloudinary.uploader.upload(result.data.gstCertificate, {
             folder: 'gst_certificates',
         });
-
+        
+        const hashedPassword = await bcrypt.hash(result.data.password, 10);
         const stagingData = {
             ...result.data,
+            password: hashedPassword,
             gstCertificate: uploadResponse.secure_url,
             gstPublicId: uploadResponse.public_id
         };

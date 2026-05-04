@@ -3,6 +3,7 @@
 import * as z from "zod"
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { motion, AnimatePresence } from "framer-motion"
@@ -33,6 +34,7 @@ import { http } from "@/lib/http"
 
 
 const VendorRegistrationPage = () => {
+    const router = useRouter();
     const [step, setStep] = useState < 'details' | 'otp' > ('details');
     const [isVerifying, setIsVerifying] = useState(false);
 
@@ -42,6 +44,7 @@ const VendorRegistrationPage = () => {
             vendorName: "",
             mobileNumber: "",
             email: "",
+            password: '',
             address: "",
             gstNumber: "",
             agreeTerms: false,
@@ -70,9 +73,9 @@ const VendorRegistrationPage = () => {
             };
 
             // console.log("Details captured with Base64:", finalPayload);
-            toast.loading('Sending details...', { id: toastId });
+            toast.loading('Sending otp details...', { id: toastId });
             const res = await http.post('/api/vendor/auth/register', finalPayload);
-            if (res.data.error) {
+            if (res.data.error || res.status !== 200) {
                 throw new Error(res.data.message || 'Something Went Wrong.');
             }
 
@@ -86,15 +89,35 @@ const VendorRegistrationPage = () => {
         }
     }
 
-    // Handle final OTP verification
-    function onOtpComplete(otp: string) {
+    // Handle OTP verification
+    async function onOtpComplete(otp: string) {
         setIsVerifying(true);
-        console.log("Verifying OTP:", otp);
-        // Simulate API call
-        setTimeout(() => {
+        const toastId = toast.loading('Verifying OTP...');
+
+        try {
+            const email = form.getValues("email");
+
+            const res = await http.post('/api/vendor/auth/verify-otp', {
+                otp,
+                email
+            });
+
+            if (res.data.error) {
+                throw new Error(res.data.message || 'Verification failed');
+            }
+
+            // 3. Success handling
+            toast.success("Registration successfully completed!", { id: toastId });
+
+            router.push('/vendor/profile');
+
+        } catch (error: any) {
+            console.error("OTP Verification Error:", error);
+            const errorMessage = error.response?.data?.message || error.message || 'Invalid OTP';
+            toast.error(errorMessage, { id: toastId });
+        } finally {
             setIsVerifying(false);
-            toast.success("Registration successfully completed!");
-        }, 2000);
+        }
     }
 
     return (
@@ -153,6 +176,17 @@ const VendorRegistrationPage = () => {
                                                     <FormItem>
                                                         <FormLabel className="font-semibold">Vendor Email ID</FormLabel>
                                                         <FormControl><Input placeholder="email@business.com" {...field} className="bg-slate-50" /></FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="password"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel className="font-semibold">Vendor password</FormLabel>
+                                                        <FormControl><Input placeholder="*****" {...field} className="bg-slate-50" /></FormControl>
                                                         <FormMessage />
                                                     </FormItem>
                                                 )}
