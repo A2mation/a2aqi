@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import cloudinary from "@/lib/cloudinary";
 import { vendorKey } from "@/constant/vendor.key";
 import { backendVendorSchema } from "@/lib/validation/vendor/Vendor.registration.schema";
+import { sendMailWithOTP } from "@/services/sendMailWithOTP";
 
 export async function POST(req: Request) {
     try {
@@ -52,10 +53,15 @@ export async function POST(req: Request) {
             gstPublicId: uploadResponse.public_id
         };
 
-        // SAVE TO REDIS: 5-minute TTL
-        await redis.set(redisKey, JSON.stringify(stagingData), "EX", 300);
+        await Promise.all([
+            //  Save to Redis with 5-min TTL (300 seconds)
+            redis.set(redisKey, JSON.stringify(stagingData), "EX", 300),
 
-        // TODO: Trigger OTP Service (e.g., sendMailWithOTP(email))
+            // Trigger Resend OTP Service
+            sendMailWithOTP.vendorRegistrationOTP({
+                email,
+            })
+        ]);
 
         return NextResponse.json({
             success: true,

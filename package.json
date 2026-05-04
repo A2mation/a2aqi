@@ -10,7 +10,8 @@
     "postinstall": "prisma generate",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "dev:email": "email dev"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1000.0",
@@ -29,6 +30,7 @@
     "@radix-ui/react-separator": "^1.1.8",
     "@radix-ui/react-slot": "^1.2.4",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@react-email/components": "^1.0.12",
     "@react-pdf/renderer": "^4.3.2",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.0.0-alpha.8",
@@ -76,6 +78,7 @@
     "react-leaflet": "^5.0.0",
     "react-share": "^5.2.2",
     "recharts": "^2.15.4",
+    "resend": "^6.12.2",
     "styled-components": "^6.3.8",
     "tailwind-merge": "^3.4.0",
     "three": "^0.182.0",
@@ -87,6 +90,7 @@
     "zustand": "^5.0.9"
   },
   "devDependencies": {
+    "@react-email/ui": "^6.0.5",
     "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.19",
     "@types/cookie": "^0.6.0",
@@ -102,6 +106,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "prisma": "6.3.0",
+    "react-email": "^6.0.5",
     "tailwind-scrollbar": "^4.0.2",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
