@@ -68,6 +68,11 @@ const MainNav = ({
             active: pathName.startsWith(`/admin/moderators`)
         },
         {
+            href: `/admin/vendors`,
+            label: 'Vendor',
+            active: pathName.startsWith(`/admin/vendors`)
+        },
+        {
             href: `/admin/settings`,
             label: 'Settings',
             active: pathName.startsWith(`/admin/settings`)

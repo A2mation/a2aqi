@@ -6,8 +6,12 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'www.shutterstock.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
     ],
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;
