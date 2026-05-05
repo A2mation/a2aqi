@@ -41,7 +41,8 @@ export function Unauthorized({
                                 type === ROLE.WRITER ? '/blogs/sign-in' :
                                     type === ROLE.MONITOR ? '/monitor/sign-in' :
                                         type === ROLE.MODERATOR ? '/moderator/sign-in' :
-                                            '/user/sign-in'
+                                            type === ROLE.VENDOR ? '/vendor/login' :
+                                                '/user/sign-in'
                         }>Return to Login</Link>
                     </Button>
                 </div>

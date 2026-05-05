@@ -6,6 +6,7 @@ export enum ROLE {
   USER = "USER",
   MONITOR = "MONITOR",
   MODERATOR = "MODERATOR",
+  VENDOR = "VENDOR"
 }
 
 export interface Author {

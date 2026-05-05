@@ -69,6 +69,30 @@ export const authOptions: NextAuthOptions = {
         }),
 
 
+        // 🔐 VENDOR
+        Credentials({
+            id: "vendor",
+            name: "Vendors Login",
+            credentials: { email: {}, password: {} },
+            async authorize(credentials) {
+                
+                try {
+                    if (!credentials?.email || !credentials?.password) return null;
+
+                    const res = await http.post("api/vendor/auth/login", credentials);
+
+                    if (res.status === 200 && res.data) {
+                        return res.data;
+                    }
+                    
+                    throw new Error(res.data?.message || "Invalid email or password");
+                } catch (error: any) {
+                    throw new Error(error.response?.data?.message || error.message || "Authentication failed");
+                }
+            },
+        }),
+
+
         // 🖥️ Monitor
         Credentials({
             id: "monitor",

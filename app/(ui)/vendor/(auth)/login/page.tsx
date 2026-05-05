@@ -2,8 +2,12 @@
 
 import * as z from "zod"
 import Link from "next/link"
+import { useState } from "react"
+import toast from "react-hot-toast"
 import { motion } from "framer-motion"
+import { signIn } from "next-auth/react"
 import { useForm } from "react-hook-form"
+import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import {
@@ -22,6 +26,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 
 
 const VendorLoginPage = () => {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
   const form = useForm < z.infer < typeof vendorLoginSchema >> ({
     resolver: zodResolver(vendorLoginSchema),
     defaultValues: {
@@ -30,8 +37,32 @@ const VendorLoginPage = () => {
     },
   })
 
-  function onSubmit(values: z.infer<typeof vendorLoginSchema>) {
-    console.log("Logging in with:", values)
+  async function onSubmit(values: z.infer<typeof vendorLoginSchema>) {
+    const toastId = toast.loading(
+      "Signing in..."
+    );
+    try {
+      setLoading(true);
+      form.reset();
+
+      const res = await signIn("vendor", {
+        ...values,
+        redirect: false
+      })
+      if (res?.error) {
+        toast.error(res.error, { id: toastId });
+        return;
+      }
+
+      toast.success(`Welcome back users 👋`, { id: toastId });
+      router.push("/vendor/users");
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.message || "Something went wrong";
+      toast.error(message, { id: toastId });
+    } finally {
+      setLoading(false);
+    }
   }
 
   // Animation Variants
@@ -93,6 +124,7 @@ const VendorLoginPage = () => {
                             placeholder="name@company.com"
                             {...field}
                             className="bg-slate-50 h-11 focus-visible:ring-blue-500 transition-all border-slate-200"
+                            disabled={loading}
                           />
                         </FormControl>
                         <FormMessage />
@@ -110,7 +142,7 @@ const VendorLoginPage = () => {
                       <FormItem>
                         <div className="flex items-center justify-between">
                           <FormLabel className="font-semibold text-slate-700">Password</FormLabel>
-                          <Button variant="link" className="px-0 font-normal text-xs text-blue-600 h-auto hover:text-blue-700 transition-colors">
+                          <Button variant="link" className="px-0 font-normal text-xs text-blue-600 h-auto hover:text-blue-700 transition-colors" disabled={loading}>
                             Forgot password?
                           </Button>
                         </div>
@@ -120,6 +152,7 @@ const VendorLoginPage = () => {
                             placeholder="••••••••"
                             {...field}
                             className="bg-slate-50 h-11 focus-visible:ring-blue-500 transition-all border-slate-200"
+                            disabled={loading}
                           />
                         </FormControl>
                         <FormMessage />
@@ -132,6 +165,7 @@ const VendorLoginPage = () => {
                   <Button
                     type="submit"
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-11 mt-2 transition-all shadow-md active:scale-[0.98] focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+                    disabled={loading}
                   >
                     Sign In
                   </Button>

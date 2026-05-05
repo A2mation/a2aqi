@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+
 import { ROLE } from "./types/type";
 
 export async function proxy(req: NextRequest) {
@@ -10,12 +11,14 @@ export async function proxy(req: NextRequest) {
 
     const { pathname } = req.nextUrl;
 
-    // Public admin sign-in
+    // Public sign-in & registers
     if (
         pathname === "/admin/sign-in" ||
         pathname === "/admin-unauthorized" ||
         pathname === "/monitor/sign-in" ||
-        pathname === "/moderator/sign-in"
+        pathname === "/moderator/sign-in" ||
+        pathname === '/vendor/login' ||
+        pathname === '/vendor/register'
     ) {
         return NextResponse.next();
     }
@@ -36,6 +39,10 @@ export async function proxy(req: NextRequest) {
 
         if (pathname.startsWith("/moderator")) {
             return NextResponse.redirect(new URL("/moderator/sign-in", req.url));
+        }
+
+        if (pathname.startsWith("/vendor")) {
+            return NextResponse.redirect(new URL("/vendor/login", req.url));
         }
     }
 
@@ -59,8 +66,13 @@ export async function proxy(req: NextRequest) {
         return NextResponse.redirect(new URL("/moderator-unauthorized", req.url));
     }
 
+    // VENDOR-only
+    if (pathname.startsWith("/vendor") && token?.role !== ROLE.VENDOR) {
+        return NextResponse.redirect(new URL("/vendor-unauthorized", req.url));
+    }
+
     return NextResponse.next();
 }
 export const config = {
-    matcher: ["/blogs/write", "/admin/:path*", "/monitor/:path*",  "/moderator/:path*"]
+    matcher: ["/blogs/write", "/admin/:path*", "/monitor/:path*", "/moderator/:path*", "/vendor/:path*"]
 }
