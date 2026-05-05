@@ -95,16 +95,17 @@ export const VendorForm = ({ initialData }: VendorFormProps) => {
     const onDelete = async () => {
         try {
             setLoading(true);
-            const res = await http.delete(`/api/admin/vendors/${params.vendorId}`);
+            // const res = await http.delete(`/api/admin/vendors/${params.vendorId}`);
 
-            if (res.status == 200 && !res.data.error) {
-                router.push('/admin/vendors');
-                router.refresh();
-                toast.success("Vendor account deleted.");
-            }
+            // if (res.status == 200 && !res.data.error) {
+            //     router.push('/admin/vendors');
+            //     toast.success("Vendor account deleted.");
+            //     router.refresh();
+            // }
 
-            toast.error(res.data.message || "Cannot alter the details");
-            throw new Error(res.data.message || "Cannot alter the details");
+            // toast.error(res.data.message || "Cannot alter the details");
+            // throw new Error(res.data.message || "Cannot alter the details");
+            toast.error("Vendor Delete Feature Not Available");
 
         } catch (error) {
             toast.error("An error occurred while deleting the vendor.");

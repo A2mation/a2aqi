@@ -1,3 +1,4 @@
+import { AdminStatus } from "@prisma/client";
 import * as z from "zod"
 
 export const MAX_FILE_SIZE = 5000000;
@@ -60,6 +61,6 @@ export const VendorEditFormSchema = z.object({
     address: z.string().optional().nullable(),
     gstNumber: z.string().optional().nullable(),
     gstCertificate: z.string().optional().nullable(),
-    status: z.string().min(1),
+    status: z.enum(AdminStatus),
     password: z.string().min(6).optional().or(z.literal('')),
 });

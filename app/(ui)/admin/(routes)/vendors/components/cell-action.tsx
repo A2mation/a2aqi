@@ -15,11 +15,10 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button";
 import AlertModal from "@/components/modals/alert-modal";
-import { http } from "@/lib/http";
 import { VendorColumn } from "./columns";
 
 interface CellActionProps {
-    data: VendorColumn; // Updated type
+    data: VendorColumn; 
 }
 
 export const CellAction = ({ data }: CellActionProps) => {
@@ -37,17 +36,17 @@ export const CellAction = ({ data }: CellActionProps) => {
         try {
             setLoading(true);
 
-            const res = await http.delete(`/api/admin/vendors/${data.id}`);
+            // const res = await http.delete(`/api/admin/vendors/${params.vendorId}`);
 
-            if (res.status === 200) {
-                toast.success("Vendor deleted successfully");
-                router.refresh();
-            }
-            else if (res.status === 401) {
-                toast.error("Unauthorized action");
-            } else {
-                toast.error(res.data?.message || "Something went wrong");
-            }
+            // if (res.status == 200 && !res.data.error) {
+            //     router.push('/admin/vendors');
+            //     toast.success("Vendor account deleted.");
+            //     router.refresh();
+            // }
+
+            // toast.error(res.data.message || "Cannot alter the details");
+            // throw new Error(res.data.message || "Cannot alter the details");
+            toast.error("Vendor Delete Feature Not Available");
 
         } catch (error: any) {
             toast.error("Unexpected error occurred while deleting the vendor");
