@@ -28,8 +28,8 @@ const DevicePage = async () => {
         status: item.status,
         model: item.model?.name ?? "N/A",
         user: item.user?.name ?? "Not Assigned",
-        assignedAt: item.assignedAt ? format(item.assignedAt, "MMMM do yyyy") : "Not Assigned",
-        createdAt: format(item.createdAt, "MMMM do yyyy"),
+        assignedAt: item.assignedAt ? item.assignedAt : null,
+        createdAt: item.createdAt,
     }));
 
     return (
