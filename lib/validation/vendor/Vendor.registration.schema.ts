@@ -7,7 +7,7 @@ export const vendorFormSchema = z.object({
     vendorName: z.string().min(2, "Name must be at least 2 characters"),
     mobileNumber: z.string().regex(/^[0-9]{10}$/, "Invalid mobile number (10 digits required)"),
     email: z.email("Invalid email address"),
-    password: z.string().min(5,"Minimum 5 characters needed"),
+    password: z.string().min(5, "Minimum 5 characters needed"),
     address: z.string().min(5, "Address is too short"),
     gstNumber: z.string().length(15, "GST Number must be 15 characters"),
     gstCertificate: z
@@ -33,7 +33,7 @@ export const backendVendorSchema = z.object({
     vendorName: z.string().min(2, "Name must be at least 2 characters"),
     mobileNumber: z.string().regex(/^[0-9]{10}$/, "Invalid mobile number"),
     email: z.string().email("Invalid email address"),
-    password: z.string().min(5,"Minimum 5 characters needed"),
+    password: z.string().min(5, "Minimum 5 characters needed"),
     address: z.string().min(5, "Address is too short"),
     gstNumber: z.string().length(15, "GST Number must be 15 characters"),
     // Validating the Base64 String
@@ -50,4 +50,16 @@ export const backendVendorSchema = z.object({
     agreeTerms: z.boolean().refine((val) => val === true, {
         message: "You must agree to the terms",
     }),
+});
+
+
+export const VendorEditFormSchema = z.object({
+    name: z.string().min(1, "Name is required"),
+    email: z.email("Invalid email address"),
+    phoneNumber: z.string().optional().nullable(),
+    address: z.string().optional().nullable(),
+    gstNumber: z.string().optional().nullable(),
+    gstCertificate: z.string().optional().nullable(),
+    status: z.string().min(1),
+    password: z.string().min(6).optional().or(z.literal('')),
 });

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { redis } from "@/lib/redis";
 import { NextResponse } from "next/server";
 
 function isNewDay(lastReset: Date) {
@@ -10,8 +11,23 @@ function isNewDay(lastReset: Date) {
     );
 }
 
-export async function POST() {
+export async function POST(request: Request) {
     try {
+
+        const ip = request.headers.get("x-forwarded-for") || "anonymous";
+        const ratelimitKey = `ratelimit:views:${ip}`;
+
+        const currentRequests = await redis.incr(ratelimitKey);
+        
+        if (currentRequests === 1) {
+            await redis.expire(ratelimitKey, 300); // 5mins
+        }
+
+        if (currentRequests > 1) {
+            return new NextResponse("Rate limit exceeded. Try again in 1 minute.", { 
+                status: 429 
+            });
+        }
 
         const stats = await prisma.siteStats.findUnique({
             where: { id: "views" },
@@ -49,8 +65,8 @@ export async function POST() {
         const updated = await prisma.siteStats.update({
             where: { id: "views" },
             data: {
-                totalViews: { increment: 1 },
-                dailyViews: { increment: 1 },
+                totalViews: { increment: 10 },
+                dailyViews: { increment: 10 },
             },
         });
 

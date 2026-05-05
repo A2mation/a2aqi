@@ -76,6 +76,7 @@
     "react-hot-toast": "^2.6.0",
     "react-intersection-observer": "^10.0.3",
     "react-leaflet": "^5.0.0",
+    "react-quick-pinch-zoom": "^5.1.1",
     "react-share": "^5.2.2",
     "recharts": "^2.15.4",
     "resend": "^6.12.2",
