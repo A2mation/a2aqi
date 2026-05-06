@@ -20,28 +20,36 @@ export async function POST(req: Request) {
                 name: true,
                 email: true,
                 password: true,
-                authProvider: true
+                authProvider: true,
+                status: true
             }
         });
         // console.log(user)
 
         if (!user) {
             return NextResponse.json(
-                { message: "Invalid credentials" },
+                { message: "Invalid credentials", error: true },
+                { status: 401 }
+            );
+        }
+
+        if (user.status !== 'APPROVED') {
+            return NextResponse.json(
+                { message: "You are not authorized for Login.", error: true, reason: user.status.toLowerCase() },
                 { status: 401 }
             );
         }
 
         if (user.authProvider !== AuthProvider.LOCAL) {
             return NextResponse.json(
-                { message: "Please login using Google" },
+                { message: "Please login using Google", error: true },
                 { status: 400 }
             );
         }
 
         if (!user.password) {
             return NextResponse.json(
-                { message: "Invalid credentials" },
+                { message: "Invalid credentials", error: true },
                 { status: 401 }
             );
         }
@@ -55,7 +63,6 @@ export async function POST(req: Request) {
         }
 
         const token = signAdminToken(user.id, user.email);
-        console.log(token)
 
         return NextResponse.json({
             id: user.id,
