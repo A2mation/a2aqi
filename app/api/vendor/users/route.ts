@@ -77,6 +77,16 @@ export async function POST(req: Request) {
     try {
         const { vendor } = await vendorGuard();
 
+        if (vendor.status !== 'ACTIVE') {
+            return NextResponse.json(
+                {
+                    message: "Your are Not authorized to do this Operatin",
+                    error: true
+                },
+                { status: 401 }
+            );
+        }
+
         const body = await req.json();
 
         const validation = userRegisterFormSchema.safeParse(body);
@@ -85,7 +95,7 @@ export async function POST(req: Request) {
             return NextResponse.json(
                 {
                     message: "Invalid fields",
-                    errors: validation.error
+                    error: validation.error
                 },
                 { status: 400 }
             );
