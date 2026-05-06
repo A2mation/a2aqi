@@ -189,8 +189,8 @@ model User {
   organizationName String?
   gstNumber        String?
 
-  comments  Comment[]
-  devices   Device[]
+  comments Comment[]
+  devices  Device[]
 
   creatorId String? @db.ObjectId
 
@@ -206,9 +206,10 @@ model User {
   exportLogs          ExportLog[]
   invoices            Invoice[]
 
-  
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([creatorId])
 }
 
 model Address {
