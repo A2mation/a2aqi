@@ -18,14 +18,14 @@ export async function POST(request: Request) {
         const ratelimitKey = `ratelimit:views:${ip}`;
 
         const currentRequests = await redis.incr(ratelimitKey);
-        
+
         if (currentRequests === 1) {
-            await redis.expire(ratelimitKey, 300); // 5mins
+            await redis.expire(ratelimitKey, 86400);
         }
 
         if (currentRequests > 1) {
-            return new NextResponse("Rate limit exceeded. Try again in 1 minute.", { 
-                status: 429 
+            return new NextResponse("Rate limit exceeded. Try again in 1 minute.", {
+                status: 429
             });
         }
 

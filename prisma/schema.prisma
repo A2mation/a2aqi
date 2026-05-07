@@ -309,6 +309,7 @@ model Device {
   user   User?   @relation(fields: [userId], references: [id])
 
   status DeviceStatus @default(UNASSIGNED)
+  state  Status       @default(APPROVED)
 
   modelId String      @db.ObjectId
   model   DeviceModel @relation(fields: [modelId], references: [id])
