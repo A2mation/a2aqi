@@ -12,9 +12,24 @@ import { Device } from './components/columns'
 
 const DevicePage = async () => {
     const allDevice = await prisma.device.findMany({
-        include: {
-            model: true,
-            user: true,
+        select: {
+            id: true,
+            name: true,
+            serialNo: true,
+            state: true,
+            status: true,
+            model: {
+                select: {
+                    name: true
+                }
+            },
+            user: {
+                select: {
+                    name: true,
+                }
+            },
+            assignedAt: true,
+            createdAt: true
         },
         orderBy: {
             createdAt: "desc",

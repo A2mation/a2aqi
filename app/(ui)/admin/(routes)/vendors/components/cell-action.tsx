@@ -3,7 +3,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
+import { Copy, Cpu, Edit, MoreHorizontal, Trash, User } from "lucide-react";
 
 import {
     DropdownMenu,
@@ -18,7 +18,7 @@ import AlertModal from "@/components/modals/alert-modal";
 import { VendorColumn } from "./columns";
 
 interface CellActionProps {
-    data: VendorColumn; 
+    data: VendorColumn;
 }
 
 export const CellAction = ({ data }: CellActionProps) => {
@@ -76,6 +76,19 @@ export const CellAction = ({ data }: CellActionProps) => {
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
                     <DropdownMenuSeparator />
 
+                    <DropdownMenuItem onClick={() => router.push(`/admin/vendors/${data.id}/users`)}>
+                        <User className="mr-2 h-5 w-5" />
+                        View Users
+                    </DropdownMenuItem>
+
+
+                    <DropdownMenuItem onClick={() => router.push(`/admin/vendors/${data.id}/devices`)}>
+                        <Cpu className="mr-2 h-5 w-5" />
+                        View Devices
+                    </DropdownMenuItem>
+
+                    <DropdownMenuSeparator />
+
                     <DropdownMenuItem onClick={() => onCopy(data.id)}>
                         <Copy className="mr-2 h-4 w-4" />
                         Copy Vendor ID
@@ -85,6 +98,7 @@ export const CellAction = ({ data }: CellActionProps) => {
                         <Edit className="mr-2 h-4 w-4" />
                         Update Vendor
                     </DropdownMenuItem>
+
 
                     <DropdownMenuItem
                         onClick={() => setOpen(true)}

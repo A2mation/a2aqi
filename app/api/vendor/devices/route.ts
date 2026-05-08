@@ -161,6 +161,7 @@ export async function POST(req: Request) {
                 lat: (parsedLat !== null && !isNaN(parsedLat)) ? parsedLat : null,
                 lng: (parsedLng !== null && !isNaN(parsedLng)) ? parsedLng : null,
                 status: DeviceStatus.ASSIGNED,
+                assignedAt: new Date(),
                 isActive: false,
                 userId: user,
                 createdById: vendor.id
