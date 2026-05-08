@@ -43,6 +43,11 @@ const MainNav = ({
             active: pathName.startsWith(`/admin/device`) && !pathName.startsWith(`/admin/device-model`)
         },
         {
+            href: `/admin/users`,
+            label: 'Users',
+            active: pathName.startsWith(`/admin/users`)
+        },
+        {
             href: `/admin/aqi`,
             label: 'AQI',
             active: pathName.startsWith(`/admin/aqi`)
@@ -89,7 +94,7 @@ const MainNav = ({
                         href={route.href}
                         className={cn(
                             "text-base font-medium transition-colors hover:text-primary",
-                            route.active ? "text-black dark:text-white" : "text-muted-foreground"
+                            route.active ? "text-black dark:text-white underline" : "text-muted-foreground"
                         )}
                     >
                         {route.label}
