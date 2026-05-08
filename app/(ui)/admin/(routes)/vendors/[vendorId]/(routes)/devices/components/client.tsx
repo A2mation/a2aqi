@@ -39,9 +39,9 @@ export const DeviceClient = ({
                         </Button>
                     </div>
                 </div>
-
-                <Separator />
+                <Separator className="mt-5" />
                 <DataTable columns={columns} data={data} searchKey="serialNo" />
+                <Separator />
             </section>
         </>
     )

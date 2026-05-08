@@ -77,7 +77,7 @@ export const DeviceForm = () => {
         isLoading: isLoadingUsers,
         isError: isUsersError
     } = useQuery<any[]>({
-        queryKey: ["vendor-users"],
+        queryKey: ["vendor-devices-users"],
         queryFn: async () => {
             const res = await http.get("/api/vendor/users");
 
@@ -114,7 +114,7 @@ export const DeviceForm = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["vendor-devices"] });
-            router.push(`/vendor/devices`);
+            router.back();
             toast.success(toastMessage);
         },
         onError: (error: any) => {

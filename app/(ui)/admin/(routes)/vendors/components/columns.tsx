@@ -22,6 +22,13 @@ export const columns: ColumnDef<VendorColumn>[] = [
     {
         accessorKey: "email",
         header: "Email",
+        cell: ({ row }) => (
+            <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-50 border w-fit border-slate-200 rounded-md">
+                <code className="font-mono text-[13px] font-bold text-slate-700 tracking-wider">
+                    {row.original.email || "N/A"}
+                </code>
+            </div>
+        )
     },
     {
         accessorKey: "gstNumber",

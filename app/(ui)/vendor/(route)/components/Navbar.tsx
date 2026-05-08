@@ -1,7 +1,5 @@
 "use client"
 
-import React from 'react'
-import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
     User,
@@ -9,8 +7,11 @@ import {
     LogOut,
     LayoutDashboard,
     Package,
-    Bell
+    Bell,
+    Cpu
 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { signOut } from 'next-auth/react'
 
 import {
     DropdownMenu,
@@ -21,11 +22,12 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { NavbarLogo } from '@/components/ui/resizable-navbar'
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export const VendorNavbar = () => {
+    const router = useRouter();
     return (
         <nav className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-md">
             <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-8">
@@ -80,17 +82,17 @@ export const VendorNavbar = () => {
                             <DropdownMenuSeparator />
 
                             <DropdownMenuGroup>
-                                <DropdownMenuItem className="cursor-pointer py-2">
+                                <DropdownMenuItem className="cursor-pointer py-2" onClick={() => router.push('/vendor/users')}>
                                     <LayoutDashboard className="mr-2 h-4 w-4 text-slate-500" />
-                                    <span>Dashboard</span>
+                                    <span>User Dashboard</span>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem className="cursor-pointer py-2">
-                                    <Package className="mr-2 h-4 w-4 text-slate-500" />
-                                    <span>My Products</span>
+                                <DropdownMenuItem className="cursor-pointer py-2" onClick={() => router.push('/vendor/devices')}>
+                                    <LayoutDashboard className="mr-2 h-4 w-4 text-slate-500" />
+                                    <span>Device Dashboard</span>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem className="cursor-pointer py-2">
+                                <DropdownMenuItem className="cursor-pointer py-2" onClick={() => router.push('/vendor/profile')}>
                                     <User className="mr-2 h-4 w-4 text-slate-500" />
-                                    <span>Profile Settings</span>
+                                    <span>Profile</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem className="cursor-pointer py-2">
                                     <Settings className="mr-2 h-4 w-4 text-slate-500" />
@@ -100,7 +102,7 @@ export const VendorNavbar = () => {
 
                             <DropdownMenuSeparator />
 
-                            <DropdownMenuItem className="cursor-pointer py-2 text-red-600 focus:text-red-600 focus:bg-red-50">
+                            <DropdownMenuItem className="cursor-pointer py-2 text-red-600 focus:text-red-600 focus:bg-red-50" onClick={() => signOut({ callbackUrl: "/vendor/login" })}>
                                 <LogOut className="mr-2 h-4 w-4" />
                                 <span>Log out</span>
                             </DropdownMenuItem>

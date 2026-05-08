@@ -13,7 +13,8 @@ import {
   ArrowUpRight,
   User,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  ChevronRight
 } from 'lucide-react';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -111,7 +112,7 @@ const VendorUserListPage = () => {
     );
   }, [data?.users, searchTerm]);
 
-  
+
   useEffect(() => {
     setMount(true);
   }, []);
@@ -127,15 +128,29 @@ const VendorUserListPage = () => {
           title="User Management"
           description="Manage your vendor accounts, monitor registrations, and verify organization details."
         />
-        <Link
-          href={'/vendor/users/register'}
-          className={cn(
-            buttonVariants({ variant: 'default' }),
-            "bg-primary hover:opacity-90 transition-all shadow-md cursor-pointer"
-          )}
-        >
-          <UserPlus className="mr-2 h-4 w-4" /> Add New User
-        </Link>
+
+        <div className="flex flex-row gap-3">
+
+          <Link
+            href="/vendor/users/register"
+            className="flex items-center bg-zinc-100 text-zinc-900 px-5 py-3 rounded-full hover:bg-zinc-200 transition-colors font-medium border border-zinc-400"
+          >
+            <UserPlus className="mr-2 h-4 w-4" /> Add New User
+          </Link>
+
+          <Link
+            href="/vendor/devices"
+            className={cn(
+              "group relative overflow-hidden bg-linear-to-br from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-full shadow-md hover:shadow-indigo-200 hover:shadow-xl transition-all active:scale-95 flex items-center gap-2"
+            )}
+          >
+            <User className="h-4 w-4" />
+            <span className="font-semibold">Manage Devices</span>
+            <div className="ml-1 bg-white/20 rounded-full p-0.5">
+              <ChevronRight className="h-3 w-3" />
+            </div>
+          </Link>
+        </div>
       </div>
 
       <Separator className="bg-gray-200" />
@@ -277,7 +292,7 @@ const VendorUserListPage = () => {
                           "relative inline-flex rounded-full h-1.5 w-1.5",
                           user.status === "APPROVED" ? "bg-green-500" :
                             user.status === "PENDING" ? "bg-amber-500" :
-                              "bg-red-500" 
+                              "bg-red-500"
                         )}></span>
                       </span>
 

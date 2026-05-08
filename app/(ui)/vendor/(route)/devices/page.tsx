@@ -14,6 +14,8 @@ import {
   Key,
   Loader2,
   AlertCircle,
+  User,
+  ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -144,15 +146,28 @@ const VendorDevicePageList = () => {
             description="Manage and monitor physical edge devices, network types, and operational status."
             Icon={Cpu}
           />
-          <Link
-            href={"/vendor/devices/register"}
-            className={cn(
-              buttonVariants({ variant: "default" }),
-              "bg-primary hover:opacity-90 transition-all shadow-md w-full md:w-auto self-end md:self-center"
-            )}
-          >
-            <Plus className="mr-2 h-4 w-4" /> Register Device
-          </Link>
+          <div className="flex flex-row gap-3">
+
+            <Link
+              href="/vendor/devices/register"
+              className="flex items-center bg-zinc-100 text-zinc-900 px-5 py-3 rounded-full hover:bg-zinc-200 transition-colors font-medium border border-zinc-400"
+            >
+              <Plus className="mr-2 h-4 w-4" /> Register Device
+            </Link>
+
+            <Link
+              href="/vendor/users"
+              className={cn(
+                "group relative overflow-hidden bg-linear-to-br from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-full shadow-md hover:shadow-indigo-200 hover:shadow-xl transition-all active:scale-95 flex items-center gap-2"
+              )}
+            >
+              <Cpu className="h-4 w-4" />
+              <span className="font-semibold">Manage Users</span>
+              <div className="ml-1 bg-white/20 rounded-full p-0.5">
+                <ChevronRight className="h-3 w-3" />
+              </div>
+            </Link>
+          </div>
         </div>
 
         <Separator className="bg-gray-200" />
