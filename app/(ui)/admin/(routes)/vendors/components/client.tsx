@@ -1,6 +1,6 @@
 "use client"
 
-import { Plus } from "lucide-react"
+import { ArrowLeft, Plus } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 import Heading from "@/components/ui/Heading"
@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator"
 import { DataTable } from "@/components/ui/data-table"
 import { ApiList } from "@/components/ui/api-list"
 
-import { VendorColumn, columns } from "./columns" 
+import { VendorColumn, columns } from "./columns"
 
 interface VendorClientProps {
     data: VendorColumn[]
@@ -27,6 +27,18 @@ export const VendorClient = ({
                     title={`Vendors (${data.length})`}
                     description="Manage vendor accounts, status, and GST information"
                 />
+                <div className="flex items-center gap-x-2">
+
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => router.back()}
+                        className="group"
+                    >
+                        <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:scale-125" />
+                        Back
+                    </Button>
+                </div>
             </div>
 
             <Separator />

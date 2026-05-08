@@ -1,15 +1,15 @@
 "use client"
 
 import * as z from "zod";
-import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import toast from "react-hot-toast";
-import { CalendarIcon, Check, ChevronsUpDown, Loader2, Settings2, Trash } from "lucide-react"
-import { DeviceStatus, DeviceModel, User } from "@prisma/client"
 import { useForm } from "react-hook-form";
+import { useEffect, useMemo, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useParams, useRouter } from "next/navigation";
+import { DeviceStatus, DeviceModel, Status } from "@prisma/client"
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
-import Link from "next/link";
+import { ArrowLeft, CalendarIcon, Check, ChevronsUpDown, Loader2, Settings2, Trash } from "lucide-react"
 
 import {
     Form,
@@ -20,12 +20,6 @@ import {
     FormMessage,
     FormDescription,
 } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import Heading from "@/components/ui/Heading"
-import { Separator } from "@/components/ui/separator"
-import AlertModal from "@/components/modals/alert-modal";
-import { http } from "@/lib/http";
 import {
     Select,
     SelectContent,
@@ -33,39 +27,24 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
+import { http } from "@/lib/http";
 import { Label } from '@/components/ui/label'
+import { Input } from "@/components/ui/input"
+import Heading from "@/components/ui/Heading"
+import { Button } from "@/components/ui/button"
+import { Switch } from "@/components/ui/switch";
 import { useDebounce } from "@/hooks/use-debounce";
+import { Calendar } from "@/components/ui/calendar";
+import { Separator } from "@/components/ui/separator"
+import AlertModal from "@/components/modals/alert-modal";
+import { deviceFormSchema } from "@/lib/validation/admin/Device";
+import { format, setHours, setMinutes, setSeconds } from "date-fns";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { cn } from "@/lib/utils";
-import { format, setHours, setMinutes, setSeconds } from "date-fns";
-import { Calendar } from "@/components/ui/calendar";
-
-// Define the Schema First
-const formSchema = z.object({
-    name: z.string().min(1, "Name is required"),
-    serialNo: z.string().min(1, "Serial number is required"),
-    modelId: z.string().min(1, "Model selection is required"),
-    apiKey: z.string().min(1, "API Key is required"),
-    status: z.enum(DeviceStatus),
-    assignedAt: z.date().optional(),
-    isUserMode: z.boolean().default(false),
-    lat: z.string().optional().default(""),
-    lng: z.string().optional().default(""),
-    user: z.string().optional().default(""),
-}).superRefine((data, ctx) => {
-    if (data.isUserMode && data.status == DeviceStatus.ASSIGNED && (!data.user || data.user.trim() === "")) {
-        ctx.addIssue({
-            code: "custom",
-            message: "User selection is mandatory when User Mode is active",
-            path: ["user"],
-        });
-    }
-});
 
 // Infer the type from the Schema
-type DeviceFormValues = z.infer<typeof formSchema>;
+type DeviceFormValues = z.infer<typeof deviceFormSchema>;
 
 interface DevicePops {
     initialData: {
@@ -73,6 +52,7 @@ interface DevicePops {
         name: string;
         serialNo: string;
         status: DeviceStatus;
+        state: Status
         assignedAt: Date | null;
         apiKey: string;
         modelId: string;
@@ -99,13 +79,14 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
     const description = initialData ? "Edit device details" : "Add a new device";
 
     // Initialize useForm with the inferred type
-    const form = useForm<DeviceFormValues>({
-        resolver: zodResolver(formSchema) as any,
+    const form = useForm < DeviceFormValues > ({
+        resolver: zodResolver(deviceFormSchema) as any,
         defaultValues: initialData ? {
             name: initialData.name || "",
             serialNo: initialData.serialNo || "",
             modelId: initialData.modelId || "",
             apiKey: initialData.apiKey || "",
+            state: initialData.state || Status.APPROVED,
             status: initialData.status || DeviceStatus.UNASSIGNED,
             assignedAt: initialData.assignedAt || new Date(),
             isUserMode: !!initialData.userId,
@@ -117,6 +98,7 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
             serialNo: "",
             modelId: "",
             apiKey: "",
+            state: 'APPROVED',
             status: DeviceStatus.UNASSIGNED,
             assignedAt: new Date(),
             isUserMode: false,
@@ -131,7 +113,7 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
 
 
 
-    const { data: deviceModel, isLoading: loadingModels } = useQuery<DeviceModel[]>({
+    const { data: deviceModel, isLoading: loadingModels } = useQuery < DeviceModel[] > ({
         queryKey: ["device-models"],
         queryFn: async () => (await http.get('/api/admin/device-model/active-device-model')).data
     });
@@ -146,10 +128,10 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
         queryKey: ["users-infinite", debouncedSearch],
         // 1. Explicitly type the context parameter
         queryFn: async ({ pageParam }: { pageParam: string | null }) => {
-            const response = await http.get<{
+            const response = await http.get < {
                 users: { id: string; name: string; email: string }[];
                 nextCursor: string | null;
-            }>('/api/admin/user', {
+            } > ('/api/admin/user', {
                 params: {
                     search: debouncedSearch,
                     cursor: pageParam,
@@ -168,7 +150,9 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
 
     const { mutate: saveDevice, isPending: isSaving } = useMutation({
         mutationFn: async (values: DeviceFormValues) => {
-            const submissionData = { ...values };
+            const submissionData = { 
+                ...values,
+            };
 
             if (!values.isUserMode) {
                 submissionData.user = "";
@@ -177,14 +161,21 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
             }
 
             if (initialData) {
-                return await http.patch(`/api/admin/device/${params.deviceId}`, submissionData);
+
+                const res = await http.patch(`/api/admin/device/${params.deviceId}`, submissionData);
+
+                if (res.status === 200) {
+                    return res.data;
+                }
+
+                throw new Error(res.data.message || 'Something Went Wrong');
             }
             return await http.post(`/api/admin/device`, submissionData);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["devices"] });
             toast.success("Success!");
-            router.push('/admin/device');
+            router.back();
             router.refresh();
         },
         onError: (error: any) => {
@@ -229,9 +220,19 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
                 onConfirm={() => deleteDevice()}
                 loading={isDeleting}
             />
+            <Button
+                variant="outline"
+                size="sm"
+                onClick={() => router.back()}
+                className="group"
+            >
+                <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:scale-125" />
+                Back
+            </Button>
             <div className="flex justify-between items-center">
                 <Heading title={title} description={description} />
                 <div className="flex flex-row gap-4 items-center">
+
                     <div className="flex items-center space-x-2">
                         <Label htmlFor="user-mode">User Mode</Label>
                         <Switch
@@ -258,6 +259,7 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
                             </Button>
                         </>
                     )}
+
                 </div>
             </div>
             <Separator className="my-4" />
@@ -342,6 +344,69 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
 
                                     <FormDescription>
                                         {deviceModel?.find((m) => m.id === field.value)?.description || "No description available"}
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="state"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>State</FormLabel>
+                                    <Select
+                                        disabled={loading}
+                                        onValueChange={field.onChange}
+                                        value={field.value}
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger
+                                                className={cn(
+                                                    "w-full font-medium",
+                                                    field.value === Status.APPROVED && "text-green-500",
+                                                    field.value === Status.PENDING && "text-yellow-500",
+                                                    field.value === Status.REJECTED && "text-red-400",
+                                                    field.value === Status.BANNED && "text-red-600",
+                                                )}
+                                            >
+                                                <SelectValue placeholder="Select State" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem
+                                                value={Status.APPROVED}
+                                                className="text-green-500 focus:text-green-500 focus:bg-green-50"
+                                            >
+                                                Approved
+                                            </SelectItem>
+
+                                            <SelectItem
+                                                value={Status.PENDING}
+                                                className="text-yellow-500 focus:text-yellow-500 focus:bg-yellow-50"
+                                            >
+                                                Pending
+                                            </SelectItem>
+
+                                            <SelectItem
+                                                value={Status.REJECTED}
+                                                className="text-red-400 focus:text-red-400 focus:bg-red-50"
+                                            >
+                                                Rejected
+                                            </SelectItem>
+
+                                            <SelectItem
+                                                value={Status.BANNED}
+                                                className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                                            >
+                                                Banned
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+
+                                    <FormDescription className="text-red-500">
+                                        Data from only <span className="mx-1 font-bold">approved</span> devices can be accepted.
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>

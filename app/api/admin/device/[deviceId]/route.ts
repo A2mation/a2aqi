@@ -2,11 +2,12 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 import { NextResponse } from "next/server";
+import { DeviceStatus } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
-import { DeviceStatus } from "@prisma/client";
 import { adminGuard } from "@/lib/adminAuth";
 import { handleAdminError } from "@/lib/handleRoleError";
+import { deviceFormSchema } from "@/lib/validation/admin/Device";
 
 export async function GET(
     req: Request,
@@ -35,7 +36,7 @@ export async function GET(
             return new NextResponse("Device not found", { status: 404 });
         }
 
-       
+
         return NextResponse.json(device);
 
     } catch (error) {
@@ -57,14 +58,24 @@ export async function PATCH(
         }
 
         const body = await req.json();
-        const { name, user, isUserMode, serialNo, modelId, lat, lng, status, assignedAt } = body;
 
+        const validation = deviceFormSchema.safeParse(body);
+        
+        if (!validation.success) {
+            console.log(validation.error)
+            return NextResponse.json(
+                {
+                    message: "Validation Error",
+                    errors: validation.error
+                },
+                { status: 400 }
+            );
+        }
 
-        if (!serialNo) return new NextResponse("Serial No is required", { status: 400 });
-        if (!modelId) return new NextResponse("Model ID is required", { status: 400 });
-
+        const { name, user, isUserMode, serialNo, modelId, lat, lng, status, assignedAt, state } = validation.data;
 
         const model = await prisma.deviceModel.findUnique({ where: { id: modelId } });
+
         if (!model) return new NextResponse("Invalid Model", { status: 400 });
 
 
@@ -72,6 +83,8 @@ export async function PATCH(
             name,
             serialNo,
             modelId,
+            state,
+            isActive: state === 'APPROVED' ? true : false
         };
 
         const currentDevice = await prisma.device.findUnique({

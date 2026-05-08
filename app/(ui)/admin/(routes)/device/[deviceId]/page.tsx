@@ -32,6 +32,7 @@ const SingleDeviceModelPage = async ({
                 lat: true,
                 lng: true,
                 assignedAt: true,
+                state: true,
                 model: {
                     select: {
                         id: true,
@@ -84,6 +85,7 @@ const SingleDeviceModelPage = async ({
             status: device.status,
             assignedAt: device.assignedAt,
             apiKey: device.apiKey,
+            state: device.state,
             modelId: device.model.id,
             modelName: device.model.name,
             userId: device.user?.id ?? "",
