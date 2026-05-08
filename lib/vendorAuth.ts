@@ -18,6 +18,15 @@ export async function vendorGuard() {
             id: session.user.id,
             role: 'VENDOR'
         },
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            phoneNumber: true,
+            gstNumber: true,
+            status: true,
+            createdAt: true,
+        }
     });
 
     if (!vendor) {
