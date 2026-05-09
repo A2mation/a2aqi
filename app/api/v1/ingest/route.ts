@@ -12,6 +12,8 @@ export async function POST(req: Request) {
         const apiKey = req.headers.get("x-api-key");
 
         if (!apiKey) {
+            console.log('MIssing')
+
             return NextResponse.json(
                 { error: "Missing API key" },
                 { status: 401 }
