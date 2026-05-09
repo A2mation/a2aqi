@@ -25,6 +25,12 @@ export interface BlogContentProps {
   img?: string;
   views?: number;
   authorId: string;
+  categories: {
+    id: string;
+    slug: string;
+    title: string;
+    description?: string;
+  }[]
   likesCount: number;
   likedIds: [];
   author: Author;

@@ -8,6 +8,7 @@ import {
     LinkedinIcon,
     Eye,
     Twitter,
+    Edit,
 } from "lucide-react";
 import {
     FacebookShareButton,
@@ -22,12 +23,17 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Author } from "@/types/type";
 import useLike from "@/hooks/useLike";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { useSession } from "next-auth/react";
 
 interface UserProps {
     user: Author;
+    authorId: string;
+    href: string;
     views: number;
     likedIds: string[];
     postId: string;
@@ -42,6 +48,8 @@ export const Header = ({
     postId,
     likesCount,
     createdAt,
+    authorId,
+    href
 }: UserProps) => {
     const {
         hasLiked,
@@ -54,6 +62,7 @@ export const Header = ({
         postId,
         likedIds,
     });
+    const session = useSession();
 
 
     const [localHasLiked, setLocalHasLiked] = useState(hasLiked);
@@ -156,11 +165,26 @@ export const Header = ({
                         <LinkedinIcon className="h-5 w-5 text-blue-600" />
                     </LinkedinShareButton>
 
+
                     {/* Views */}
                     <div className="flex items-center space-x-1">
                         <Eye className="h-5 w-5 text-gray-500" />
                         <span className="text-sm">{views}</span>
                     </div>
+
+
+                    {
+                        (session && session.data?.user.id === authorId) && <>
+                            <Link
+                                className={cn(buttonVariants({
+                                    variant: 'outline'
+                                }))}
+                                href={href}
+                            >
+                                <Edit className='h-4 w-4' />
+                            </Link>
+                        </>
+                    }
                 </div>
             </div>
         </div>

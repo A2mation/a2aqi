@@ -16,13 +16,20 @@ import { Header } from './components/Header'
 import { BlogContentProps } from "@/types/type";
 import { http } from "@/lib/http";
 import { Comments } from '@/components/blog/Comments';
+import { useSession } from 'next-auth/react'
+import Link from 'next/link'
+import { cn } from '@/lib/utils'
+import { buttonVariants } from '@/components/ui/button'
+import { Edit } from 'lucide-react'
 
 const SingleBlogPage = ({
   params,
 }: {
   params: Promise<{ blogId: string, username: string }>
 }) => {
-  const { blogId, username } = use(params)
+
+
+  const { blogId, username } = use(params);
   const id = blogId.split("-").pop();
 
   const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
@@ -123,6 +130,8 @@ const SingleBlogPage = ({
               <div className="px-8 py-6 border-b border-slate-50 dark:border-slate-800">
                 <Header
                   user={blogContent.author}
+                  authorId={blogContent.authorId}
+                  href={`/blogs/edit?username=${username}&blogId=${blogContent.id}`}
                   views={5}
                   likedIds={blogContent.likedIds}
                   postId={id!}

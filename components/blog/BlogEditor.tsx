@@ -24,6 +24,7 @@ import { ListButton } from "./tools/Listbutton"
 import { FontSizeButton } from "./tools/FontSizeButton"
 import { ImageButton } from "./tools/ImageButton"
 import { http } from "@/lib/http"
+import { useEffect } from "react"
 
 interface BlogEditorProps {
     value: string
@@ -131,7 +132,12 @@ const BlogEditor = ({ value, onChange }: BlogEditorProps) => {
             },
         },
     })
-
+    
+    useEffect(() => {
+        if (editor && value !== editor.getHTML()) {
+            editor.commands.setContent(value);
+        }
+    }, [value, editor]);
 
     if (!editor) return null
 
