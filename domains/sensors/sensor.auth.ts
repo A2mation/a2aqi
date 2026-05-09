@@ -7,7 +7,7 @@ export async function authenticateSensor(serialNo: string, apiKey: string) {
         where: { serialNo: serialNo },
         select: {
             id: true,
-            isActive: true,
+            state: true,
             apiKey: true,
             model: {
                 select: {
@@ -17,11 +17,10 @@ export async function authenticateSensor(serialNo: string, apiKey: string) {
         }
     });
     // console.timeEnd("db");
-    console.log(apiKey)
 
     if (!device) throw new SensorError("Device not found", 404);
     if (device.apiKey !== apiKey) throw new SensorError("Invalid API key", 401);
-    if (!device.isActive) throw new SensorError("Device is disabled", 403);
+    if (device.state !== 'APPROVED') throw new SensorError("Device is disabled", 403);
 
     return device;
 }

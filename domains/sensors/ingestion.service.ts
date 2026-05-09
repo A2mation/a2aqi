@@ -1,13 +1,14 @@
 import { sensorQueue } from "@/lib/queue";
 import { SensorPayload } from "./sensor.model";
 import { JsonValue } from "@prisma/client/runtime/library";
+import { Status } from "@prisma/client";
 
 interface Device {
     model: {
         parameters: JsonValue;
     };
     id: string;
-    isActive: boolean;
+    state: Status;
     apiKey: string;
 }
 
