@@ -1,14 +1,16 @@
-import { SensorError } from "@/domains/sensors/sensor.error";
-import { validateSensorPayload } from "@/domains/sensors/sensor.validation";
 import { NextResponse } from "next/server";
+
+import { SensorError } from "@/domains/sensors/sensor.error";
+import { authenticateSensor } from "@/domains/sensors/sensor.auth";
+import { sensorRateLimit } from "@/domains/sensors/sensor.ratelimit";
+import { ingestSensorData } from "@/domains/sensors/ingestion.service";
+import { validateSensorPayload } from "@/domains/sensors/sensor.validation";
 
 export async function POST(req: Request) {
     try {
         const apiKey = req.headers.get("x-api-key");
 
         if (!apiKey) {
-            console.log('MIssing')
-
             return NextResponse.json(
                 { error: "Missing API key" },
                 { status: 401 }
@@ -19,6 +21,21 @@ export async function POST(req: Request) {
 
         // Validate payload
         const payload = validateSensorPayload(body);
+
+        // Authenticate sensor
+        const device = await authenticateSensor(payload.serialNo, apiKey);
+
+        // Rate Limiter
+        await sensorRateLimit(device.id);
+
+        const raw = await ingestSensorData(payload, device.id, device);
+
+        return NextResponse.json({
+            message: "Raw saved and job queued",
+            rawId: raw,
+        }, {
+            status: 200
+        });
 
     } catch (err: any) {
         if (err instanceof SensorError) {
