@@ -17,7 +17,7 @@ export async function authenticateSensor(serialNo: string, apiKey: string) {
         }
     });
     // console.timeEnd("db");
-    // console.log(device)
+    console.log(apiKey)
 
     if (!device) throw new SensorError("Device not found", 404);
     if (device.apiKey !== apiKey) throw new SensorError("Invalid API key", 401);
