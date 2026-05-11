@@ -22,14 +22,14 @@ export async function proxy(req: NextRequest) {
     ) {
         return NextResponse.next();
     }
-
+    
     // Not authenticated
     if (!token) {
         if (pathname.startsWith("/admin")) {
             return NextResponse.redirect(new URL("/admin/sign-in", req.url));
         }
 
-        if (pathname.startsWith("/blogs/write")) {
+        if (pathname.startsWith("/blogs/write") || pathname.startsWith("/blogs/edit")) {
             return NextResponse.redirect(new URL("/blogs/sign-in", req.url));
         }
 
@@ -47,7 +47,7 @@ export async function proxy(req: NextRequest) {
     }
 
     // WRITER-only
-    if (pathname.startsWith("/blogs/write") && token?.role !== ROLE.WRITER) {
+    if ((pathname.startsWith("/blogs/write") || pathname.startsWith("/blogs/edit")) && token?.role !== ROLE.WRITER) {
         return NextResponse.redirect(new URL("/writer-unauthorized", req.url));
     }
 
@@ -74,5 +74,5 @@ export async function proxy(req: NextRequest) {
     return NextResponse.next();
 }
 export const config = {
-    matcher: ["/blogs/write", "/admin/:path*", "/monitor/:path*", "/moderator/:path*", "/vendor/:path*"]
+    matcher: ["/blogs/write", "/blogs/edit", "/admin/:path*", "/monitor/:path*", "/moderator/:path*", "/vendor/:path*"]
 }
