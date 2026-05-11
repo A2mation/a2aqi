@@ -44,7 +44,7 @@ export function DeviceList() {
     const [currentPage, setCurrentPage] = useState(1)
     const [searchQuery, setSearchQuery] = useState("")
 
-    const { data, isLoading, isPlaceholderData } = useQuery<DevicesResponse>({
+    const { data, isLoading, isPlaceholderData } = useQuery < DevicesResponse > ({
         queryKey: ["devices", searchQuery, currentPage],
         queryFn: async () => {
             const response = await http.get(`/api/monitor`, {
@@ -77,14 +77,11 @@ export function DeviceList() {
 
     return (
         <div className={cn(
-            "min-h-screen flex flex-col bg-background",
-            isDarkMode && "dark",
+            "min-h-screen flex flex-col bg-background max-w-7xl mx-auto",
         )}>
             {/* Header */}
             <Header
                 setIsOpen={setIsOpen}
-                isDarkMode={isDarkMode}
-                setIsDarkMode={setIsDarkMode}
             />
 
             <AddDeviceModal
@@ -94,7 +91,7 @@ export function DeviceList() {
             />
 
             {/* Main Content */}
-            <div className="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
+            <div className="flex-1 w-full px-6 py-8">
                 <div className="flex items-center justify-between mb-6 gap-4">
                     <div className="relative flex-1 max-w-sm">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
