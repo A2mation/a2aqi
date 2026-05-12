@@ -1,5 +1,7 @@
+import { advancedAnalysisKey } from "@/constant/monitor.key";
 import { AdvancedAnalysisRepo } from "../repo/analysis.repo";
 import { DailyStats, DashboardParams } from "../types/type";
+import { redis } from "@/lib/redis";
 
 export class AdvancedAnalysiService {
 
@@ -83,6 +85,18 @@ export class AdvancedAnalysiService {
         }[];
         history: any[];
     }> {
+
+        // Redis Layer
+        const cacheKey = advancedAnalysisKey(monitorId);
+
+        const cachedData = await redis.get(cacheKey);
+
+        if (cachedData) {
+            const parsed = JSON.parse(cachedData);
+            return { ...parsed, cached: true };
+        }
+
+        // Main Logic
         const devices = await this.getTop5Devices(monitorId);
 
         if (!devices || devices.length === 0) {
@@ -126,11 +140,15 @@ export class AdvancedAnalysiService {
             });
         });
 
-        return {
+        const result = {
             devices,
             history: Object.values(historyMap).sort((a: any, b: any) =>
                 new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
             )
         };
+
+        await redis.setex(cacheKey, 3600, JSON.stringify(result));
+
+        return result;
     }
 }

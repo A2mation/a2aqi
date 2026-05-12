@@ -20,7 +20,7 @@ export async function POST(request: Request) {
         const currentRequests = await redis.incr(ratelimitKey);
 
         if (currentRequests === 1) {
-            await redis.expire(ratelimitKey, 86400);
+            await redis.expire(ratelimitKey, 3600);
         }
 
         if (currentRequests > 1) {
