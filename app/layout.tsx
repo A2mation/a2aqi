@@ -134,7 +134,7 @@ export default function RootLayout({
 
           {children}
           <VisitCounter />
-          <PromoBannerModal />
+          {/* <PromoBannerModal /> */}
           <Toaster position="top-center" reverseOrder={false} />
         </TanStackProvider>
       </body>

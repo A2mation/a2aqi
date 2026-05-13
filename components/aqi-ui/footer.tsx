@@ -10,6 +10,7 @@ const ROLES = [
     { label: "Administrator", href: "/admin/sign-in" },
     { label: "Moderator", href: "/moderator/sign-in" },
     { label: "Monitors", href: "/monitor/sign-in" },
+    { label: "Vendors", href: "/vendor/login" },
     { label: "Writer", href: "/blogs/sign-in" },
 ];
 
