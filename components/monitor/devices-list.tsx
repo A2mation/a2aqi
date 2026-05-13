@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { getAQIBgColor } from "@/helpers/aqi-color-pallet"
 import AddDeviceModal from "../modals/monior-add-device-modal"
+
 import Header from "./Header"
 
 interface Device {
@@ -79,10 +80,12 @@ export function DeviceList() {
         <div className={cn(
             "min-h-screen flex flex-col bg-background max-w-7xl mx-auto",
         )}>
+           
             {/* Header */}
             <Header
                 setIsOpen={setIsOpen}
             />
+
 
             <AddDeviceModal
                 isOpen={isOpen}
