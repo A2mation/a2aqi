@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Check } from 'lucide-react';
 import { latestSensorReading } from '@prisma/client';
+import { formatDateTime } from '@/utils/formatDateTime';
 
 const PARAM_CONFIG: Record<string, { color: string; label: string; unit: string }> = {
     aqi: { color: '#4f46e5', label: 'AQI', unit: '' },
@@ -32,7 +33,8 @@ interface Props {
 }
 
 const AdvancedDeviceChart = ({ hourlyData, liveData }: Props) => {
-    const [activeParams, setActiveParams] = useState<string[]>(['aqi', 'pm25']);
+    console.log(liveData)
+    const [activeParams, setActiveParams] = useState < string[] > (['aqi', 'pm25']);
 
     // 1. Chart Data Processing
     const chartData = useMemo(() => {
@@ -47,6 +49,8 @@ const AdvancedDeviceChart = ({ hourlyData, liveData }: Props) => {
             return val !== null && val !== undefined;
         });
     }, [liveData]);
+
+    console.log(availableParams)
 
     const getLiveValue = (key: keyof latestSensorReading) => {
         const val = liveData[key];
@@ -87,8 +91,8 @@ const AdvancedDeviceChart = ({ hourlyData, liveData }: Props) => {
                         </div>
                         <h4 className="text-sm font-bold text-gray-800 uppercase tracking-wider">Live Metrics</h4>
                     </div>
-                    <span className="text-[10px] text-gray-400 font-mono uppercase">
-                        Sync: {liveData.measuredAt ? new Date(liveData.measuredAt).toLocaleTimeString() : 'Just now'}
+                    <span className="text-sm text-gray-400 font-mono uppercase font-bold">
+                        Sync: {liveData.measuredAt ? formatDateTime(liveData.measuredAt.toString()) : 'Just now'}
                     </span>
                 </div>
 

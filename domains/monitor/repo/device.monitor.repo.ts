@@ -101,7 +101,8 @@ export async function getDevicesByDeviceId(deviceId: string) {
                 select: {
                     name: true
                 }
-            }
+            },
+            loaction: true
         }
     })
 

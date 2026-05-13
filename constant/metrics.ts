@@ -3,7 +3,7 @@ export type MetricKey =
     | "Aqi"
     | "Pm25"
     | "Pm10"
-    | "PM1"
+    | "Pm1"
     | "So2"
     | "No2"
     | "Co2"
@@ -29,7 +29,7 @@ export const BASE_METRICS: { key: MetricKey; label: string }[] = [
     { key: "Aqi", label: "AQI" },
     { key: "Pm25", label: "PM2.5" },
     { key: "Pm10", label: "PM10" },
-    { key: "PM1", label: "PM1" },
+    { key: "Pm1", label: "PM1" },
 
     { key: "So2", label: "SO₂" },
     { key: "No2", label: "NO₂" },

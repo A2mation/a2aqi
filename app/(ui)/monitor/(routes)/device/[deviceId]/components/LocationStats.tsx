@@ -71,8 +71,8 @@ const LocationStats = ({
                 {/* Physical Address Block */}
                 <div className="bg-gray-50/60 p-5 rounded-3xl border border-gray-100 transition-colors hover:bg-gray-50">
                     <label className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] block mb-2">Primary Placement</label>
-                    <p className="text-sm font-extrabold text-gray-800 leading-relaxed">
-                        {device.location ? device.location : 'INDIA'}
+                    <p className="text-xl font-extrabold text-gray-800 leading-relaxed">
+                        {device.loaction ? device.loaction : 'INDIA'}
                     </p>
                 </div>
 
@@ -137,8 +137,8 @@ const LocationStats = ({
                             <Navigation size={18} />
                         </motion.div>
                         <div>
-                            <span className="block text-[9px] font-black text-gray-400 uppercase tracking-wider">Latitude</span>
-                            <span className="text-xs font-mono font-bold text-gray-700">{device.lat.toFixed(2)}</span>
+                            <span className="block text-xs font-black text-gray-400 uppercase tracking-wider">Latitude</span>
+                            <span className="text-sm font-mono font-bold text-gray-700">{device.lat.toFixed(2)}..</span>
                         </div>
                     </motion.div>
 
@@ -159,8 +159,8 @@ const LocationStats = ({
                             <Globe size={18} />
                         </motion.div>
                         <div>
-                            <span className="block text-[9px] font-black text-gray-400 uppercase tracking-wider">Longitude</span>
-                            <span className="text-xs font-mono font-bold text-gray-700">{device.lng.toFixed(2)}</span>
+                            <span className="block text-xs font-black text-gray-400 uppercase tracking-wider">Longitude</span>
+                            <span className="text-sm font-mono font-bold text-gray-700">{device.lng.toFixed(2)}..</span>
                         </div>
                     </motion.div>
                 </div>

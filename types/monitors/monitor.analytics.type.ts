@@ -10,7 +10,7 @@ export interface MonitorAnalyticsDevice {
     model: {
         name: string
     },
-    location: string
+    loaction: string
 }
 
 type Slot = EmptySlot | DataSlot;
