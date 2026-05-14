@@ -78,7 +78,7 @@ export function DeviceList() {
 
     return (
         <div className={cn(
-            "min-h-screen flex flex-col bg-background max-w-7xl mx-auto",
+            "min-h-screen flex flex-col bg-background",
         )}>
            
             {/* Header */}

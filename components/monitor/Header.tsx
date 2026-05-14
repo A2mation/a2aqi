@@ -16,7 +16,7 @@ const Header = ({ setIsOpen }: HeaderProps) => {
 
     return (
         <header className="sticky top-0 z-30 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
-            <div className="container mx-auto px-4 sm:px-6 py-4">
+            <div className=" mx-auto px-4 sm:px-6 py-4">
                 {session?.data && (
                     <div className="mb-2 animate-in fade-in slide-in-from-top-1 duration-500">
                         <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-0 text-center">

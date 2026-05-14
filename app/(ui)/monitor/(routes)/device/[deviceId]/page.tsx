@@ -49,7 +49,7 @@ const MonitorDeviceAnalyticsPage: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-[#FBFBFE] p-4 lg:p-8 font-sans">
-            <div className="max-w-7xl mx-auto">
+            <div className="">
                 {isLoading ? (
                     <LoadingSkeleton />
                 ) : (

@@ -172,7 +172,7 @@ const MultiDeviceSyncHub = () => {
         <div className="bg-[#FDFDFD] min-h-screen text-slate-900">
             <Header setIsOpen={setIsOpen} />
 
-            <div className='max-w-7xl mx-auto flex flex-col gap-6 p-8 '>
+            <div className='flex flex-col gap-6 p-8 '>
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 bg-white py-4 px-8 rounded-4xl border border-gray-100 shadow-sm">
                     <div className="space-y-1">
                         <h2 className="text-2xl font-black tracking-tighter">
