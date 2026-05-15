@@ -40,7 +40,7 @@ const minusDays = (date: Date, days: number) => {
     return d;
 };
 
-export function HourlyAnalysis({ currentDeviceAssignDate }: {
+export function WeeklyAnalysis({ currentDeviceAssignDate }: {
     currentDeviceAssignDate: Date | null
 }) {
     const { deviceId } = useParams();
@@ -176,7 +176,7 @@ export function HourlyAnalysis({ currentDeviceAssignDate }: {
     return (
         <div className="w-full mx-auto p-6 rounded-2xl bg-white border shadow-sm">
             <div className="mb-6 flex items-center justify-between">
-                <h1 className="text-2xl font-bold">Hourly Insights</h1>
+                <h1 className="text-2xl font-bold">Weekly Insights</h1>
 
                 <Popover open={dateOpen} onOpenChange={setDateOpen}>
                     <PopoverTrigger asChild>

@@ -5,27 +5,27 @@ import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import { useQuery } from "@tanstack/react-query"
 
-import { Sidebar, useSidebar } from "@/components/users-ui/dashboard/Sidebar"
-import { Header } from "@/components/users-ui/dashboard/Header"
-import { StatsCards } from "@/components/users-ui/dashboard/Stats-cards"
-import { WeeklyAqiAnalytics } from "@/components/users-ui/dashboard/Weekly-aqi-analytics"
-import { MonthlyInsights } from "@/components/users-ui/dashboard/Monthly-Insights"
-import { ProjectList } from "@/components/users-ui/dashboard/Project-list"
-import { DeviceManagement } from "@/components/users-ui/dashboard/Device-Mangement"
-import { MobileAppCard } from "@/components/users-ui/dashboard/Mobile-app-card"
-import { ChartRadar } from "@/components/users-ui/dashboard/ChartRadar"
-import { Button } from "@/components/ui/button"
-import { useDeviceModal } from "@/hooks/use-device-store"
-import { DeviceModal } from "@/components/modals/device-modal"
 import { cn } from "@/lib/utils"
 import { http } from "@/lib/http"
-import { HourlyAnalysis } from "@/components/users-ui/dashboard/hourly-analysis"
+import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useExportDrawerStore } from "@/store/use-export-drawer-store"
+import { useDeviceModal } from "@/hooks/use-device-store"
 import { ExportDrawer } from "@/components/Export-Drawer"
 import { useDeviceStore } from "@/store/use-device.store"
-import { SubscriptionModal } from "@/components/modals/subscription-alert-modal"
 import { useSubscription } from "@/hooks/use-subscription"
+import { DeviceModal } from "@/components/modals/device-modal"
+import { Header } from "@/components/users-ui/dashboard/Header"
+import { useExportDrawerStore } from "@/store/use-export-drawer-store"
+import { ChartRadar } from "@/components/users-ui/dashboard/ChartRadar"
+import { StatsCards } from "@/components/users-ui/dashboard/Stats-cards"
+import { ProjectList } from "@/components/users-ui/dashboard/Project-list"
+import { Sidebar, useSidebar } from "@/components/users-ui/dashboard/Sidebar"
+import { MobileAppCard } from "@/components/users-ui/dashboard/Mobile-app-card"
+import { SubscriptionModal } from "@/components/modals/subscription-alert-modal"
+import { MonthlyInsights } from "@/components/users-ui/dashboard/Monthly-Insights"
+import { DeviceManagement } from "@/components/users-ui/dashboard/Device-Mangement"
+import { WeeklyAnalysis } from "@/components/users-ui/dashboard/Weakly-aqi-analytics"
+import { MinuteAqiAnalytics } from "@/components/users-ui/dashboard/Minute-aqi-analytics"
 
 
 export default function DashboardPage() {
@@ -142,8 +142,8 @@ export default function DashboardPage() {
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                         <div className="lg:col-span-2 space-y-4">
-                            <HourlyAnalysis currentDeviceAssignDate={currentDeviceAssignDate} />
-                            <WeeklyAqiAnalytics />
+                            <MinuteAqiAnalytics />
+                            <WeeklyAnalysis currentDeviceAssignDate={currentDeviceAssignDate} />
                             <DeviceManagement />
                         </div>
 

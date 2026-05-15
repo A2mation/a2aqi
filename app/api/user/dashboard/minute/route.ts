@@ -38,11 +38,16 @@ export async function GET(req: Request) {
             take: 50
         });
 
+        const cleanedReadings = readings.map(reading => {
+            return Object.fromEntries(
+                Object.entries(reading).filter(([_, value]) => value !== null)
+            );
+        });
 
-        await redis.setex(key, 60, JSON.stringify(readings));
+        await redis.setex(key, 60, JSON.stringify(cleanedReadings));
 
         return NextResponse.json(
-            readings,
+            cleanedReadings,
         );
 
     } catch (error) {
