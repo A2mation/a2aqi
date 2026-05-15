@@ -9,6 +9,7 @@ import { Check, Home, PhoneCall } from "lucide-react";
 import { PRODUCTS } from "@/data/products";
 import TechnicalSpecs from "../components/TechnicalSpecs";
 import MobileBestQuoteModal from "@/components/modals/mobile-best-qoute-modal";
+import { Parameters } from "./components/Parameters";
 
 const SingleProductPage = ({
   params,
@@ -34,7 +35,7 @@ const SingleProductPage = ({
 
   return (
     <div className="min-h-screen pt-20 bg-[#f8fafc] text-slate-900 selection:bg-blue-100">
-      <main className="max-w-7xl mx-auto px-6 py-12">
+      <main className="px-1 md:px-6 py-12">
         {/* BREADCRUMBS */}
         <nav className="flex items-center gap-2 text-sm text-slate-400 mb-8 font-medium">
           <Home size={14} />
@@ -78,9 +79,8 @@ const SingleProductPage = ({
                 {product.images.map((_, i) => (
                   <div
                     key={i}
-                    className={`h-1.5 rounded-full transition-all duration-500 ${
-                      activeImg === i ? "w-8 bg-blue-600" : "w-2 bg-slate-300"
-                    }`}
+                    className={`h-1.5 rounded-full transition-all duration-500 ${activeImg === i ? "w-8 bg-blue-600" : "w-2 bg-slate-300"
+                      }`}
                   />
                 ))}
               </div>
@@ -97,11 +97,10 @@ const SingleProductPage = ({
                 <button
                   key={idx}
                   onClick={() => setActiveImg(idx)}
-                  className={`relative shrink-0 w-28 h-20 rounded-2xl overflow-hidden border-2 transition-all ${
-                    activeImg === idx
+                  className={`relative shrink-0 w-28 h-20 rounded-2xl overflow-hidden border-2 transition-all ${activeImg === idx
                       ? "border-blue-600 ring-4 ring-blue-50 scale-95"
                       : "border-transparent opacity-60 hover:opacity-100"
-                  }`}
+                    }`}
                 >
                   <img
                     src={img}
@@ -183,11 +182,14 @@ const SingleProductPage = ({
           </div>
         </div>
 
+        <Parameters />
+
         {/* BOTTOM SECTION: TECHNICAL SPECS TABLE */}
         <div className="mt-20">
           <TechnicalSpecs product={product} />
         </div>
       </main>
+
       <MobileBestQuoteModal isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
     </div>
   );
