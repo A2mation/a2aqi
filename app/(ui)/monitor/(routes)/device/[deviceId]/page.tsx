@@ -7,11 +7,13 @@ import React, { useEffect, useState } from 'react';
 import { http } from '@/lib/http';
 import Header from './components/Header';
 import CustomDays from './components/CustomDays';
+import { Skeleton } from "@/components/ui/skeleton";
 import LocationStats from './components/LocationStats';
+import SyncIntrrrupted from '@/components/Error/Sync-Intrrrupted';
 import AdvancedDeviceChart from './components/AdvancedDeviceChart';
 import { AnalyticsResponse } from '@/types/monitors/monitor.analytics.type';
-import { Skeleton } from "@/components/ui/skeleton";
-import SyncIntrrrupted from '@/components/Error/Sync-Intrrrupted';
+
+import { MinuteAqiAnalytics } from './components/Minute-aqi-analytics';
 
 
 const MonitorDeviceAnalyticsPage: React.FC = () => {
@@ -20,7 +22,7 @@ const MonitorDeviceAnalyticsPage: React.FC = () => {
 
     const today = new Date().toISOString().split('T')[0];
 
-    const { data, isLoading, isError } = useQuery<AnalyticsResponse>({
+    const { data, isLoading, isError, refetch } = useQuery<AnalyticsResponse>({
         queryKey: ["deviceDetails", deviceId, today],
         queryFn: async () => {
             const response = await http.get(`/api/monitor/device/${deviceId}`, {
@@ -32,7 +34,8 @@ const MonitorDeviceAnalyticsPage: React.FC = () => {
             return response.data;
         },
         placeholderData: (previousData) => previousData,
-        staleTime: 40000
+        staleTime: 1000 * 60,
+        refetchInterval: 1000 * 60,
     });
 
     useEffect(() => {
@@ -43,7 +46,7 @@ const MonitorDeviceAnalyticsPage: React.FC = () => {
 
     if (isError) {
         return (
-           <SyncIntrrrupted />
+            <SyncIntrrrupted />
         );
     }
 
@@ -67,6 +70,10 @@ const MonitorDeviceAnalyticsPage: React.FC = () => {
                                 {/* Location Sidebar */}
                                 <LocationStats device={data.device} />
                             </div>
+
+                            <MinuteAqiAnalytics
+                                data={data.minute}
+                            />
 
                             <CustomDays
                                 last30days={data.last30Days}

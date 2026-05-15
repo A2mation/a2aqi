@@ -1,4 +1,4 @@
-import { DeviceStatus, latestSensorReading } from "@prisma/client"
+import { DeviceStatus, latestSensorReading, SensorReading } from "@prisma/client"
 
 export interface MonitorAnalyticsDevice {
     id: string,
@@ -74,4 +74,5 @@ export interface AnalyticsResponse {
     }[],
     latestReading: latestSensorReading,
     last30Days: DaysReading[]
+    minute: SensorReading[]
 }

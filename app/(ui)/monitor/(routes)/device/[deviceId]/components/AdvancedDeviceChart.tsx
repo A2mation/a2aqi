@@ -50,7 +50,6 @@ const AdvancedDeviceChart = ({ hourlyData, liveData }: Props) => {
         });
     }, [liveData]);
 
-    console.log(availableParams)
 
     const getLiveValue = (key: keyof latestSensorReading) => {
         const val = liveData[key];

@@ -6,6 +6,7 @@ import { getSingleDeviceDetails } from "../service/device.monitor.service";
 import { getDailyBasicDashboardStats } from "../service/dailycustom.readings.service";
 import { getLatestSensorData } from "../service/latest.sensor.monitor.service";
 import { handleMonitorError } from "@/lib/handleRoleError";
+import { getLast1HourMinuteDataService } from "../service/minute.reading.service";
 
 export async function deviceIdController(req: Request,
     params: {
@@ -37,14 +38,23 @@ export async function deviceIdController(req: Request,
             });
         }
 
-        const data = await getHeatmap(deviceId, startDate);
-        const device = await getSingleDeviceDetails(deviceId);
-        const last30Days = await getDailyBasicDashboardStats(deviceId, {
-            type: 'custom',
-            dateStr: startDate,
-            day: 30
-        });
-        const latestReading = await getLatestSensorData(deviceId);
+        const [
+            data,
+            device,
+            last30Days,
+            latestReading,
+            minute
+        ] = await Promise.all([
+            getHeatmap(deviceId, startDate),
+            getSingleDeviceDetails(deviceId),
+            getDailyBasicDashboardStats(deviceId, {
+                type: 'custom',
+                dateStr: startDate,
+                day: 30
+            }),
+            getLatestSensorData(deviceId),
+            getLast1HourMinuteDataService(deviceId)
+        ]);
 
         return NextResponse.json({
             success: true,
@@ -52,6 +62,7 @@ export async function deviceIdController(req: Request,
             hourly: data.heatmap,
             last30Days,
             latestReading,
+            minute
         });
 
     } catch (error: any) {
