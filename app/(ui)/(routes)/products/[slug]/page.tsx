@@ -1,15 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { use, useState, useEffect } from "react"; // Added useEffect
-import { motion, AnimatePresence } from "framer-motion";
+import { use, useState, useEffect } from "react";
 import { Check, Home, PhoneCall } from "lucide-react";
-
+import { motion, AnimatePresence } from "framer-motion";
 
 import { PRODUCTS } from "@/data/products";
-import TechnicalSpecs from "../components/TechnicalSpecs";
-import MobileBestQuoteModal from "@/components/modals/mobile-best-qoute-modal";
 import { Parameters } from "./components/Parameters";
+import TechnicalSpecs from "../components/TechnicalSpecs";
+import { GallerySection } from "./components/GallerySection";
+import MobileBestQuoteModal from "@/components/modals/mobile-best-qoute-modal";
 
 const SingleProductPage = ({
   params,
@@ -35,7 +35,7 @@ const SingleProductPage = ({
 
   return (
     <div className="min-h-screen pt-20 bg-[#f8fafc] text-slate-900 selection:bg-blue-100">
-      <main className="px-1 md:px-6 py-12">
+      <main className="px-2 md:px-6 py-12">
         {/* BREADCRUMBS */}
         <nav className="flex items-center gap-2 text-sm text-slate-400 mb-8 font-medium">
           <Home size={14} />
@@ -98,8 +98,8 @@ const SingleProductPage = ({
                   key={idx}
                   onClick={() => setActiveImg(idx)}
                   className={`relative shrink-0 w-28 h-20 rounded-2xl overflow-hidden border-2 transition-all ${activeImg === idx
-                      ? "border-blue-600 ring-4 ring-blue-50 scale-95"
-                      : "border-transparent opacity-60 hover:opacity-100"
+                    ? "border-blue-600 ring-4 ring-blue-50 scale-95"
+                    : "border-transparent opacity-60 hover:opacity-100"
                     }`}
                 >
                   <img
@@ -113,7 +113,7 @@ const SingleProductPage = ({
           </div>
 
           {/* RIGHT: CONTENT SECTION */}
-          <div className="lg:col-span-5 space-y-8">
+          <div className="lg:col-span-5 space-y-8 px-4 md:px-2">
             <div>
               <h1 className="text-4xl lg:text-5xl font-black text-slate-900 leading-tight">
                 {product.title}
@@ -183,6 +183,8 @@ const SingleProductPage = ({
         </div>
 
         <Parameters />
+
+        <GallerySection />
 
         {/* BOTTOM SECTION: TECHNICAL SPECS TABLE */}
         <div className="mt-20">
