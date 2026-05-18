@@ -17,7 +17,7 @@ const ProductListingPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <div className="min-h-screen mt-5 pt-10 bg-[#f8fafc] text-slate-900 selection:bg-blue-100">
-      <main className="max-w-7xl mx-auto px-6 py-16">
+      <main className="px-6 py-16">
         {/* HEADER SECTION */}
         <header className="mb-16 text-center lg:text-left">
           <motion.div
@@ -62,9 +62,12 @@ const ProductListingPage = () => {
 
               {/* Content Container */}
               <div className="p-8 flex flex-col grow">
-                <h2 className="text-2xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                <Link
+                  href={`/products/${product.slug}`}
+                  className="text-2xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors"
+                >
                   {product.title}
-                </h2>
+                </Link>
 
                 <p className="text-slate-500 mt-3 line-clamp-2 text-sm leading-relaxed">
                   {product.description}

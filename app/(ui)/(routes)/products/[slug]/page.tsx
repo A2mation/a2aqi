@@ -10,6 +10,7 @@ import { Parameters } from "./components/Parameters";
 import TechnicalSpecs from "../components/TechnicalSpecs";
 import { GallerySection } from "./components/GallerySection";
 import MobileBestQuoteModal from "@/components/modals/mobile-best-qoute-modal";
+import { DashboardShowcase } from "./components/DashboardShowcase";
 
 const SingleProductPage = ({
   params,
@@ -182,14 +183,17 @@ const SingleProductPage = ({
           </div>
         </div>
 
+        {/* TECHNICAL SPECS TABLE */}
+        <div className="my-20">
+          <TechnicalSpecs product={product} />
+        </div>
+
         <Parameters />
+
+        <DashboardShowcase />
 
         <GallerySection />
 
-        {/* BOTTOM SECTION: TECHNICAL SPECS TABLE */}
-        <div className="mt-20">
-          <TechnicalSpecs product={product} />
-        </div>
       </main>
 
       <MobileBestQuoteModal isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
