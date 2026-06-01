@@ -1,6 +1,10 @@
 'use client'
+
 import dynamic from "next/dynamic";
+
 import AQIDashboard from "@/components/aqi-ui/aqi-dashboard";
+import { ClientLogosBanner } from "@/components/CientLogoBanner";
+import { FloatingMarketingNav } from "@/components/FloatingMarketingNav";
 
 const AirQualityDashboard = dynamic(
   () => import("../../../components/aqi-ui/major-air-pollutants-board"),
@@ -42,8 +46,23 @@ const AirQualityIndexTable = dynamic(
   }
 );
 
-import { ClientLogosBanner } from "@/components/CientLogoBanner";
-import { FloatingMarketingNav } from "@/components/FloatingMarketingNav";
+const MainDashboardShowcase = dynamic(
+  () => import("@/components/aqi-ui/Dashboard-Showcase"),
+  {
+    ssr: false,
+    loading: () => <div className="h-40 animate-pulse bg-gray-100 rounded-lg m-4" />
+  }
+);
+
+const UserDashboardPreview = dynamic(
+  () => import("@/components/aqi-ui/User-Dashboard-Preview"),
+  {
+    ssr: false,
+    loading: () => <div className="h-40 animate-pulse bg-gray-100 rounded-lg m-4" />
+  }
+);
+
+
 
 export default function Home() {
   const logos = [
@@ -67,11 +86,18 @@ export default function Home() {
       <AirPollutionTable />
 
       <AirQualityIndexTable />
+
+      <UserDashboardPreview />
+
+      <MainDashboardShowcase />
+
       <PopularCityCards />
 
+
       <ClientLogosBanner logos={logos} />
+
       <FloatingMarketingNav />
-      
+
     </main>
   );
 }
