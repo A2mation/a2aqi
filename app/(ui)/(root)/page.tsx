@@ -46,16 +46,16 @@ const AirQualityIndexTable = dynamic(
   }
 );
 
-const MainDashboardShowcase = dynamic(
-  () => import("@/components/aqi-ui/Dashboard-Showcase"),
+const PlatformShowcaseSection = dynamic(
+  () => import("@/components/aqi-ui/PlatformShowcaseSection"),
   {
     ssr: false,
     loading: () => <div className="h-40 animate-pulse bg-gray-100 rounded-lg m-4" />
   }
 );
 
-const UserDashboardPreview = dynamic(
-  () => import("@/components/aqi-ui/User-Dashboard-Preview"),
+const ConnectivitySection = dynamic(
+  () => import("@/components/aqi-ui/ConnectivitySection"),
   {
     ssr: false,
     loading: () => <div className="h-40 animate-pulse bg-gray-100 rounded-lg m-4" />
@@ -87,9 +87,9 @@ export default function Home() {
 
       <AirQualityIndexTable />
 
-      <UserDashboardPreview />
+      <PlatformShowcaseSection />
 
-      <MainDashboardShowcase />
+      <ConnectivitySection />
 
       <PopularCityCards />
 
