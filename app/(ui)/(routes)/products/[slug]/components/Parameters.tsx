@@ -110,6 +110,9 @@ export const Parameters = () => {
                             </motion.div>
                         ))}
                     </div>
+                    <div className='text-red-600 text-sm opacity-50 text-center w-full pt-3'>
+                        **Parameters Modification option only available on industrial products**
+                    </div>
 
                     {/* Footer Section */}
                     <div className="mt-20 pt-12 border-t border-slate-100 flex flex-wrap items-center justify-center md:justify-between gap-10">
@@ -142,7 +145,9 @@ export const Parameters = () => {
                                 width={300}
                             />
                         </div>
+
                     </div>
+
                 </div>
             </div>
         </div>

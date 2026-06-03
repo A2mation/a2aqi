@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import AQIDashboard from "@/components/aqi-ui/aqi-dashboard";
 import { ClientLogosBanner } from "@/components/CientLogoBanner";
 import { FloatingMarketingNav } from "@/components/FloatingMarketingNav";
+import ProductAdBanner from "@/components/aqi-ui/product-ad-banner"
 
 const AirQualityDashboard = dynamic(
   () => import("../../../components/aqi-ui/major-air-pollutants-board"),
@@ -83,7 +84,10 @@ export default function Home() {
       <AQIGraph />
 
 
+      <ProductAdBanner />
+
       <AirPollutionTable />
+
 
       <AirQualityIndexTable />
 

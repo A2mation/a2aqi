@@ -11,6 +11,7 @@ import TechnicalSpecs from "../components/TechnicalSpecs";
 import { GallerySection } from "./components/GallerySection";
 import MobileBestQuoteModal from "@/components/modals/mobile-best-qoute-modal";
 import { DashboardShowcase } from "./components/DashboardShowcase";
+import { useRouter } from "next/navigation";
 
 const SingleProductPage = ({
   params,
@@ -18,6 +19,7 @@ const SingleProductPage = ({
   params: Promise<{ slug: string }>;
 }) => {
   const param = use(params);
+  const router = useRouter();
   const [activeImg, setActiveImg] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,20 +37,22 @@ const SingleProductPage = ({
   }, [product.images.length, isPaused]);
 
   return (
-    <div className="min-h-screen pt-20 bg-[#f8fafc] text-slate-900 selection:bg-blue-100">
+    <div className="min-h-screen pt-20 bg-[#f8fafc] text-slate-900 selection:bg-green-100">
       <main className="px-2 md:px-6 py-12">
         {/* BREADCRUMBS */}
-        <nav className="flex items-center gap-2 text-sm text-slate-400 mb-8 font-medium">
-          <Home size={14} />
+        <nav className="flex items-center gap-2 text-sm md:text-lg  text-slate-400 mb-8 font-medium">
+          <Home size={22} onClick={() => {
+            router.push('/')
+          }} className="hover:text-green-600 cursor-pointer"/>
           <span>/</span>
           <Link
             href="/products"
-            className="hover:text-blue-600 transition-colors"
+            className="hover:text-green-600 transition-colors"
           >
             Products
           </Link>
           <span>/</span>
-          <span className="text-slate-900 font-bold">{product.title}</span>
+          <span className="text-green-600 font-bold">{product.title}</span>
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -61,7 +65,7 @@ const SingleProductPage = ({
             <motion.div
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="relative aspect-video rounded-[2.5rem] bg-white shadow-2xl shadow-blue-100 border border-blue-50"
+              className="relative aspect-video rounded-[2.5rem] bg-white shadow-2xl shadow-green-100 border border-green-50"
             >
               <AnimatePresence mode="wait">
                 <motion.img
@@ -80,15 +84,15 @@ const SingleProductPage = ({
                 {product.images.map((_, i) => (
                   <div
                     key={i}
-                    className={`h-1.5 rounded-full transition-all duration-500 ${activeImg === i ? "w-8 bg-blue-600" : "w-2 bg-slate-300"
+                    className={`h-1.5 rounded-full transition-all duration-500 ${activeImg === i ? "w-8 bg-green-600" : "w-2 bg-slate-300"
                       }`}
                   />
                 ))}
               </div>
 
               <div className="absolute top-6 left-6 flex gap-2">
-                <span className="px-4 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest text-blue-600 shadow-sm">
-                  Industrial Grade
+                <span className="px-4 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest text-green-600 shadow-sm">
+                  {product.badge}
                 </span>
               </div>
             </motion.div>
@@ -99,7 +103,7 @@ const SingleProductPage = ({
                   key={idx}
                   onClick={() => setActiveImg(idx)}
                   className={`relative shrink-0 w-28 h-20 rounded-2xl overflow-hidden border-2 transition-all ${activeImg === idx
-                    ? "border-blue-600 ring-4 ring-blue-50 scale-95"
+                    ? "border-green-600 ring-4 ring-green-50 scale-95"
                     : "border-transparent opacity-60 hover:opacity-100"
                     }`}
                 >
@@ -129,9 +133,9 @@ const SingleProductPage = ({
               {product.features.map((feature, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 p-4 bg-blue-50/50 rounded-2xl border border-blue-100/50"
+                  className="flex items-center gap-3 p-4 bg-green-50/50 rounded-2xl border border-green-100/50"
                 >
-                  <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center">
+                  <div className="w-6 h-6 rounded-full bg-green-600 flex items-center justify-center">
                     <Check
                       className="text-white"
                       size={14}
@@ -147,14 +151,14 @@ const SingleProductPage = ({
             <div className="flex flex-col gap-4">
               <Link
                 href="tel:+918777353002"
-                className="md:hidden w-full flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-3xl shadow-xl shadow-blue-200 transition-all active:scale-[0.98]"
+                className="md:hidden w-full flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 text-white font-black py-5 rounded-3xl shadow-xl shadow-green-200 transition-all active:scale-[0.98]"
               >
                 <PhoneCall size={20} />
                 Call for best Quote
               </Link>
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="hidden w-full md:flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-3xl shadow-xl shadow-blue-200 transition-all active:scale-[0.98]"
+                className="hidden w-full md:flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 text-white font-black py-5 rounded-3xl shadow-xl shadow-green-200 transition-all active:scale-[0.98]"
               >
                 <PhoneCall size={20} />
                 Call for best Quote
