@@ -12,17 +12,37 @@ import { AQITheme, getAQITheme } from "@/helpers/aqi-color-pallet"
 
 
 export default function AirQualityDashboard() {
-  const { aqi, pm10, pm25, so2, o3, co, no2, error, state } = useLocationStore();
-  const [theme, setTheme] = useState<AQITheme>(getAQITheme(0))
+  const {
+    aqi, pm10, pm25, so2, o3, co, no2, co2,
+    noise, pm1, tvoc, smoke, methane, h2,
+    ammonia, h2s, error, state
+  } = useLocationStore();
 
-  const pollutants = useMemo(() => [
-    { name: "Fine Particles", formula: "PM2.5", value: pm25 ?? null, unit: "µg/m³", icon: "/assets/pm2.5-parameter.png" },
-    { name: "Inhalable Particles", formula: "PM10", value: pm10 ?? null, unit: "µg/m³", icon: "/assets/pm10-perameter.png" },
-    { name: "Carbon Monoxide", formula: "CO", value: co ?? null, unit: "ppb", icon: "/assets/co-icon.png" },
-    { name: "Sulfur Dioxide", formula: "SO2", value: so2 ?? null, unit: "ppb", icon: "/assets/so2-icon.png" },
-    { name: "Nitrogen Dioxide", formula: "NO2", value: no2 ?? null, unit: "ppb", icon: "/assets/no2-icon.png" },
-    { name: "Ozone", formula: "O3", value: o3 ?? null, unit: "ppb", icon: "/assets/o3.svg" },
-  ], [pm10, pm25, so2, o3, co, no2])
+  const [theme, setTheme] = useState < AQITheme > (getAQITheme(0))
+
+  const pollutants = useMemo(() => {
+    const allPollutants = [
+      { name: "Fine Particles", formula: "PM2.5", value: pm25 ?? null, unit: "µg/m³", icon: "/assets/pm2.5-parameter.png" },
+      { name: "Inhalable Particles", formula: "PM10", value: pm10 ?? null, unit: "µg/m³", icon: "/assets/pm10-perameter.png" },
+      { name: "Carbon Monoxide", formula: "CO", value: co ?? null, unit: "ppm", icon: "/assets/co-icon.png" },
+      { name: "Sulfur Dioxide", formula: "SO2", value: so2 ?? null, unit: "ppb", icon: "/assets/so2-icon.png" },
+      { name: "Nitrogen Dioxide", formula: "NO2", value: no2 ?? null, unit: "ppb", icon: "/assets/no2-icon.png" },
+      { name: "Ozone", formula: "O3", value: o3 ?? null, unit: "ppb", icon: "/assets/o3.svg" },
+      { name: "Carbon Dioxide", formula: "CO2", value: co2 ?? null, unit: "ppm", icon: "/assets/co-icon.png" },
+      { name: "Ambient Noise", formula: "Noise", value: noise ?? null, unit: "dB", icon: "/assets/noise-icon.png" },
+      { name: "Ultra-fine Particles", formula: "PM1", value: pm1 ?? null, unit: "µg/m³", icon: "/assets/pm1-icon.png" },
+      { name: "Volatile Organic Compounds", formula: "TVOC", value: tvoc ?? null, unit: "mg/m³", icon: "/assets/tvoc-icon.png" },
+      { name: "Smoke Density", formula: "Smoke", value: smoke ?? null, unit: "ppm", icon: "/assets/smoke-icon.png" },
+      { name: "Methane Gas", formula: "CH4", value: methane ?? null, unit: "ppm", icon: "/assets/methane-icon.png" },
+      { name: "Hydrogen Gas", formula: "H2", value: h2 ?? null, unit: "ppm", icon: "/assets/h2-icon.png" },
+      { name: "Ammonia", formula: "NH3", value: ammonia ?? null, unit: "ppm", icon: "/assets/ammonia-icon.png" },
+      { name: "Hydrogen Sulfide", formula: "H2S", value: h2s ?? null, unit: "ppm", icon: "/assets/h2s-icon.png" },
+    ];
+    return allPollutants.filter(pollutant => pollutant.value !== null && pollutant.value !== undefined);
+  }, [
+    pm25, pm10, co, so2, no2, o3, co2, noise,
+    pm1, tvoc, smoke, methane, h2, ammonia, h2s
+  ])
 
   useEffect(() => {
     if (typeof aqi === "number") setTheme(getAQITheme(aqi))
@@ -50,11 +70,9 @@ export default function AirQualityDashboard() {
             </motion.div>
 
             <h1 className="text-5xl font-light tracking-tight text-slate-900 md:text-6xl">
-              Air <span className="font-extrabold italic text-slate-800">
-                Quality
-              </span>
+              Air <span className="font-extrabold italic text-slate-800">Quality</span>
             </h1>
-            <p className="text-slate-400 font-medium max-w-md">Detailed monitoring of atmospheric pollutants and particulate matter.</p>
+            <p className="text-slate-400 font-medium max-w-md">Detailed monitoring of atmospheric pollutants and environmental metrics.</p>
           </div>
 
           <div className="hidden md:flex items-center gap-8">
@@ -68,7 +86,6 @@ export default function AirQualityDashboard() {
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 transition-colors group-hover:text-muted-foreground">
                 Powered by
               </span>
-              {/* <div className="h-4 w-px bg-border/60" aria-hidden="true" /> */}
               <div className="relative flex items-center">
                 <Image
                   src="/assets/a2mation-logo.png"
@@ -97,18 +114,21 @@ export default function AirQualityDashboard() {
           </div>
         </header>
 
+        {/* --- Dynamic Grid Section --- */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          <AnimatePresence>
+          <AnimatePresence mode="popLayout">
             {pollutants.map((pollutant, index) => {
               const currentTheme = getAQITheme(pollutant.value ?? 0);
 
               return (
                 <motion.div
                   key={pollutant.formula}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                  initial={{ opacity: 0, scale: 0.9, y: 30 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9, y: -30 }}
+                  transition={{ delay: index * 0.03, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                   whileHover={{ y: -8 }}
+                  layout
                 >
                   <Card
                     className={cn(
@@ -138,29 +158,25 @@ export default function AirQualityDashboard() {
                           />
                         </div>
                         <div className="text-right">
-                          <p
-                            className="text-3xl font-black text-slate-800 leading-tight"
-                          // style={{ color: currentTheme.color }}
-                          >{pollutant.formula}</p>
+                          <p className="text-3xl font-black text-slate-800 leading-tight">
+                            {pollutant.formula}
+                          </p>
                         </div>
                       </div>
 
                       {/* Middle: Name & Value */}
                       <div className="space-y-4">
                         <div>
-                          <h3
-                            className="text-md font-bold  uppercase tracking-widest mb-1 flex items-center gap-1.5"
-                          // style={{ color: currentTheme.color }}
-                          >
+                          <h3 className="text-md font-bold uppercase tracking-widest mb-1 flex items-center gap-1.5">
                             <Activity className="w-3 h-3" />
                             {pollutant.name}
                           </h3>
                           <div className="flex items-baseline gap-3">
                             <span
-                              className="text-6xl font-bold tracking-tighter "
+                              className="text-6xl font-bold tracking-tighter"
                               style={{ color: currentTheme.color }}
                             >
-                              {pollutant.value ?? "--"}
+                              {pollutant.value}
                             </span>
                             <span className="text-sm font-bold text-slate-400">
                               {pollutant.unit}

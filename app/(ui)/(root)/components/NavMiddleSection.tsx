@@ -118,31 +118,56 @@ export function NavbarMiddleSection({
             </button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent className="w-50" align="start">
-            <DropdownMenuGroup>
-              <DropdownMenuLabel>
+          <DropdownMenuContent
+            className="w-64 p-2 bg-white/70 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200/50 dark:border-slate-800/50 rounded-2xl shadow-[0_10px_30px_-10px_rgba(0,0,0,0.08)] animate-in fade-in-50 zoom-in-95 duration-200"
+            align="start"
+            sideOffset={8}
+          >
+            <div className="px-3 py-2 mb-1">
+              <p className="text-[10px] font-bold tracking-[0.15em] text-slate-400 uppercase">
                 Sectors
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => router.push('/air-quality-monitoring-construction-sites')}>
-                Construction
-                <DropdownMenuShortcut><IconBuildingFactory2 stroke={2} /></DropdownMenuShortcut>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/air-quality-monitoring-hospital-sites')}>
-                Hospitals
-                <DropdownMenuShortcut><IconBuildingHospital stroke={2} /></DropdownMenuShortcut>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/air-quality-monitoring-smart-cities')}>
-                Smart Cities
-                <DropdownMenuShortcut><IconBuildings stroke={2} /></DropdownMenuShortcut>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/air-quality-monitoring-industries')}>
-                Institution
-                <DropdownMenuShortcut><IconBuildingBank stroke={2} /></DropdownMenuShortcut>
-              </DropdownMenuItem>
+              </p>
+            </div>
+
+            <DropdownMenuGroup className="space-y-1">
+              {[
+                {
+                  label: "Construction",
+                  path: "/air-quality-monitoring-construction-sites",
+                  icon: <IconBuildingFactory2 stroke={2} className="size-6" />
+                },
+                {
+                  label: "Hospitals",
+                  path: "/air-quality-monitoring-hospital-sites",
+                  icon: <IconBuildingHospital stroke={2} className="size-6" />
+                },
+                {
+                  label: "Smart Cities",
+                  path: "/air-quality-monitoring-smart-cities",
+                  icon: <IconBuildings stroke={2} className="size-6" />
+                },
+                {
+                  label: "Institution",
+                  path: "/air-quality-monitoring-industries",
+                  icon: <IconBuildingBank stroke={2} className="size-6" />
+                },
+              ].map((item) => (
+                <DropdownMenuItem
+                  key={item.path}
+                  className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-200 transition-all duration-200 cursor-pointer outline-none focus:bg-amber-50 focus:text-amber-600 dark:focus:bg-amber-950/30 dark:focus:text-amber-400 group data-[disabled]:opacity-50"
+                  onClick={() => router.push(item.path)}
+                >
+                  <span className="tracking-wide transition-transform duration-200 group-focus:translate-x-0.5">
+                    {item.label}
+                  </span>
+
+                  <DropdownMenuShortcut className="ml-auto text-slate-400 group-focus:text-amber-500 transition-colors duration-200 opacity-80 group-focus:opacity-100 fallback-shortcut">
+                    {item.icon}
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+              ))}
             </DropdownMenuGroup>
           </DropdownMenuContent>
-
         </DropdownMenu>
 
         <Link

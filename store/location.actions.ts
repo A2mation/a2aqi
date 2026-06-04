@@ -45,6 +45,16 @@ export const detectIpLocation = async () => {
                     wind: nearest.wind,
                     co: nearest.co,
                     so2: nearest.so2,
+                    co2: nearest.co2,
+                    noise: nearest.noise,
+                    pm1: nearest.pm1,
+                    tvoc: nearest.tvoc,
+                    smoke: nearest.smoke,
+                    methane: nearest.methane,
+                    h2: nearest.h2,
+                    ammonia: nearest.ammonia,
+                    h2s: nearest.h2s,
+
                     source: nearest.source || "CPCB",
 
                     // Update the collection fields
