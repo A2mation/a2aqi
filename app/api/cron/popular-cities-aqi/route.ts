@@ -10,7 +10,7 @@ export async function GET(req: Request) {
 
         const BATCH_SIZE = 20;
         const results: any[] = [];
-        console.log(cities.length)
+        // console.log(cities.length)
 
         for (let i = 0; i < cities.length; i += BATCH_SIZE) {
             const batch = cities.slice(i, i + BATCH_SIZE);
@@ -22,6 +22,11 @@ export async function GET(req: Request) {
 
                         if (!waqi?.data?.aqi) {
                             results.push({ city: city.name, status: "no-data" });
+                            return;
+                        }
+
+                        if (waqi.data.aqi === 999) {
+                            results.push({city: city.name, status: 'Rejected'})
                             return;
                         }
 

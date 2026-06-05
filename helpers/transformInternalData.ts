@@ -4,7 +4,7 @@ export const transformInternalData = (records: any[]) => {
   return records.map((data) => {
 
     return {
-      id: data.device.id || String(data.id),
+      id: String(data.device.id) || String(data.id),
       lat: Number(data.device?.lat || data.lat),
       lng: Number(data.device?.lng || data.lng),
       aqi: Math.round(Number(data.aqi)),
@@ -90,23 +90,23 @@ export const transformInternalForNearbyLocationsData = (records: any[], state: s
       country: "India",
       lat: Number(data.device?.lat || data.lat),
       lng: Number(data.device?.lng || data.lng),
-      
-      street : data.street ? data.street : '',
+
+      street: data.street ? data.street : '',
       aqi: Number(Number(data.aqi).toFixed(2)),
       pm25: data.pm25 ? Number(Number(data.pm25).toFixed(2)) : null,
       pm10: data.pm10 ? Number(Number(data.pm10).toFixed(2)) : null,
-      
+
       no2: data.no2 !== null ? Number(data.no2) : null,
       so2: data.so2 !== null ? Number(data.so2) : null,
       o3: data.o3 !== null ? Number(data.o3) : null,
       co: data.co !== null ? Number(data.co) : null,
-      
+
       temperature: data.temperature !== null ? Number(data.temperature) : null,
       humidity: data.humidity !== null ? Number(data.humidity) : null,
-      
-      source: AQISource.INTERNAL, 
+
+      source: AQISource.INTERNAL,
       stationId: data.device?.serialNo || null,
-      
+
       measuredAt: timestamp,
       createdAt: timestamp,
     };
