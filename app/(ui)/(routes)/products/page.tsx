@@ -9,6 +9,7 @@ import UserDashboardPreview from "@/components/aqi-ui/User-Dashboard-Preview";
 import Headers from "./components/Headers";
 import Footer from "./components/Footer";
 import ProductCard from "./components/Product-Card";
+import CalibrationDashboard from "./components/CalibrationDashboard";
 
 
 
@@ -30,6 +31,9 @@ const ProductListingPage = () => {
 
         {/* USER DASHBOARD FEATURES SHOWCASE */}
         <MainDashboardShowcase />
+
+        {/* CALIBRATION DASHBOARD FEATURES SHOWCASE */}
+        <CalibrationDashboard />
 
         {/* BOTTOM INFO CARD */}
         <Footer setIsModalOpen={setIsModalOpen} />
