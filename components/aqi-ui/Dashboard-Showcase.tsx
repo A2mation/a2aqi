@@ -60,7 +60,7 @@ const MainDashboardShowcase: React.FC = () => {
     const currentBenefit = benefits.find(b => b.id === activeTab) || benefits[0];
 
     return (
-        <section className="bg-slate-50 py-16 px-4 sm:px-6 lg:px-8 min-h-screen flex flex-col justify-center">
+        <section className="bg-inherit py-16 px-4 sm:px-6 lg:px-8 min-h-screen flex flex-col justify-center">
             <div className="max-w-400 mx-auto w-full">
 
                 {/* Header Section */}

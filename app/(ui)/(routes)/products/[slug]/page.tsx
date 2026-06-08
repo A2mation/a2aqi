@@ -37,13 +37,13 @@ const SingleProductPage = ({
   }, [product.images.length, isPaused]);
 
   return (
-    <div className="min-h-screen pt-20 bg-[#f8fafc] text-slate-900 selection:bg-green-100">
+    <div className="min-h-screen pt-20 bg-inherit text-slate-900 selection:bg-green-100">
       <main className="px-2 md:px-6 py-12">
         {/* BREADCRUMBS */}
         <nav className="flex items-center gap-2 text-sm md:text-lg  text-slate-400 mb-8 font-medium">
           <Home size={22} onClick={() => {
             router.push('/')
-          }} className="hover:text-green-600 cursor-pointer"/>
+          }} className="hover:text-green-600 cursor-pointer" />
           <span>/</span>
           <Link
             href="/products"
@@ -163,6 +163,14 @@ const SingleProductPage = ({
                 <PhoneCall size={20} />
                 Call for best Quote
               </button>
+
+              <Link
+                href="tel:+918777353002"
+                className="md:hidden w-full flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 text-white font-black py-5 rounded-3xl shadow-xl shadow-green-200 transition-all active:scale-[0.98]"
+              >
+                <PhoneCall size={20} />
+                Call for best Quote
+              </Link>
             </div>
 
             {/* LOGISTICS BRIEF */}

@@ -18,7 +18,7 @@ import CalibrationDashboard from "./components/CalibrationDashboard";
 const ProductListingPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   return (
-    <div className="min-h-screen mt-5 pt-2 bg-[#f8fafc] text-slate-900 selection:bg-blue-100">
+    <div className="min-h-screen mt-5 pt-2 text-slate-900 selection:bg-blue-100">
       <main className="px-6 py-16">
         {/* HEADER SECTION */}
         <Headers />

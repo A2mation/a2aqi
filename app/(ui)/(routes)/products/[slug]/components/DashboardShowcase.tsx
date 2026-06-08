@@ -64,7 +64,7 @@ export function DashboardShowcase() {
     const [activeFeature, setActiveFeature] = useState<FeaturePoint>(features[0]);
 
     return (
-        <section className="relative min-h-screen w-full bg-slate-50 text-slate-900 py-24 px-4 sm:px-6 lg:px-8">
+        <section className="relative min-h-screen w-full bg-inherit text-slate-900 py-24 px-4 sm:px-6 lg:px-8">
 
             {/* Soft Premium Background Light Leaks */}
             <div className="absolute top-0 right-1/4 w-125 h-125 bg-teal-500/5 rounded-full blur-[120px] pointer-events-none" />

@@ -54,7 +54,7 @@ const Layout = async ({
 
     return (
         <>
-            <main className='bg-[#f8fafc]'>
+            <main className='bg-[#f4f7f5]'>
                 <section className='max-w-400 mx-auto'>
                     {children}
                 </section>

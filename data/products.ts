@@ -28,7 +28,8 @@ export const PRODUCTS = [
             '1 Year Free Subscription',
             '24 * 7 Data Access'
         ],
-        badge: 'Standard'
+        badge: 'Standard',
+        price: 6599
     },
 
     {
@@ -58,7 +59,8 @@ export const PRODUCTS = [
             '1 Year Free Subscription',
             '24 * 7 Data Access'
         ],
-        badge: 'Standard'
+        badge: 'Standard',
+        price: 5599
     },
 
     {
@@ -90,7 +92,8 @@ export const PRODUCTS = [
             '1 Year Free Subscription',
             '24 * 7 Data Access'
         ],
-        badge: 'Hand-held'
+        badge: 'Hand-held',
+        price: 199999
     },
 
     {
@@ -121,7 +124,8 @@ export const PRODUCTS = [
             '12/24 Hour Clock Support',
             'All Data Available in Server'
         ],
-        badge: 'Industrial Grade'
+        badge: 'Industrial Grade',
+        price: 74999
     },
 
     {
@@ -155,7 +159,8 @@ export const PRODUCTS = [
             'Fixed Scrolling Message',
             '12/24 Hour Clock Support'
         ],
-        badge: 'Industrial Grade'
+        badge: 'Industrial Grade',
+        price: 84999
     },
 
     {
@@ -186,6 +191,7 @@ export const PRODUCTS = [
             'Weatherproof & Waterproof',
             '12/24 Hour Clock Support',
         ],
-        badge: 'Industrial Grade'
+        badge: 'Industrial Grade',
+        price: 159999
     },
 ];

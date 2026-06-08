@@ -102,7 +102,7 @@ const UserDashboardPreview: React.FC = () => {
 
     return (
         <>
-            <section className="bg-slate-50 py-20 px-4 sm:px-6 lg:px-8 min-h-screen flex items-center justify-center">
+            <section className="bg-inherit py-20 px-4 sm:px-6 lg:px-8 min-h-screen flex items-center justify-center">
                 <div className="max-w-400 mx-auto w-full">
 
                     <div className="text-center max-w-3xl mx-auto mb-16">
