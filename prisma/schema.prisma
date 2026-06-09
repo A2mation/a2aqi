@@ -911,20 +911,23 @@ model CouponRedemption {
 model Payment {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  userId String @db.ObjectId
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String? @db.ObjectId
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  deviceId String @db.ObjectId
-  device   Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  deviceId String? @db.ObjectId
+  device   Device? @relation(fields: [deviceId], references: [id], onDelete: Cascade)
 
-  pricingPlanId String      @db.ObjectId
-  pricingPlan   PricingPlan @relation(fields: [pricingPlanId], references: [id])
+  pricingPlanId String?      @db.ObjectId
+  pricingPlan   PricingPlan? @relation(fields: [pricingPlanId], references: [id])
 
   deviceSubscriptionId String?             @db.ObjectId
   deviceSubscription   DeviceSubscription? @relation(fields: [deviceSubscriptionId], references: [id], onDelete: SetNull)
 
   couponId String? @db.ObjectId
   coupon   Coupon? @relation(fields: [couponId], references: [id], onDelete: SetNull)
+
+  productId   String? @unique
+  productSlug String? @unique
 
   amount         Float
   discountAmount Float?
@@ -967,8 +970,11 @@ model Invoice {
   deviceSubscriptionId String?             @db.ObjectId
   deviceSubscription   DeviceSubscription? @relation(fields: [deviceSubscriptionId], references: [id])
 
-  addressId String  @db.ObjectId
-  address   Address @relation(fields: [addressId], references: [id])
+  addressId String?  @db.ObjectId
+  address   Address? @relation(fields: [addressId], references: [id])
+
+  productId   String? @unique
+  productSlug String? @unique
 
   subtotal    Float
   taxAmount   Float
