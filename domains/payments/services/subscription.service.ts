@@ -15,7 +15,7 @@ export async function activateSubscription(
     tx?: DB
 ) {
 
-    const plan = await getPricingPlanById(data.pricingPlanId, tx)
+    const plan = await getPricingPlanById(data.pricingPlanId!, tx)
 
     if (!plan) {
         throw new Error("Pricing plan not found")
@@ -29,8 +29,8 @@ export async function activateSubscription(
     end.setMonth(start.getMonth() + months)
 
     return createDeviceSubscription({
-        userId: data.userId,
-        deviceId: data.deviceId,
+        userId: data.userId!,
+        deviceId: data.deviceId!,
         startDate: start,
         endDate: end,
         paidAmount: plan.price,

@@ -19,7 +19,7 @@ export async function generateAndSaveInvoice(payment: Payment, subscription: Dev
 
     const userGstNumber = await prisma.user.findUnique({
         where: {
-            id: payment.userId
+            id: payment.userId!
         }, select: {
             gstNumber: true
         }
@@ -60,7 +60,7 @@ export async function generateAndSaveInvoice(payment: Payment, subscription: Dev
         gstNumber: userGstNumber?.gstNumber ?? '',
         status: "PAID",
         issuedAt: payment.paidAt ?? new Date(),
-        user: { connect: { id: payment.userId } },
+        user: { connect: { id: payment.userId! } },
         payment: { connect: { id: payment.id } },
         address: { connect: { id: billDetails.id } },
         deviceSubscription: { connect: { id: subscription.id } }

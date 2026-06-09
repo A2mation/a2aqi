@@ -80,7 +80,7 @@ export async function POST(req: Request) {
                     const userId = payment.userId;
 
                     const billingAdsOBJ = new UserBillingAddressService();
-                    const userBillingAddress = await billingAdsOBJ.getPrimaryBillingAddress(userId);
+                    const userBillingAddress = await billingAdsOBJ.getPrimaryBillingAddress(userId!);
 
                     if (userBillingAddress) {
                         await generateAndSaveInvoice(payment, subscription, userBillingAddress);

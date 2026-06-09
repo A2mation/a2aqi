@@ -58,8 +58,8 @@ export async function redeemCoupon(payment: Payment, tx?: DB) {
 
     await createCouponRedemption({
         couponId: payment.couponId,
-        userId: payment.userId,
-        deviceId: payment.deviceId,
+        userId: payment.userId!,
+        deviceId: payment.deviceId!,
         paymentId: payment.id,
         discountApplied: payment.discountAmount ?? 0,
     }, tx)
