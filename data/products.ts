@@ -1,6 +1,7 @@
 export const PRODUCTS = [
 
     {
+        id: 'a2aq21sw712',
         slug: 'a2aq21sw-7x12-cm',
         title: 'A2-AQ21SW - 7 CM X 12 CM',
         description: 'High-quality Air Quality Monitor Device featuring a durable plastic cabinet. Features auto-updating data for PM10, PM2.5, PM1, AQI, Temperature, and Humidity with in build display.',
@@ -33,6 +34,7 @@ export const PRODUCTS = [
     },
 
     {
+        id: 'a2aq20sw712',
         slug: 'a2aq20sw-7x12-cm',
         title: 'A2-AQ20SW - 7 CM X 12 CM',
         description: 'High-quality Air Quality Monitor Device featuring a durable plastic cabinet. Features auto-updating data for PM10, PM2.5, PM1, AQI, Temperature.',
@@ -64,6 +66,7 @@ export const PRODUCTS = [
     },
 
     {
+        id: 'a2aq22sw207',
         slug: 'a2aq22sw-20x7-cm',
         title: 'A2-AQ22SW - 20 CM X 7 CM',
         description: 'High-quality Air Quality Monitor Device featuring a durable plastic cabinet. Features auto-updating data for PM10, PM2.5, PM1, AQI, Temperature.',
@@ -97,8 +100,9 @@ export const PRODUCTS = [
     },
 
     {
-        slug: 'a2-aq12sw-38x21-inch',
-        title: 'A2-AQ12SW - 38 INCH X 21 INCH',
+        id: 'a2aq12sw3821',
+        slug: 'a2aq12sw-38x21-inch',
+        title: 'A2AQ12SW - 38 INCH X 21 INCH',
         description: 'Industrial-grade outdoor AQI display with high-contrast Blue/White LED digits. Engineered for extreme environments with an Auto-Update feature and IR Remote calibration system.',
         images: [
             'https://res.cloudinary.com/dvlzmzztg/image/upload/v1775189765/A2-AQ12SW_IMG1_fdt1y2.png',
@@ -129,8 +133,9 @@ export const PRODUCTS = [
     },
 
     {
+        id:'a2aq18sw3636',
         slug: 'a2aq18sw-36x36-inch',
-        title: 'A2-AQ18SW - 36 INCH X 36 INCH',
+        title: 'A2AQ18SW - 36 INCH X 36 INCH',
         description: 'High-quality industry-based LED Air Quality Index Display featuring a durable metal cabinet. Supports 12/24hr clock formats and scrolling messages. Features auto-updating data for PM10, PM2.5, CO, AQI, Temperature, and Humidity with full IR remote calibration.',
         images: [
             'https://res.cloudinary.com/dvlzmzztg/image/upload/v1775191155/A2-AQ18SW_IMG1_dx3ben.png',
@@ -164,8 +169,9 @@ export const PRODUCTS = [
     },
 
     {
+        id: 'a2aq10sw7248',
         slug: 'a2aq10sw-72x48-inch',
-        title: 'A2-AQ10SW - 72 INCH X 48 INCH',
+        title: 'A2AQ10SW - 72 INCH X 48 INCH',
         description: "Industrial-Grade LED Air Quality Index Monitor. Housed in a durable, robust metal cabinet with a professional finish. Features clear, multi-color LED indicators for real-time readings of PM10, PM2.5, CO, AQI, Temperature, and Humidity. Supports auto-updating data feeds, 12/24hr clock formats, and a scrolling message banner for important alerts. Full IR remote control allows for seamless calibration and on-site setup. Perfect for industrial environments, warehouses, and smart city applications.",
         images: [
             'https://res.cloudinary.com/dvlzmzztg/image/upload/v1775192444/A2-AQ10SW_IMG1_xgj3oa.png',

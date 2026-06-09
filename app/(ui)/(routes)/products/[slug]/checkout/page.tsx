@@ -13,14 +13,11 @@ import { PRODUCTS } from '@/data/products'
 
 const CheckoutPage = () => {
     const params = useParams();
-    const [step, setStep] = useState<1 | 2>(1)
-    const [quantity, setQuantity] = useState<number>(1)
-    const [savedAddress, setSavedAddress] = useState<AddressFormValues | null>(null)
+    const [step, setStep] = useState < 1 | 2 > (1)
+    const [quantity, setQuantity] = useState < number > (1)
+    const [savedAddress, setSavedAddress] = useState < AddressFormValues | null > (null)
 
     const p = PRODUCTS.find((s) => s.slug === params.slug);
-
-    console.log(p)
-    console.log(p)
 
     const product = {
         title: p?.title || ``,
@@ -60,9 +57,17 @@ const CheckoutPage = () => {
                     {/* Smooth Multistep Transition Engine */}
                     <AnimatePresence mode="wait">
                         {step === 1 ? (
-                            <AddressForm setStep={(v: number) => setStep(v as 1 | 2)} setSavedAddress={setSavedAddress} />
+                            <AddressForm
+                                setStep={(v: number) => setStep(v as 1 | 2)}
+                                setSavedAddress={setSavedAddress}
+                            />
                         ) : savedAddress ? (
-                            <PaymentSection quantity={quantity} product={product} savedAddress={savedAddress} setStep={(v: number) => setStep(v as 1 | 2)} />
+                            <PaymentSection
+                                quantity={quantity}
+                                product={product}
+                                savedAddress={savedAddress}
+                                setStep={(v: number) => setStep(v as 1 | 2)}
+                            />
                         ) : null}
                     </AnimatePresence>
                 </div>

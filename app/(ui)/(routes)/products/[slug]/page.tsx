@@ -2,16 +2,17 @@
 
 import Link from "next/link";
 import { use, useState, useEffect } from "react";
-import { Check, Home, PhoneCall } from "lucide-react";
+import { Check, Home, ShoppingBag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePathname, useRouter } from "next/navigation";
 
 import { PRODUCTS } from "@/data/products";
+import MobileBestQuoteModal from "@/components/modals/mobile-best-qoute-modal";
+
 import { Parameters } from "./components/Parameters";
 import TechnicalSpecs from "../components/TechnicalSpecs";
 import { GallerySection } from "./components/GallerySection";
-import MobileBestQuoteModal from "@/components/modals/mobile-best-qoute-modal";
 import { DashboardShowcase } from "./components/DashboardShowcase";
-import { useRouter } from "next/navigation";
 
 const SingleProductPage = ({
   params,
@@ -20,6 +21,7 @@ const SingleProductPage = ({
 }) => {
   const param = use(params);
   const router = useRouter();
+  const pathname = usePathname()
   const [activeImg, setActiveImg] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -149,30 +151,32 @@ const SingleProductPage = ({
 
             {/* ACTIONS */}
             <div className="flex flex-col gap-4">
-              <Link
-                href="tel:+918777353002"
-                className="md:hidden w-full flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 text-white font-black py-5 rounded-3xl shadow-xl shadow-green-200 transition-all active:scale-[0.98]"
-              >
-                <PhoneCall size={20} />
-                Call for best Quote
-              </Link>
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="hidden w-full md:flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 text-white font-black py-5 rounded-3xl shadow-xl shadow-green-200 transition-all active:scale-[0.98]"
-              >
-                <PhoneCall size={20} />
-                Call for best Quote
-              </button>
+              <div className="flex flex-col gap-1">
+                <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                  Device Price
+                </span>
+                <div className="flex items-baseline gap-1 text-slate-900 dark:text-slate-50 font-black">
+                  <span className="text-2xl font-bold">₹</span>
+                  <span className="text-4xl tracking-tight">
+                    {new Intl.NumberFormat('en-IN', {
+                      maximumFractionDigits: 0
+                    }).format(product.price)}
+                  </span>
+                  <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400 ml-2 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded">
+                    Inc. 18% GST
+                  </span>
+                </div>
+              </div>
 
               <Link
-                href="tel:+918777353002"
-                className="md:hidden w-full flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 text-white font-black py-5 rounded-3xl shadow-xl shadow-green-200 transition-all active:scale-[0.98]"
+                href={`${pathname}/checkout`}
+                className="w-full flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 text-white font-black py-5 rounded-3xl shadow-xl shadow-green-200/50 dark:shadow-none transition-all active:scale-[0.98]"
               >
-                <PhoneCall size={20} />
-                Call for best Quote
+                {/* Swapped PhoneCall icon for a standard e-commerce shopping bag / cart icon */}
+                <ShoppingBag size={20} />
+                Buy Now
               </Link>
             </div>
-
             {/* LOGISTICS BRIEF */}
             <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 space-y-4">
               <div className="flex justify-between text-sm">

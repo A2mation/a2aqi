@@ -1,8 +1,8 @@
 import type { Dispatch, SetStateAction } from "react"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Minus, Plus, ShoppingBag } from "lucide-react"
 import { AnimatePresence, motion } from "motion/react"
-import { AddressFormValues } from "./address-form"
+import { Minus, Plus, ShoppingBag } from "lucide-react"
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 const RightColumn = ({
   quantity,
@@ -42,7 +42,7 @@ const RightColumn = ({
               <div className="space-y-1 flex-1">
                 <h4 className="text-sm font-bold text-slate-900 leading-tight">{product.title}</h4>
                 <p className="text-xs text-slate-400">{product.subtitle}</p>
-                <p className="text-xs text-amber-600 font-medium">Est: {product.delivery}</p>
+                {/* <p className="text-xs text-amber-600 font-medium">Est: {product.delivery}</p> */}
               </div>
             </div>
 
