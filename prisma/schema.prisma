@@ -236,6 +236,7 @@ model Address {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  orders    Orders[]
 }
 
 model Admin {
@@ -908,6 +909,24 @@ model CouponRedemption {
   @@index([deviceId])
 }
 
+model Orders {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  productId   String
+  productSlug String
+  quantity    Int    @default(1)
+
+  email String
+
+  addressId String  @db.ObjectId
+  address   Address @relation(fields: [addressId], references: [id])
+
+  paymentId String  @unique @db.ObjectId
+  payment   Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+}
+
 model Payment {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
@@ -952,6 +971,7 @@ model Payment {
 
   couponRedemption CouponRedemption?
   invoice          Invoice?
+  orders           Orders?
 
   @@index([userId])
   @@index([deviceId])

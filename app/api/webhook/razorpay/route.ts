@@ -1,17 +1,19 @@
 import crypto from "crypto";
 import { DeviceSubscription, Payment } from "@prisma/client";
+import { CreateEmailResponseSuccess, ErrorResponse } from "resend";
 
 import { prisma } from "@/lib/prisma";
-import { withAuditContext } from "@/lib/withAuditContext";
-import { activateSubscription } from "@/domains/payments/services/subscription.service";
-import { generateAndSaveInvoice } from "@/domains/payments/services/invoice.service";
-import { redeemCoupon } from "@/domains/payments/services/coupon.service";
 import {
     changePaymentStatusToPending,
     completePayment,
     lockPaymentForProcessing,
     recordFailure
 } from "@/domains/payments/services/payment.service";
+import { withAuditContext } from "@/lib/withAuditContext";
+import { redeemCoupon } from "@/domains/payments/services/coupon.service";
+import { generateAndSaveInvoice } from "@/domains/payments/services/invoice.service";
+import { activateSubscription } from "@/domains/payments/services/subscription.service";
+import { adminOrderAlertSender, customerPaymentSuccessSender } from "@/lib/resend/client";
 import { UserBillingAddressService } from "@/domains/users/services/user.billing.address.service";
 
 export async function POST(req: Request) {
@@ -45,8 +47,17 @@ export async function POST(req: Request) {
 
                 if (!lock) return new Response("OK", { status: 200 });
 
-                let userId: string = "";
-                let transactionResult: { payment: Payment; subscription: DeviceSubscription } | null = null;
+                let transactionResult: {
+                    payment: Payment,
+                    subscription?: DeviceSubscription,
+                    results?: [PromiseSettledResult<{
+                        data: CreateEmailResponseSuccess | null;
+                        error: ErrorResponse | null;
+                    }>, PromiseSettledResult<{
+                        data: CreateEmailResponseSuccess | null;
+                        error: ErrorResponse | null;
+                    }>]
+                } | null = null;
 
                 try {
                     transactionResult = await prisma.$transaction(async (tx) => {
@@ -56,6 +67,32 @@ export async function POST(req: Request) {
                             expected,
                             tx
                         );
+
+                        if (payment.orders) {
+                            const results = await Promise.allSettled([
+                                customerPaymentSuccessSender({
+                                    email: payment.orders.email,
+                                    orderId: payment.razorpayOrderId,
+                                    paymentId: payment.razorpayPaymentId!,
+                                    customerName: payment.orders.address.name!,
+                                    shippingAddress: `${payment.orders.address.street}, ${payment.orders.address.city}, ${payment.orders.address.state}, ${payment.orders.address.zipCode}`,
+                                }),
+
+                                adminOrderAlertSender({
+                                    orderId: payment.razorpayOrderId,
+                                    paymentId: payment.razorpayPaymentId!,
+                                    purchaseDate: payment.orders.createdAt,
+                                    customerName: payment.orders.address.name!,
+                                    customerEmail: payment.orders.email,
+                                    shippingAddress: `${payment.orders.address.street}, ${payment.orders.address.city}, ${payment.orders.address.state}, ${payment.orders.address.zipCode}`,
+                                })
+                            ]);
+
+                            return {
+                                payment,
+                                results
+                            }
+                        }
 
                         if (payment.couponId) {
                             await redeemCoupon(payment, tx);
@@ -74,8 +111,12 @@ export async function POST(req: Request) {
                     throw txError;
                 }
 
+
                 // Invoice Generation
-                if (transactionResult) {
+                if (transactionResult.results) {
+                    return new Response("SUCCESS_COMPLETE", { status: 200 });
+                }
+                if (transactionResult.subscription) {
                     const { payment, subscription } = transactionResult;
                     const userId = payment.userId;
 

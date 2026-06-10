@@ -95,6 +95,13 @@ export async function updatePaymentSuccess(
             razorpayPaymentId,
             razorpaySignature: razorpay_signature,
             paidAt: new Date()
+        }, include: {
+            orders: {
+                include:{
+                    address: true
+                }
+            },
+            
         }
     })
 }

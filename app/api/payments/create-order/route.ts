@@ -36,7 +36,7 @@ export async function POST(req: Request) {
                 },
                 async () => {
 
-                    await prisma.address.create({
+                    const savedAddress = await prisma.address.create({
                         data: {
                             name: address.fullName,
                             email: address.email,
@@ -52,9 +52,23 @@ export async function POST(req: Request) {
                             isDefault: true,
                         },
                     })
-   
+
+                    
                     const order = await createOrder({ qty, email, productId })
 
+
+                    await prisma.orders.create({
+                        data: {
+                            productId,
+                            productSlug: order?.product?.slug!,
+                            quantity: qty,
+                            email,
+
+                            addressId: savedAddress.id,
+                            paymentId: order?.payment?.id!,
+                        }
+                    })
+                    
                     return NextResponse.json(order)
 
                 }

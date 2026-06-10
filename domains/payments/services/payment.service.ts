@@ -55,14 +55,16 @@ export async function createOrder({
 
             razorpayOrderId: order.id
         }
-        await createOrderPaymnet(
+        const payment = await createOrderPaymnet(
             data
         )
 
         return {
             orderId: order.id,
             amount: order.amount,
-            currency: order.currency
+            currency: order.currency,
+            payment,
+            product: p
         }
     }
 
