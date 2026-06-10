@@ -1,4 +1,3 @@
-import * as z from 'zod'
 import { ArrowRight, MapPin } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useForm } from 'react-hook-form'
@@ -6,19 +5,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { AddressFormValues, orderAddressSchema } from '@/lib/validation/order/order.address.schema'
 
-const addressSchema = z.object({
-    fullName: z.string().min(3, { message: "Full name must be at least 3 characters." }),
-    phone: z.string().regex(/^[6-9]\d{9}$/, { message: "Please enter a valid 10-digit Indian phone number." }),
-    addressLine: z.string().min(5, { message: "Please enter your detailed shipping address." }),
-    city: z.string().min(2, { message: "City name is required." }),
-    state: z.string().min(2, { message: "State name is required." }),
-    pincode: z.string().regex(/^\d{6}$/, { message: "Pincode must be exactly 6 digits." }),
-})
 
-export type AddressFormValues = z.infer<typeof addressSchema>
 
 const AddressForm = ({
     setStep,
@@ -27,13 +18,15 @@ const AddressForm = ({
     setStep: (v: number) => void,
     setSavedAddress: (add: AddressFormValues | null) => void
 }) => {
-   
-    const form = useForm<AddressFormValues>({
-        resolver: zodResolver(addressSchema),
+
+    const form = useForm < AddressFormValues > ({
+        resolver: zodResolver(orderAddressSchema),
         defaultValues: {
             fullName: "",
             phone: "",
             addressLine: "",
+            email: '',
+            street: '',
             city: "",
             state: "",
             pincode: "",
@@ -93,12 +86,41 @@ const AddressForm = ({
                                     />
                                 </div>
 
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="email"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-slate-700 font-medium">Email</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="abc@xyz.com" {...field} className="focus-visible:ring-emerald-500" />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="street"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-slate-700 font-medium">Street</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="22/1" {...field} className="focus-visible:ring-emerald-500" />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                </div>
                                 <FormField
                                     control={form.control}
                                     name="addressLine"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-slate-700 font-medium">Street Address / Unit Location</FormLabel>
+                                            <FormLabel className="text-slate-700 font-medium">Enter Detailed Address</FormLabel>
                                             <FormControl>
                                                 <Input placeholder="Plot 42, Sector V, Salt Lake" {...field} className="focus-visible:ring-emerald-500" />
                                             </FormControl>

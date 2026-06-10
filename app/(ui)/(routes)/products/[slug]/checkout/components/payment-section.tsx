@@ -1,11 +1,11 @@
 
 import { motion } from 'framer-motion'
-
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { CreditCard, MapPin, ShieldCheck } from 'lucide-react'
-import { AddressFormValues } from './address-form'
-import { useState } from 'react'
+
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { AddressFormValues } from '@/lib/validation/order/order.address.schema'
+import OrderCheckOutButton from '@/components/Order-CheckOut-Button'
 
 const PaymentSection = ({
     quantity,
@@ -15,6 +15,7 @@ const PaymentSection = ({
 }: {
     quantity: number
     product: {
+        id: string
         title: string
         subtitle: string
         basePrice: number
@@ -29,7 +30,7 @@ const PaymentSection = ({
 
 
     const handlePaymentSubmit = () => {
-        alert(`Redirecting to payment gateway to process order for ${quantity} unit(s)...`)
+        
     }
 
     return (
@@ -78,10 +79,7 @@ const PaymentSection = ({
                             <div className="text-emerald-600 font-bold text-xs tracking-wider uppercase bg-emerald-100 px-2.5 py-1 rounded-md">Instant</div>
                         </div>
 
-                        <Button onClick={handlePaymentSubmit} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-6 rounded-lg shadow-md flex items-center justify-center space-x-2 transition-all text-base">
-                            <ShieldCheck className="w-5 h-5" />
-                            <span>Authorize Payment Total: ₹{computedTotal.toLocaleString('en-IN')}.00</span>
-                        </Button>
+                       <OrderCheckOutButton product={product} amount={computedTotal} qty={quantity} address={savedAddress} />
                     </CardContent>
                     <CardFooter className="bg-slate-50 border-t border-slate-100 rounded-b-xl py-4 flex items-center justify-center space-x-2 text-xs text-slate-400">
                         <ShieldCheck className="w-4 h-4 text-emerald-600" />

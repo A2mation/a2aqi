@@ -7,8 +7,9 @@ import { AnimatePresence } from 'framer-motion'
 
 import RightColumn from './components/right-column'
 import PaymentSection from './components/payment-section'
-import AddressForm, { AddressFormValues } from './components/address-form'
+import AddressForm from './components/address-form'
 import { PRODUCTS } from '@/data/products'
+import { AddressFormValues } from '@/lib/validation/order/order.address.schema'
 
 
 const CheckoutPage = () => {
@@ -20,6 +21,7 @@ const CheckoutPage = () => {
     const p = PRODUCTS.find((s) => s.slug === params.slug);
 
     const product = {
+        id: p?.id || '',
         title: p?.title || ``,
         subtitle: 'Standard Air Quality Monitor Device',
         basePrice: p?.price || 99999,
