@@ -1,74 +1,130 @@
-import { DB } from "@/lib/prisma"
-import { createPayment, updateLockPaymentTable, updatePaymentFailed, updatePaymentPending, updatePaymentSuccess } from "../repositories/payment.repo"
-import { getPricingPlanById } from "../repositories/pricing-plan.repo"
-import { validateCoupon } from "./coupon.service"
 import { razorpay } from "@/lib/razorpay"
 
-export async function createOrder(
-    userId: string,
-    deviceId: string,
-    pricingPlanId: string,
-    couponCode?: string
-) {
+import { DB } from "@/lib/prisma"
+import { PRODUCTS } from "@/data/products"
 
-    let discount = 0
-    let couponId: string | null = null
-    let finalAmount: number = 0
+import { createOrderPaymnet, createPayment, updateLockPaymentTable, updatePaymentFailed, updatePaymentPending, updatePaymentSuccess } from "../repositories/payment.repo"
+import { getPricingPlanById } from "../repositories/pricing-plan.repo"
+import { validateCoupon } from "./coupon.service"
 
-    const plan = await getPricingPlanById(pricingPlanId)
+type CreateOrderParams = {
+    qty?: number;
+    userId?: string;
+    deviceId?: string;
+    pricingPlanId?: string;
+    couponCode?: string;
+    productId?: string;
+    email?: string;
+};
 
-    if (!plan) {
-        throw new Error(
-            "Plan not found"
+export async function createOrder({
+    qty = 1,
+    userId,
+    deviceId,
+    pricingPlanId,
+    couponCode,
+    productId,
+    email,
+}: CreateOrderParams) {
+
+    if (email && productId) {
+        console.log("IN Create Order: ", email, productId)
+        // For Independent Product Order
+        const p = PRODUCTS.find((p) => p.id === productId);
+
+        if (!p?.price) {
+            return {};
+        }
+
+        const order = await razorpay.orders.create({
+            amount: Math.round(p?.price * 100),
+            currency: "INR",
+            receipt: `receipt_${Date.now()}`
+        })
+
+        const data = {
+            email,
+            productId,
+            productSlug: p?.slug,
+            quantity: qty,
+
+            amount: Math.round(p?.price * qty),
+            discountAmount: 0,
+            finalAmount: Math.round(p?.price * qty),
+            currency: 'INR',
+
+            razorpayOrderId: order.id
+        }
+        await createOrderPaymnet(
+            data
         )
+
+        return {
+            orderId: order.id,
+            amount: order.amount,
+            currency: order.currency
+        }
     }
 
-    finalAmount = plan.price;
+    if (userId && deviceId && pricingPlanId) {
 
-    if (couponCode) {
+        let discount = 0
+        let couponId: string | null = null
+        let finalAmount: number = 0
 
-        const result = await validateCoupon(
-            couponCode,
-            userId,
-            deviceId,
-            plan.price
-        )
+        const plan = await getPricingPlanById(pricingPlanId)
 
-        discount = result.discount
-        couponId = result.coupon.id
-        finalAmount = result.finalAmount
+        if (!plan) {
+            throw new Error(
+                "Plan not found"
+            )
+        }
+
+        finalAmount = plan.price;
+
+        if (couponCode) {
+
+            const result = await validateCoupon(
+                couponCode,
+                userId,
+                deviceId,
+                plan.price
+            )
+
+            discount = result.discount
+            couponId = result.coupon.id
+            finalAmount = result.finalAmount
+        }
+
+        const order = await razorpay.orders.create({
+            amount: Math.round(finalAmount * 100),
+            currency: "INR",
+            receipt: `receipt_${Date.now()}`
+        })
+
+        await createPayment({
+            userId: userId,
+            deviceId: deviceId,
+            pricingPlanId,
+
+            amount: plan.price,
+            discountAmount: discount,
+            finalAmount,
+
+            razorpayOrderId: order.id,
+            status: "PENDING",
+
+            couponId: couponId || undefined,
+        })
+
+        return {
+            orderId: order.id,
+            amount: order.amount,
+            currency: order.currency,
+            // paymentId: payment.id,
+            discount
+        }
     }
-
-    const order = await razorpay.orders.create({
-        amount: Math.round(finalAmount * 100),
-        currency: "INR",
-        receipt: `receipt_${Date.now()}`
-    })
-
-    await createPayment({
-        userId:  userId ,
-        deviceId: deviceId,
-        pricingPlanId,
-
-        amount: plan.price,
-        discountAmount: discount,
-        finalAmount,
-
-        razorpayOrderId: order.id,
-        status: "PENDING",
-
-        couponId: couponId || undefined,
-    })
-
-    return {
-        orderId: order.id,
-        amount: order.amount,
-        currency: order.currency,
-        // paymentId: payment.id,
-        discount
-    }
-
-
 }
 
 

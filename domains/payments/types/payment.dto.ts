@@ -4,12 +4,31 @@ export interface CreatePaymentDTO {
     userId: string;
     deviceId: string;
     pricingPlanId: string;
-    couponId?: string; 
+    couponId?: string;
 
     amount: number;
     discountAmount?: number;
     finalAmount: number;
-    currency?: string; 
+    currency?: string;
+
+    razorpayOrderId: string;
+    razorpayPaymentId?: string;
+    razorpaySignature?: string;
+    status?: PaymentStatus;
+    metadata?: any;
+}
+
+export interface CreateOrderPaymentDTO {
+    email: string
+    productId: string
+    productSlug: string
+
+    quantity: number
+
+    amount: number;
+    discountAmount?: number;
+    finalAmount: number;
+    currency?: string;
 
     razorpayOrderId: string;
     razorpayPaymentId?: string;

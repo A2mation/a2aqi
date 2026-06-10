@@ -1,6 +1,9 @@
-import { DB, prisma } from "@/lib/prisma"
 import { PaymentStatus } from "@prisma/client"
-import { CreatePaymentDTO } from "../types/payment.dto";
+
+import { DB, prisma } from "@/lib/prisma"
+
+import { CreateOrderPaymentDTO, CreatePaymentDTO } from "../types/payment.dto";
+
 
 export async function createPayment(data: CreatePaymentDTO) {
 
@@ -35,6 +38,38 @@ export async function createPayment(data: CreatePaymentDTO) {
 
 }
 
+export async function createOrderPaymnet(data: CreateOrderPaymentDTO) {
+    await prisma.payment.updateMany({
+        where: {
+            email: data.email,
+            productId: data.productId,
+            status: "PENDING",
+            NOT: { razorpayOrderId: data.razorpayOrderId }
+        },
+        data: {
+            status: "FAILED"
+        }
+    });
+
+    return await prisma.payment.create({
+        data:{
+            email: data.email,
+            productId: data.productId,
+            productSlug: data.productSlug,
+
+            quantity: data.quantity,
+
+            amount: data.amount,
+            discountAmount: data.discountAmount,
+            finalAmount: data.finalAmount,
+            currency: data.currency || "INR",
+            razorpayOrderId: data.razorpayOrderId,
+            status: "PENDING",
+            metadata: data.metadata || {},
+        }
+    })
+}
+
 export async function updatePayment(id: string, data: any) {
     return prisma.payment.update({
         where: { id },
@@ -49,7 +84,7 @@ export async function updatePaymentSuccess(
     tx?: DB
 ) {
     const db = tx || prisma;
-    
+
     return db.payment.update({
         where: {
             razorpayOrderId,
