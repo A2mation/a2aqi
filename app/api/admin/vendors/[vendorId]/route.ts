@@ -1,3 +1,4 @@
+import { hash } from "bcryptjs";
 import { NextResponse } from "next/server";
 import { AdminRole } from "@prisma/client";
 
@@ -31,15 +32,23 @@ export async function PATCH(
 
         const { name, email, password, status, gstNumber } = validation.data;
 
+        const updateData = {
+            name,
+            email,
+            status,
+            gstNumber,
+            password
+        };
+
+        if (password && password.trim() !== "") {
+            updateData.password = await hash(password, 10);
+        }
+
         await prisma.admin.update({
             where: {
                 id: vendorId,
                 role: 'VENDOR'
-            }, data: {
-                name,
-                status,
-                gstNumber
-            }
+            }, data: updateData
         });
 
         return NextResponse.json({
@@ -95,7 +104,8 @@ export async function DELETE(
 
         return NextResponse.json({
             success: true,
-            message: 'Vendor Delete Successfully'
+            // message: 'Vendor Delete Successfully'
+            message: 'Nothing is deleted. Beasuse this is a NON-Functional Route.'
         }, {
             status: 200
         })

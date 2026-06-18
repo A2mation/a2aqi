@@ -7,7 +7,7 @@ export const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "im
 export const vendorFormSchema = z.object({
     vendorName: z.string().min(2, "Name must be at least 2 characters"),
     mobileNumber: z.string().regex(/^[0-9]{10}$/, "Invalid mobile number (10 digits required)"),
-    email: z.email("Invalid email address"),
+    email: z.email("Invalid email address").min(2, "Email must be at least 2 characters"),
     password: z.string().min(5, "Minimum 5 characters needed"),
     address: z.string().min(5, "Address is too short"),
     gstNumber: z.string().length(15, "GST Number must be 15 characters"),
@@ -33,7 +33,7 @@ const getBase64Size = (base64String: string) => {
 export const backendVendorSchema = z.object({
     vendorName: z.string().min(2, "Name must be at least 2 characters"),
     mobileNumber: z.string().regex(/^[0-9]{10}$/, "Invalid mobile number"),
-    email: z.string().email("Invalid email address"),
+    email: z.email("Invalid email address").min(2, "Email must be at least 2 characters"),
     password: z.string().min(5, "Minimum 5 characters needed"),
     address: z.string().min(5, "Address is too short"),
     gstNumber: z.string().length(15, "GST Number must be 15 characters"),

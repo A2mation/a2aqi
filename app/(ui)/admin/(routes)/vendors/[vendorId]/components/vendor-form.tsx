@@ -21,6 +21,7 @@ import {
 import {
     Form,
     FormControl,
+    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -71,7 +72,6 @@ export const VendorForm = ({ initialData }: VendorFormProps) => {
         try {
             setLoading(true);
             const payload = { ...values };
-            if (!payload.password) delete payload.password;
 
             const res = await http.patch(`/api/admin/vendors/${params.vendorId}`, payload);
 
@@ -251,6 +251,33 @@ export const VendorForm = ({ initialData }: VendorFormProps) => {
                                 <FormControl>
                                     <Input disabled={loading} {...field} value={field.value || ""} />
                                 </FormControl>
+                                <FormDescription>
+                                    {'GST Image official path'}
+                                </FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                        )} />
+
+                        <FormField control={form.control} name="email" render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Email</FormLabel>
+                                <FormControl>
+                                    <Input disabled={loading} {...field} />
+                                </FormControl>
+                                 <FormDescription>
+                                    {'Vendor Email'}
+                                </FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                        )} />
+
+                        <FormField control={form.control} name="password" render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Password</FormLabel>
+                                <FormControl><Input type="password" disabled={loading} {...field} /></FormControl>
+                                <FormDescription>
+                                    {initialData ? "Leave blank to keep current password" : "Minimum 6 characters"}
+                                </FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )} />
