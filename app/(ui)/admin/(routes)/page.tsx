@@ -47,6 +47,7 @@ const AdminMainPannel = () => {
       if (response.status === 200) {
         toast.success(response.data.message || "Password updated successfully.");
         router.refresh();
+        return;
       }
 
       toast.error(response.data.message || "Something went wrong.");
