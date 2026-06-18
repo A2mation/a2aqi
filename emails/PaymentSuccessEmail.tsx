@@ -1,3 +1,4 @@
+import { PRODUCTS } from "@/data/products";
 import {
     Body,
     Container,
@@ -17,6 +18,7 @@ interface PaymentSuccessEmailProps {
     purchaseDate: string;
     customerName: string;
     shippingAddress: string;
+    productId: string
 }
 
 const baseUrl = 'https://a2aqi.com';
@@ -29,19 +31,17 @@ export const PaymentSuccessEmail = ({
     purchaseDate = "June 8, 2026",
     customerName = "Valued Vendor",
     shippingAddress = "Enter shipping address here",
+    productId
 }: PaymentSuccessEmailProps) => {
+    const p = PRODUCTS.find((p) => p.id === productId);
+
     const product = {
-        title: 'A2-AQ21SW - 7 CM X 12 CM',
-        description: 'High-quality Air Quality Monitor Device featuring a durable plastic cabinet. Features auto-updating data for PM10, PM2.5, PM1, AQI, Temperature, and Humidity with in build display.',
-        image: 'https://res.cloudinary.com/dvlzmzztg/image/upload/v1780461454/A2mation_Sensor_Display_2_ou6xbw.png',
-        price: 6599,
-        delivery: '15 to 30 Days',
-        specs: [
-            { label: 'Dimension', value: '7 CM X 12 CM' },
-            { label: 'Board Type', value: 'Premium Plastic Frame' },
-            { label: 'Material', value: 'Premium & Durable Plastic Cabinet' },
-            { label: 'Warranty', value: '1 Year' },
-        ]
+        title: p?.title,
+        description: p?.description,
+        image: p?.images[0],
+        price: p?.price || 6599,
+        delivery: p?.logistics.delivery,
+        specs: p?.specs || []
     };
 
     return (

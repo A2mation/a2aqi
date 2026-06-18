@@ -76,8 +76,9 @@ export async function POST(req: Request) {
                                     paymentId: payment.razorpayPaymentId!,
                                     customerName: payment.orders.address.name!,
                                     shippingAddress: `${payment.orders.address.street}, ${payment.orders.address.city}, ${payment.orders.address.state}, ${payment.orders.address.zipCode}`,
+                                    productId: payment.orders.productId
                                 }),
-
+                                
                                 adminOrderAlertSender({
                                     orderId: payment.razorpayOrderId,
                                     paymentId: payment.razorpayPaymentId!,
@@ -85,6 +86,7 @@ export async function POST(req: Request) {
                                     customerName: payment.orders.address.name!,
                                     customerEmail: payment.orders.email,
                                     shippingAddress: `${payment.orders.address.street}, ${payment.orders.address.city}, ${payment.orders.address.state}, ${payment.orders.address.zipCode}`,
+                                    productId: payment.orders.productId
                                 })
                             ]);
 

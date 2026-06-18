@@ -12,6 +12,7 @@ interface AdminOrderAlertPayload {
     customerName: string;
     customerEmail: string;
     shippingAddress: string;
+    productId: string
 }
 
 interface CustomerPaymentSuccessPayload {
@@ -20,6 +21,7 @@ interface CustomerPaymentSuccessPayload {
     paymentId: string;
     customerName: string;
     shippingAddress: string;
+    productId: string;
 }
 
 
@@ -69,6 +71,7 @@ export const adminOrderAlertSender = async ({
     customerName,
     customerEmail,
     shippingAddress,
+    productId
 }: AdminOrderAlertPayload) => {
 
     const formattedDate = purchaseDate.toLocaleDateString('en-US', {
@@ -87,7 +90,8 @@ export const adminOrderAlertSender = async ({
             purchaseDate: formattedDate,
             customerName,
             customerEmail,
-            shippingAddress
+            shippingAddress,
+            productId
         }),
     });
 
@@ -103,6 +107,7 @@ export const customerPaymentSuccessSender = async ({
     paymentId,
     customerName,
     shippingAddress,
+    productId
 }: CustomerPaymentSuccessPayload) => {
 
     const formattedDate = new Date().toLocaleDateString('en-US', {
@@ -120,7 +125,8 @@ export const customerPaymentSuccessSender = async ({
             paymentId,
             purchaseDate: formattedDate,
             customerName,
-            shippingAddress
+            shippingAddress,
+            productId
         }),
     });
 

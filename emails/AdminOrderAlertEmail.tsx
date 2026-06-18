@@ -1,3 +1,4 @@
+import { PRODUCTS } from "@/data/products";
 import {
     Body,
     Container,
@@ -18,6 +19,7 @@ interface AdminOrderAlertEmailProps {
     customerName: string;
     customerEmail?: string;
     shippingAddress: string;
+    productId: string;
 }
 
 const baseUrl = 'https://a2aqi.com';
@@ -29,15 +31,13 @@ export const AdminOrderAlertEmail = ({
     customerName = "Valued Vendor",
     customerEmail = "customer@example.com",
     shippingAddress = "Enter shipping address here",
+    productId
 }: AdminOrderAlertEmailProps) => {
+    const p = PRODUCTS.find((p) => p.id === productId);
     const product = {
-        title: 'A2-AQ21SW - 7 CM X 12 CM',
-        price: 6599,
-        specs: [
-            { label: 'Dimension', value: '7 CM X 12 CM' },
-            { label: 'Board Type', value: 'Premium Plastic Frame' },
-            { label: 'Material', value: 'Premium & Durable Plastic Cabinet' },
-        ]
+        title: p?.title,
+        price: p?.price || 6599,
+        specs: p?.specs || []
     };
 
     return (

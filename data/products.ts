@@ -30,7 +30,7 @@ export const PRODUCTS = [
             '24 * 7 Data Access'
         ],
         badge: 'Standard',
-        price: 49
+        price: 6599
     },
 
     {
