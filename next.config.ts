@@ -10,6 +10,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'res.cloudinary.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'api.razorpay.com',
+      },
     ],
   },
   allowedDevOrigins: ['192.168.0.13'],

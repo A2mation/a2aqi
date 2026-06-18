@@ -19,7 +19,7 @@ export const PRODUCTS = [
             { label: 'Warranty', value: '1 Year', icon: 'BadgeCheck' },
         ],
         logistics: {
-            delivery: '15 to 30 Days',
+            delivery: '25 to 30 Days',
             packaging: 'Standard packaging included.',
         },
         features: [
@@ -52,7 +52,7 @@ export const PRODUCTS = [
             { label: 'Warranty', value: '1 Year', icon: 'BadgeCheck' },
         ],
         logistics: {
-            delivery: '15 to 30 Days',
+            delivery: '25 to 30 Days',
             packaging: 'Standard packaging included.',
         },
         features: [
@@ -84,7 +84,7 @@ export const PRODUCTS = [
             { label: 'Warranty', value: '1 Year', icon: 'BadgeCheck' },
         ],
         logistics: {
-            delivery: '45 to 60 Days',
+            delivery: '40 to 45 Days',
             packaging: 'Standard packaging included.',
         },
         features: [
@@ -119,7 +119,7 @@ export const PRODUCTS = [
             { label: 'Customizable', value: 'Yes', icon: 'Edit3' },
         ],
         logistics: {
-            delivery: '3 to 4 days',
+            delivery: '3 to 7 days',
             packaging: 'Standard shipping rates apply. Wooden box packaging available for ₹2,000 extra.'
         },
         features: [
@@ -154,7 +154,7 @@ export const PRODUCTS = [
             { label: 'Warranty', value: '1 Year', icon: 'BadgeCheck' },
         ],
         logistics: {
-            delivery: '5 to 6 Days',
+            delivery: '5 to 7 Days',
             packaging: 'Standard packaging included. Premium wooden packaging available for ₹3,000.',
             moq: '1 sq ft'
         },
@@ -188,7 +188,7 @@ export const PRODUCTS = [
             { label: 'Warranty', value: '1 Year', icon: 'BadgeCheck' },
         ],
         logistics: {
-            delivery: '7 to 10 Working Days',
+            delivery: '4 to 7 Working Days',
             packaging: 'Industrial-grade wooden package with bubble wrap protection available for ₹4,000.',
             moq: '1 Unit'
         },
