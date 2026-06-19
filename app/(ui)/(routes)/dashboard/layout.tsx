@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { FloatingMarketingNav } from '@/components/FloatingMarketingNav'
+import { PromoBannerModal } from '@/components/modals/promo-banner-modal'
 
 
 const DashboardLayout = async ({
@@ -13,6 +14,7 @@ const DashboardLayout = async ({
                 {children}
             </div>
             <FloatingMarketingNav />
+            <PromoBannerModal />
         </>
 
     )

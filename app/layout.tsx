@@ -5,8 +5,8 @@ import { Toaster } from "react-hot-toast";
 import NextTopLoader from "nextjs-toploader";
 import VisitCounter from "@/components/VisitCounter";
 import TanStackProvider from "@/providers/tanstack-provider";
+
 import "./globals.css";
-import { PromoBannerModal } from "@/components/modals/promo-banner-modal";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -134,7 +134,6 @@ export default function RootLayout({
 
           {children}
           <VisitCounter />
-          {/* <PromoBannerModal /> */}
           <Toaster position="top-center" reverseOrder={false} />
         </TanStackProvider>
       </body>
