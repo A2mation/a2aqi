@@ -304,7 +304,7 @@ export const DeviceForm = ({ initialData }: DevicePops) => {
                                     <FormControl>
                                         <Input
                                             placeholder="EX.- AYAN1452AYAN"
-                                            disabled={!!initialData || loading}
+                                            disabled={loading}
                                             {...field}
                                         />
                                     </FormControl>

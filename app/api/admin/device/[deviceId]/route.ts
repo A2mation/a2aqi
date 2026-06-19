@@ -60,7 +60,7 @@ export async function PATCH(
         const body = await req.json();
 
         const validation = deviceFormSchema.safeParse(body);
-        
+
         if (!validation.success) {
             console.log(validation.error)
             return NextResponse.json(
@@ -72,29 +72,26 @@ export async function PATCH(
             );
         }
 
-        const { name, user, isUserMode, serialNo, modelId, lat, lng, status, assignedAt, state } = validation.data;
+        const { name, user, apiKey, isUserMode, serialNo, modelId, lat, lng, status, assignedAt, state } = validation.data;
 
         const model = await prisma.deviceModel.findUnique({ where: { id: modelId } });
 
         if (!model) return new NextResponse("Invalid Model", { status: 400 });
-
 
         let payload: any = {
             name,
             serialNo,
             modelId,
             state,
+            apiKey,
             isActive: state === 'APPROVED' ? true : false
         };
 
         const currentDevice = await prisma.device.findUnique({
             where: { id: deviceId },
-            select: { status: true, assignedAt: true }
+            select: { status: true, assignedAt: true, userId: true }
         });
 
-        const isTransitioningToAssigned =
-            status === DeviceStatus.ASSIGNED &&
-            currentDevice?.status !== DeviceStatus.ASSIGNED;
 
         if (isUserMode && user) {
 
@@ -103,23 +100,42 @@ export async function PATCH(
                 select: { id: true }
             });
 
+
+
             if (!vefUser) return new NextResponse("User not found", { status: 404 });
 
             const parsedLat = lat ? parseFloat(lat) : null;
             const parsedLng = lng ? parseFloat(lng) : null;
 
-            payload = {
-                ...payload,
-                userId: vefUser.id,
-                lat: isNaN(parsedLat!) ? null : parsedLat,
-                lng: isNaN(parsedLng!) ? null : parsedLng,
-                status: status || DeviceStatus.UNASSIGNED,
-                assignedAt: isTransitioningToAssigned
-                    ? assignedAt
-                    : status === DeviceStatus.ASSIGNED
-                        ? currentDevice?.assignedAt
-                        : null,
-            };
+            const date1 = new Date(currentDevice?.assignedAt!).toISOString().split('T')[0]; 
+            const date2 = new Date(assignedAt!).toISOString().split('T')[0];
+     
+
+            if (
+                currentDevice?.userId === vefUser.id &&
+                date1 !== date2
+            ) {
+                payload = {
+                    ...payload,
+                    userId: vefUser.id,
+                    lat: isNaN(parsedLat!) ? null : parsedLat,
+                    lng: isNaN(parsedLng!) ? null : parsedLng,
+                    status: status || DeviceStatus.ASSIGNED,
+                    assignedAt: assignedAt
+                };
+
+            } else {
+                payload = {
+                    ...payload,
+                    userId: vefUser.id,
+                    lat: isNaN(parsedLat!) ? null : parsedLat,
+                    lng: isNaN(parsedLng!) ? null : parsedLng,
+                    assignedAt: currentDevice?.assignedAt || assignedAt,
+                    status: currentDevice?.status || DeviceStatus.ASSIGNED,
+                };
+            }
+
+
         } else {
 
             payload = {
