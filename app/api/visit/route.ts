@@ -65,8 +65,8 @@ export async function POST(request: Request) {
         const updated = await prisma.siteStats.update({
             where: { id: "views" },
             data: {
-                totalViews: { increment: 10 },
-                dailyViews: { increment: 10 },
+                totalViews: { increment: 1 },
+                dailyViews: { increment: 1 },
             },
         });
 
