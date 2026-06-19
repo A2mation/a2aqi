@@ -4,6 +4,8 @@ import DeviceCredentialsEmail from "@/emails/VendorDeviceCredentialsEmail";
 import { resend } from "./server";
 import AdminOrderAlertEmail from "@/emails/AdminOrderAlertEmail";
 import PaymentSuccessEmail from "@/emails/PaymentSuccessEmail";
+import UserForgotPasswordOTPEmail from "@/emails/UserForgetPasswordOTP";
+import { MonitorOTPEmail } from "@/emails/MonitorForgetPasswordOTP";
 
 interface AdminOrderAlertPayload {
     orderId: string;
@@ -135,3 +137,62 @@ export const customerPaymentSuccessSender = async ({
         error
     };
 };
+
+
+
+export const userResetPasswordOtp = async (
+    email: string,
+    otp: string
+) => {
+
+    const { data, error } = await resend.emails.send({
+        from: 'A2AQI <onboarding@a2aqi.com>',
+        to: [email],
+        subject: 'Reset Your Password',
+        react: UserForgotPasswordOTPEmail({ otp }),
+    });
+
+    return {
+        data,
+        error
+    }
+}
+
+
+export const monitorResetPasswordOtp = async (
+    email: string,
+    otp: string
+) => {
+
+    const { data, error } = await resend.emails.send({
+        from: 'A2AQI <onboarding@a2aqi.com>',
+        to: [email],
+        subject: 'Reset Your Password',
+        react: MonitorOTPEmail({ otp }),
+    });
+
+    return {
+        data,
+        error
+    }
+}
+
+
+export const vendorResetPasswordOtp = async (
+    email: string,
+    otp: string
+) => {
+
+    const { data, error } = await resend.emails.send({
+        from: 'A2AQI <onboarding@a2aqi.com>',
+        to: [email],
+        subject: 'Reset Your Password',
+        react: VendorOTPEmail({ otp }),
+    });
+
+    return {
+        data,
+        error
+    }
+}
+

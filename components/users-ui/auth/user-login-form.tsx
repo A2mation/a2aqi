@@ -49,7 +49,7 @@ export function UserLoginForm({
     const [loading, setLoading] = useState(false)
     const [showPassword, setShowPassword] = useState(false);
 
-    const form = useForm<FormValues>({
+    const form = useForm < FormValues > ({
         resolver: zodResolver(formSchema),
         defaultValues: {
             email: "",
@@ -131,12 +131,12 @@ export function UserLoginForm({
                                         <FormItem className="space-y-2">
                                             <div className="flex items-center">
                                                 <FormLabel>Password</FormLabel>
-                                                {/* <Link
-                                                        href="#"
-                                                        className="ml-auto text-sm underline-offset-2 hover:underline"
+                                                <Link
+                                                    href="/user/forgot-password"
+                                                    className="ml-auto text-sm underline-offset-2 hover:underline hover:text-primary"
                                                 >
                                                     Forgot your password?
-                                                </Link> */}
+                                                </Link>
                                             </div>
 
                                             <FormControl>
@@ -171,11 +171,13 @@ export function UserLoginForm({
                                     )}
                                 />
 
+
+
                                 <Field>
                                     <Button
                                         type="submit"
                                         disabled={loading}
-                                        className="cursor-pointer w-full flex items-center justify-center gap-2"
+                                        className="cursor-pointer w-full flex items-center justify-center gap-0"
                                     >
                                         {loading && (
                                             <Loader2 className="h-4 w-4 animate-spin" />

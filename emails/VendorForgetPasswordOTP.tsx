@@ -12,13 +12,13 @@ import {
     Text,
 } from "@react-email/components";
 
-interface MonitorOTPEmailProps {
+interface VendorOTPEmailProps {
     otp: string;
 }
 
 const baseUrl = 'https://a2aqi.com';
 
-export const MonitorOTPEmail = ({ otp }: MonitorOTPEmailProps) => (
+export const VendorOTPEmail = ({ otp }: VendorOTPEmailProps) => (
     <Html>
         <Head />
         <Preview>Your Forget Password code</Preview>
@@ -66,7 +66,7 @@ export const MonitorOTPEmail = ({ otp }: MonitorOTPEmailProps) => (
     </Html>
 );
 
-export default MonitorOTPEmail;
+export default VendorOTPEmail;
 
 // --- Styles ---
 
