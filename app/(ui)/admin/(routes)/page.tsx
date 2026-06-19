@@ -7,7 +7,6 @@ import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/navigation'
 import { zodResolver } from '@hookform/resolvers/zod'
 
-import { http } from '@/lib/http'
 import {
   Form,
   FormControl,
@@ -17,9 +16,11 @@ import {
   FormLabel,
   FormMessage
 } from '@/components/ui/form'
+import { http } from '@/lib/http'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { ChartBarInteractive } from '@/components/admin-ui/charts/chart'
+import { useQuery } from '@tanstack/react-query'
+import AnalyticsTable from '@/components/admin-ui/AnalyticsTable'
 
 const formSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
@@ -60,9 +61,27 @@ const AdminMainPannel = () => {
     }
   };
 
+  const { data: adminStats } = useQuery({
+    queryKey: ['admin-stats'],
+    queryFn: async () => {
+
+      const [buyNowData, viewDetailsData] = await Promise.all([
+        http.get('/api/visit/buy-now'),
+        http.get('/api/visit/view-details'),
+      ]);
+
+      return {
+        buyNow: buyNowData.data,
+        viewDetails: viewDetailsData.data,
+      }
+    },
+    staleTime: 1000 * 60, // 1 minutes
+    refetchInterval: 1000 * 60, // 1 minutes
+  });
+
   return (
     <>
-      <ChartBarInteractive />
+      <AnalyticsTable data={adminStats} isLoading={false} isPending={false} error={null} />
 
       <section className="my-8 border rounded-lg p-8 bg-card shadow-xl">
         <h2 className="text-3xl font-medium mb-4">Update Admin Password</h2>
