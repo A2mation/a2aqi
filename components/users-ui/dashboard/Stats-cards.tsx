@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import {
     BarChart,
     Bar,
@@ -9,13 +8,11 @@ import {
     CartesianGrid,
     Cell,
 } from "recharts";
-import { useQuery } from "@tanstack/react-query";
+import Image from "next/image";
 import { useParams } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
 import { http } from "@/lib/http";
-import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import {
     ChartContainer,
@@ -23,10 +20,13 @@ import {
     ChartTooltipContent,
     type ChartConfig,
 } from "@/components/ui/chart";
-import { getAQIBgColor, getAQIColor, getAQIStatus, getAQITextColor } from "@/helpers/aqi-color-pallet";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatDateTime } from "@/utils/formatDateTime";
-import { DeviceManagement } from "./Device-Mangement";
+import { useDeviceStore } from "@/store/use-device.store";
 import { SubscriptionExpireWheel } from "./SubscriptionExpireWheel";
+import { getAQIBgColor, getAQIColor, getAQIStatus, getAQITextColor } from "@/helpers/aqi-color-pallet";
 
 const AirQualityImages: Record<string, string> = {
     Good: "/assets/aqi-moods/Good.png",
@@ -49,6 +49,7 @@ const sensorIcons: Record<string, string> = {
 
 export function StatsCards() {
     const { deviceId } = useParams();
+    const { selectedDeviceActiveStatus } = useDeviceStore();
 
     const { data, isPending, error } = useQuery({
         queryKey: ["dashboardOverview", deviceId],
@@ -98,7 +99,7 @@ export function StatsCards() {
     const pollutants = [
         { key: "temperature", label: "Temperature", value: latest.temperature, unit: "°C", icon: sensorIcons.temperature },
         { key: "humidity", label: "Humidity", value: latest.humidity, unit: "%", icon: sensorIcons.humidity },
-        
+
         { key: "pm25", label: "PM2.5", value: latest.pm25, unit: "µg/m³", icon: sensorIcons.pm25 },
         { key: "pm10", label: "PM10", value: latest.pm10, unit: "µg/m³", icon: sensorIcons.pm10 },
         { key: "pm1", label: "PM1", value: latest.pm1, unit: "µg/m³", icon: sensorIcons.pm1 },
@@ -139,9 +140,32 @@ export function StatsCards() {
 
                         {/* LEFT SIDE */}
                         <div className="space-y-4">
-                            <Badge variant="secondary" className="w-fit text-base">
+                            <Badge variant="secondary" className="w-fit text-base hidden md:flex">
                                 Sensor
                             </Badge>
+
+                            <div className="flex md:hidden items-center gap-3">
+                                {selectedDeviceActiveStatus ? (
+                                    /* Online State Badge */
+                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 text-emerald-500 rounded-full border border-emerald-500/20 max-w-max animate-in fade-in duration-300">
+                                        <span className="relative flex h-2 w-2">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                        </span>
+                                        <span className="text-xs font-semibold tracking-wide uppercase text-emerald-600 dark:text-emerald-400">
+                                            Online
+                                        </span>
+                                    </div>
+                                ) : (
+                                    /* Offline State Badge */
+                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-destructive/10 text-destructive rounded-full border border-destructive/20 max-w-max animate-in fade-in duration-300">
+                                        <div className="h-2 w-2 bg-destructive rounded-full opacity-60" />
+                                        <span className="text-xs font-semibold tracking-wide uppercase text-destructive">
+                                            Offline
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
 
                             <h2 className="text-base sm:text-xl font-bold text-gray-800">
                                 Air Quality Index

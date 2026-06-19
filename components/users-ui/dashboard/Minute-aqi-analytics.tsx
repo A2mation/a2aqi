@@ -11,10 +11,10 @@ import {
     Tooltip,
     ResponsiveContainer,
 } from "recharts";
-import { useState, useMemo } from "react";
 import { useParams } from "next/navigation";
 import { SensorReading } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
+import { useState, useMemo, useEffect } from "react";
 import { ChartArea, ChartNetwork, ChevronDown, Filter } from "lucide-react";
 
 import {
@@ -42,28 +42,43 @@ import {
 import { Button } from "@/components/ui/button";
 import ChartLoader from "@/components/ui/chart-loading";
 import { PARAM_MASTER_CONFIG } from "@/constant/metrics";
+import { useDeviceStore } from "@/store/use-device.store";
 
 
 
 export function MinuteAqiAnalytics() {
     const { deviceId } = useParams();
 
-    const [chartType, setChartType] = useState<"line" | "Area">("Area");
-    const [selectedMetricKeys, setSelectedMetricKeys] = useState<string[]>(["aqi"]);
+    const setSelectedDeviceActiveStatus = useDeviceStore((state) => state.setSelectedDeviceActiveStatus);
 
-    const { data, isPending, error, refetch } = useQuery<SensorReading[]>({
+    const [chartType, setChartType] = useState < "line" | "Area" > ("Area");
+    const [selectedMetricKeys, setSelectedMetricKeys] = useState < string[] > (["aqi"]);
+
+    const { data, isPending, error, refetch } = useQuery < SensorReading[] > ({
         queryKey: ["user-minuteAnalytics", deviceId],
         queryFn: async () => {
             const res = await http.get(`/api/user/dashboard/minute?deviceId=${deviceId}`);
             if (res.status === 200) {
                 return res.data;
             }
-            throw new Error(res.data.error || 'Something went Wrong')
+            throw new Error(res.data.error || 'Something went Wrong');
         },
         staleTime: 1000 * 60,
         refetchInterval: 1000 * 60,
         placeholderData: (previousData) => previousData,
     });
+
+    useEffect(() => {
+        if (data && data[0]?.createdAt) {
+            const lastUpdate = data[0].createdAt;
+            const now = Date.now();
+            const TWO_MINUTES_IN_MS = 2 * 60 * 1000;
+
+            const isActive = (now - new Date(lastUpdate).getTime()) < TWO_MINUTES_IN_MS;
+
+            setSelectedDeviceActiveStatus(isActive);
+        }
+    }, [data, setSelectedDeviceActiveStatus]);
 
     const availableMetrics = useMemo(() => {
         if (!data || data.length === 0) return [];
