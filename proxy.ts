@@ -16,6 +16,7 @@ export async function proxy(req: NextRequest) {
         pathname === "/admin/sign-in" ||
         pathname === "/admin-unauthorized" ||
         pathname === "/monitor/sign-in" ||
+        pathname === "/monitor/forgot-password" ||
         pathname === "/moderator/sign-in" ||
         pathname === '/vendor/login' ||
         pathname === '/vendor/register'

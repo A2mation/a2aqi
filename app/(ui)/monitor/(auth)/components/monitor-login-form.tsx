@@ -29,13 +29,14 @@ import {
 } from "@/components/ui/form"
 import { signInSchema, SignInValues } from './schema';
 import { Eye, EyeOff } from 'lucide-react';
+import Link from 'next/link';
 
 const MonitorLoginFrom = () => {
     const router = useRouter()
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-    const form = useForm<SignInValues>({
+    const form = useForm < SignInValues > ({
         resolver: zodResolver(signInSchema),
         defaultValues: { email: "", password: "" },
     })
@@ -105,6 +106,12 @@ const MonitorLoginFrom = () => {
                                 <FormItem className="space-y-2">
                                     <div className="flex items-center">
                                         <FormLabel>Password</FormLabel>
+                                        <Link
+                                            href="/monitor/forgot-password"
+                                            className="ml-auto text-sm underline-offset-2 hover:underline hover:text-primary"
+                                        >
+                                            Forgot your password?
+                                        </Link>
                                     </div>
 
                                     <FormControl>
