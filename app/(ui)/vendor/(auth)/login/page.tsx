@@ -140,11 +140,14 @@ const VendorLoginPage = () => {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <div className="flex items-center justify-between">
-                          <FormLabel className="font-semibold text-slate-700">Password</FormLabel>
-                          <Button variant="link" className="px-0 font-normal text-xs text-blue-600 h-auto hover:text-blue-700 transition-colors" disabled={loading}>
-                            Forgot password?
-                          </Button>
+                        <div className="flex items-center">
+                          <FormLabel>Password</FormLabel>
+                          <Link
+                            href="/vendor/forgot-password"
+                            className="ml-auto text-sm underline-offset-2 hover:underline hover:text-primary"
+                          >
+                            Forgot your password?
+                          </Link>
                         </div>
                         <FormControl>
                           <Input

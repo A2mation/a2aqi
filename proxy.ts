@@ -19,6 +19,7 @@ export async function proxy(req: NextRequest) {
         pathname === "/monitor/forgot-password" ||
         pathname === "/moderator/sign-in" ||
         pathname === '/vendor/login' ||
+        pathname === "/vendor/forgot-password" ||
         pathname === '/vendor/register'
     ) {
         return NextResponse.next();
