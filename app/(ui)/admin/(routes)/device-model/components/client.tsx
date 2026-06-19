@@ -34,6 +34,10 @@ export const DeviceModelClient = ({
             </div>
 
             <Separator />
+            <span className="text-xl text-destructive font-medium">
+               Note: When you add models for Vendor, Always the first 2 letters will be VN
+            </span>
+            
             <DataTable columns={columns} data={data} searchKey="name" />
 
 
