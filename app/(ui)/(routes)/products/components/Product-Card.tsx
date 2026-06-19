@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import React, { useState } from "react";
+import React, { useState, useTransition } from "react";
 import * as Icons from "lucide-react";
 import { ArrowUpRight, PhoneCall } from "lucide-react";
 
 import { PRODUCTS } from "@/data/products";
+import { http } from "@/lib/http";
 
 
 const IconRenderer = ({ name, size = 16 }: { name: string; size?: number }) => {
@@ -22,6 +23,7 @@ const ProductCard = ({
 }) => {
     // State to store chosen filter. null means no selection initially (shows all)
     const [selectedBadge, setSelectedBadge] = useState < string | null > (null);
+    const [isPending, startTransition] = useTransition();
 
     // Get unique badges dynamically : ['Standard', 'Hand-held', 'Industrial Grade']
     const uniqueBadges = Array.from(new Set(PRODUCTS.map((p) => p.badge)));
@@ -29,6 +31,12 @@ const ProductCard = ({
     const filteredProducts = selectedBadge
         ? PRODUCTS.filter((product) => product.badge === selectedBadge)
         : PRODUCTS;
+
+    const handleClick = async (id: string) => {
+        startTransition(async () => {
+            await http.post("/api/visit/view-details", { id });
+        });
+    };
 
     return (
         <div className="w-full flex flex-col gap-8">
@@ -119,6 +127,7 @@ const ProductCard = ({
                                 <Link
                                     href={`/products/${product.slug}`}
                                     className="text-2xl font-bold text-slate-900 group-hover:text-green-600 transition-colors"
+                                    onClick={() => handleClick(product.id)}
                                 >
                                     {product.title}
                                 </Link>
@@ -145,6 +154,7 @@ const ProductCard = ({
                                     <Link
                                         href={`/products/${product.slug}`}
                                         className="flex-1 text-center bg-green-700 hover:bg-green-600 text-white font-bold py-4 rounded-2xl transition-all active:scale-[0.98]"
+                                        onClick={() => handleClick(product.id)}
                                     >
                                         View Details
                                     </Link>

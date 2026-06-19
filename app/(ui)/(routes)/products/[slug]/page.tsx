@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { use, useState, useEffect } from "react";
+import { use, useState, useEffect, useTransition } from "react";
 import { Check, Home, ShoppingBag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 
+import { http } from "@/lib/http";
 import { PRODUCTS } from "@/data/products";
 import MobileBestQuoteModal from "@/components/modals/mobile-best-qoute-modal";
 
@@ -25,6 +26,7 @@ const SingleProductPage = ({
   const [activeImg, setActiveImg] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const product = PRODUCTS.find((p) => p.slug === param.slug) || PRODUCTS[0];
 
@@ -37,6 +39,12 @@ const SingleProductPage = ({
 
     return () => clearInterval(interval);
   }, [product.images.length, isPaused]);
+
+  const handleClick = async (id: string) => {
+    startTransition(async () => {
+      await http.post("/api/visit/buy-now", { id });
+    });
+  };
 
   return (
     <div className="min-h-screen pt-20 bg-inherit text-slate-900 selection:bg-green-100">
@@ -171,6 +179,7 @@ const SingleProductPage = ({
               <Link
                 href={`${pathname}/checkout`}
                 className="w-full flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 text-white font-black py-5 rounded-3xl shadow-xl shadow-green-200/50 dark:shadow-none transition-all active:scale-[0.98]"
+                onClick={() => handleClick(product.id)}
               >
                 {/* Swapped PhoneCall icon for a standard e-commerce shopping bag / cart icon */}
                 <ShoppingBag size={20} />
